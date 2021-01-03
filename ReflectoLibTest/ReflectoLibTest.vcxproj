@@ -159,12 +159,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="RawSerializationTest.cpp" />
+    <ClCompile Include="BinarySerializationTest.cpp" />
+    <ClCompile Include="IntegerSerializationAdapterTest.cpp" />
+    <ClCompile Include="SerializerTest.cpp" />
+    <ClCompile Include="Type\ResolverTest.cpp" />
+    <ClCompile Include="Type\TypeDescriptorTest.cpp" />
+    <ClCompile Include="Utils\StringExtTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ReflectoLib\ReflectoLib.vcxproj">
       <Project>{e9ede046-0fca-4522-9268-b73ca37a8932}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TestExtensions.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

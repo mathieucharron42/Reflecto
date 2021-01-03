@@ -27,19 +27,46 @@
     <ClInclude Include="Utils\io.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Type\Type.h">
+    <ClInclude Include="Serialization\TextSerialization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization\BinarySerialization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Serialization\SerializationWorkbench.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\RawSerialization.h">
+    <ClInclude Include="Serialization\Adapter\IntegerSerializationAdapter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\TextSerialization.h">
+    <ClInclude Include="Serialization\Adapter\ISerializationAdapter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Platform.h">
+    <ClInclude Include="Serialization\Serializer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\StringExt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type\Type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type\TypeDescriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type\TypeDescriptorFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type\TypeDescriptorMember.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type\TypeDescriptorMethod.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type\Resolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

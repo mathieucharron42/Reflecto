@@ -6,6 +6,9 @@
 
 namespace Type
 {
+	using HashType = std::size_t;
+
+
 	template <typename T>
 	std::string GetClassName()
 	{
@@ -14,9 +17,18 @@ namespace Type
 		return clean;
 	}
 
-	template <typename ObjectType>
+	template <typename Type>
 	std::size_t GetTypeHash()
 	{
-		return typeid(ObjectType).hash_code();
+		return typeid(Type).hash_code();
+	}
+
+	template<typename ObjectType, typename MemberPointerType>
+	byte ComputeOffset(const ObjectType& sampleObj, MemberPointerType typename ObjectType::* memberPointer)
+	{
+		const byte* dummyAddr = reinterpret_cast<const byte*>(&sampleObj);
+		const byte* memberAddr = reinterpret_cast<const byte*>(&(sampleObj.*memberPointer));
+		const byte offset = static_cast<byte>(memberAddr - dummyAddr);
+		return offset;
 	}
 }

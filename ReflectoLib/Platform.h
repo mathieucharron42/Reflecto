@@ -4,7 +4,7 @@
 
 namespace Platform
 {
-	bool IsLittleEndian()
+	static bool IsLittleEndian()
 	{
 		static short int number = 0x1;
 		static byte* ptr = reinterpret_cast<byte*>(&number);

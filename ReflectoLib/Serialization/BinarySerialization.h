@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-struct RawSerialization
+struct BinarySerialization
 {
     template <typename T>
     static uint32_t Serialize(const T& obj, std::vector<byte>& bytes)
