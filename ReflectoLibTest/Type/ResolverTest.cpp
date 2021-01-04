@@ -15,6 +15,27 @@ namespace LibTest
 	TEST_CLASS(ResolverTest)
 	{
 	public:
+		TEST_METHOD(ResolveSingle)
+		{
+			class Potato
+			{
+			public:
+				float Weight = 0.f;
+			};
+
+			const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>()
+				.Register(&Potato::Weight, "Weight")
+				.Build();
+
+			const float expectedWeight = 42.24f;
+
+			Potato potato;
+			potato.Weight = expectedWeight;
+			
+			const float actualWeight = Resolver::Resolve<float>(potato, *descriptor.GetMemberByName("Weight"));
+			Assert::AreEqual(expectedWeight, actualWeight, L"Value is not expected");
+		}
+
 		TEST_METHOD(ResolveMultiple)
 		{
 			class Potato

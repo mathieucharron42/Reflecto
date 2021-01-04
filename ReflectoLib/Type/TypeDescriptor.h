@@ -1,24 +1,23 @@
 #pragma once
 
+#include "TypeExt.h"
 #include "TypeDescriptorMember.h"
 #include "TypeDescriptorMethod.h"
 
 #include <string>
 #include <vector>
 
-using TypeHashType = std::size_t;
-
 class TypeDescriptor
 {
 public:
-	TypeDescriptor(TypeHashType typeHash, const std::vector<TypeDescriptorMember>& members)
-		: _typeHash(typeHash)
+	TypeDescriptor(const TypeDescriptorType& type, const std::vector<TypeDescriptorMember>& members)
+		: _type(type)
 		, _members(members)
 	{ }
 
-	TypeHashType TypeHash() const
+	const TypeDescriptorType& Type() const
 	{
-		return _typeHash;
+		return _type;
 	}
 
 	const std::vector<TypeDescriptorMember>& Members() const
@@ -36,6 +35,6 @@ public:
 	}
 
 private:
-	TypeHashType _typeHash;
+	TypeDescriptorType _type;
 	std::vector<TypeDescriptorMember> _members;
 };

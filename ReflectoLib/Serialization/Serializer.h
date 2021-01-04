@@ -49,11 +49,11 @@ public:
 		}*/
 	}
 
-	void Register(TypeHashType typeHash, TypeDescriptor descriptor)
+	/*void Register(TypeHashType typeHash, TypeDescriptor descriptor)
 	{
 		assert(typeHash == descriptor.TypeHash());
 		_descriptorMap.insert(std::make_pair(typeHash, descriptor));
-	}
+	}*/
 
 private:
 	/*void Serialize(MemberType type, const byte* memberAddr, std::vector<byte>& bytes)
@@ -114,7 +114,7 @@ private:
 	template <typename ObjectType>
 	const TypeDescriptor& GetDescriptor() const
 	{
-		const std::size_t typeHash = Type::template GetTypeHash<ObjectType>();
+		const std::size_t typeHash = TypeExt::template GetTypeHash<ObjectType>();
 		const TypeDescriptorMap::const_iterator found = _descriptorMap.find(typeHash);
 		assert(found != _descriptorMap.end());
 		return (*found).second;

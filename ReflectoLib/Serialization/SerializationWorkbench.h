@@ -1,7 +1,7 @@
 #pragma once
 
 #include "io.h"
-#include "Type.h"
+#include "TypeExt.h"
 
 #include <cassert>
 #include <tuple>
@@ -40,7 +40,7 @@ public:
             Validate(mappings, deserialized);
         }
 
-        std::cout << "Validated " << Type::GetClassName<ObjectType>() << " with " << Type::GetClassName<SerializerType>() << " to '" << _traceFile << "'" << std::endl;
+        std::cout << "Validated " << TypeExt::GetClassName<ObjectType>() << " with " << TypeExt::GetClassName<SerializerType>() << " to '" << _traceFile << "'" << std::endl;
     }
 
 private:

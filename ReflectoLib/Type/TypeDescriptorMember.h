@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Definitions.h"
-#include "Type.h"
+#include "TypeDescriptorType.h"
+#include "TypeExt.h"
 
 #include <stdint.h>
 #include <string>
@@ -9,13 +10,13 @@
 class TypeDescriptorMember
 {
 public:
-	TypeDescriptorMember(Type::HashType type, const std::string& name, byte offset)
+	TypeDescriptorMember(const TypeDescriptorType& type, const std::string& name, byte offset)
 		: _type(type)
 		, _name(name)
 		, _offset(offset)
 	{ }
 
-	const Type::HashType Type() const
+	const TypeDescriptorType& Type() const
 	{
 		return _type;
 	}
@@ -38,7 +39,7 @@ public:
 	}
 
 private:
-	Type::HashType _type;
+	TypeDescriptorType _type;
 	std::string _name;
 	uint32_t _offset;
 };

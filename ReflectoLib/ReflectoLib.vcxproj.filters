@@ -51,9 +51,6 @@
     <ClInclude Include="Utils\StringExt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Type\Type.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Type\TypeDescriptor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -67,6 +64,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Type\Resolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type\TypeExt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type\TypeDescriptorType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type\TypeDescriptorTypeFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

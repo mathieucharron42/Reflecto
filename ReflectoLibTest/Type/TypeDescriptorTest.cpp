@@ -16,13 +16,20 @@ namespace Microsoft
 	{
 		namespace CppUnitTestFramework
 		{
+			template<> inline std::wstring ToString<TypeDescriptorType>(const TypeDescriptorType& type)
+			{
+				std::string name = type.Name();
+				TypeExt::HashType hash = type.Hash();
+				return StringExt::Format<std::wstring>(L"{Name=%s,TypeHash=%i}", name.c_str(), hash);
+			}
+
 			template<> inline std::wstring ToString<std::vector<TypeDescriptorMember>>(const std::vector<TypeDescriptorMember>& members)
 			{
 				const std::wstring membersStr = StringExt::Join<std::wstring>(members, L",", [](const TypeDescriptorMember& members) {
 					const std::wstring name = StringExt::ToWstring(members.Name());
-					const Type::HashType typeHash = members.Type();
+					const std::string& type = members.Type().Name();
 					const byte offset = members.Offset();
-					return StringExt::Format<std::wstring>(L"Name=%s,TypeHash=%u,Offset=%i", name.c_str(), typeHash, offset);
+					return StringExt::Format<std::wstring>(L"Name=%s,TypeHash=%s,Offset=%i", name.c_str(), type.c_str(), offset);
 				});
 				return StringExt::Format<std::wstring>(L"[%s]", membersStr.c_str());
 			}
@@ -48,9 +55,11 @@ namespace LibTest
 		{
 			const TypeDescriptor descriptor = TypeDescriptorFactory<uint32_t>().Build();
 
-			Assert::AreEqual(descriptor.TypeHash(), Type::GetTypeHash<uint32_t>(), L"Type hash is unexpected");
+			TypeDescriptorType expectedType = TypeDescriptorTypeFactory<uint32_t>().Build();
+			Assert::AreEqual(expectedType, descriptor.Type(), L"Type hash is unexpected");
 			
-			Assert::AreEqual(descriptor.Members(), std::vector<TypeDescriptorMember>(), L"Type members are unexpected");
+			std::vector<TypeDescriptorMember> expectedMembers;
+			Assert::AreEqual(expectedMembers, descriptor.Members(), L"Type members are unexpected");
 		}
 
 		TEST_METHOD(SingleMember)
@@ -65,16 +74,16 @@ namespace LibTest
 				.Register(&Potato::Weight, "Weight")
 			.Build();
 
-			Assert::AreEqual(descriptor.TypeHash(), Type::GetTypeHash<Potato>(), L"Type hash is unexpected");
+			const TypeDescriptorType expectedType = TypeDescriptorTypeFactory<Potato>().Build();
+			Assert::AreEqual(expectedType, descriptor.Type(), L"Type hash is unexpected");
 
 			const std::vector<TypeDescriptorMember> expectedMembers = [] {
-				const Type::HashType type = Type::GetTypeHash<float>();
+				const TypeDescriptorType type = TypeDescriptorTypeFactory<float>().Build();
 				const std::string name = "Weight";
 				const byte offset = 0;
 				return std::vector<TypeDescriptorMember>{ TypeDescriptorMember(type, name, offset) };
 			}();
-
-			Assert::AreEqual(descriptor.Members(), expectedMembers, L"Type members are unexpected");
+			Assert::AreEqual(expectedMembers, descriptor.Members(), L"Type members are unexpected");
 		}
 
 		TEST_METHOD(MultipleMembersNoPadding)
@@ -93,36 +102,37 @@ namespace LibTest
 				.Register(&PotatoNoPadding::Name, "Name")
 				.Register(&PotatoNoPadding::Weight, "Weight")
 				.Register(&PotatoNoPadding::CookedTime, "CookedTime")
-				.Build();
+			.Build();
 
-			Assert::AreEqual(descriptor.TypeHash(), Type::GetTypeHash<PotatoNoPadding>(), L"Type hash is unexpected");
+			const TypeDescriptorType expectedType = TypeDescriptorTypeFactory<PotatoNoPadding>().Build();
+			Assert::AreEqual(expectedType, descriptor.Type(), L"Type hash is unexpected");
 
 			const std::vector<TypeDescriptorMember> expectedMembers = [] {
-				using Member1Type = std::string;
+				using member1_t = std::string;
 				const TypeDescriptorMember member1 = [] {
-					const Type::HashType type = Type::GetTypeHash<Member1Type>();
+					const TypeDescriptorType type = TypeDescriptorTypeFactory<member1_t>().Build();
 					const std::string name = "Name";
 					const byte offset = 0;
 					return TypeDescriptorMember(type, name, offset);
 				}();
-				using Member2Type = float;
+				using member2_t = float;
 				const TypeDescriptorMember member2 = [] {
-					const Type::HashType type = Type::GetTypeHash<float>();
+					const TypeDescriptorType type = TypeDescriptorTypeFactory<member2_t>().Build();
 					const std::string name = "Weight";
-					const byte offset = sizeof(Member1Type);
+					const byte offset = sizeof(member1_t);
 					return TypeDescriptorMember(type, name, offset);
 				}();
-				using Member3Type = int64_t;
+				using member3_t = int64_t;
 				const TypeDescriptorMember member3 = [] {
-					const Type::HashType type = Type::GetTypeHash<int64_t>();
+					const TypeDescriptorType type = TypeDescriptorTypeFactory<member3_t>().Build();
 					const std::string name = "CookedTime";
-					const byte offset = sizeof(Member1Type) + sizeof(Member2Type);
+					const byte offset = sizeof(member1_t) + sizeof(member2_t);
 					return TypeDescriptorMember(type, name, offset);
 				}();
 				return std::vector<TypeDescriptorMember>{member1, member2, member3};
 			}();
 
-			Assert::AreEqual(descriptor.Members(), expectedMembers, L"Type members are unexpected");
+			Assert::AreEqual(expectedMembers, descriptor.Members(), L"Type members are unexpected");
 		}
 	};
 }

@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace Type
+namespace TypeExt
 {
 	using HashType = std::size_t;
 
@@ -17,10 +17,10 @@ namespace Type
 		return clean;
 	}
 
-	template <typename Type>
+	template <typename TypeExt>
 	std::size_t GetTypeHash()
 	{
-		return typeid(Type).hash_code();
+		return typeid(TypeExt).hash_code();
 	}
 
 	template<typename ObjectType, typename MemberPointerType>
