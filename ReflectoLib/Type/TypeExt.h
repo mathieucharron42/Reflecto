@@ -4,11 +4,10 @@
 
 #include <string>
 
+using typehash_t = uint64_t;
+
 namespace TypeExt
 {
-	using HashType = std::size_t;
-
-
 	template <typename T>
 	std::string GetClassName()
 	{
@@ -18,7 +17,7 @@ namespace TypeExt
 	}
 
 	template <typename TypeExt>
-	std::size_t GetTypeHash()
+	typehash_t GetTypeHash()
 	{
 		return typeid(TypeExt).hash_code();
 	}

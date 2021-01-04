@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TypeDescriptorType.h"
+#include "TypeExt.h"
 
 template<class type_t>
 class TypeDescriptorTypeFactory
@@ -20,5 +21,5 @@ public:
 
 private:
 	std::string _name;
-	TypeExt::HashType _hash;
+	typehash_t _hash;
 };

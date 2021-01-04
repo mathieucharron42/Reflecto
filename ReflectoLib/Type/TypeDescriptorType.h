@@ -5,7 +5,7 @@
 class TypeDescriptorType
 {
 public:
-	TypeDescriptorType(const std::string& name, TypeExt::HashType hash)
+	TypeDescriptorType(const std::string& name, typehash_t hash)
 		: _name(name)
 		, _hash(hash)
 	{
@@ -17,7 +17,7 @@ public:
 		return _name;
 	}
 
-	TypeExt::HashType Hash() const
+	typehash_t Hash() const
 	{
 		return _hash;
 	}
@@ -29,5 +29,5 @@ public:
 
 private:
 	std::string _name;
-	TypeExt::HashType _hash;
+	typehash_t _hash;
 };

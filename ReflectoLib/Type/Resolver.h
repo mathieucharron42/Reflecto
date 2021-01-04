@@ -3,18 +3,44 @@
 #include "../Definitions.h"
 #include "TypeDescriptor.h"
 #include "TypeDescriptorTypeFactory.h"
+#include "Utils/NonCopyable.h"
 
 #include <assert.h>
+#include <optional>
 
-class Resolver
+template<class object_t>
+class Resolver : private NonCopyable
 {
 public:
-	template<typename member_t, typename object_t>
-	static member_t& Resolve(object_t& obj, const TypeDescriptorMember& member)
+	Resolver(const TypeDescriptor& typeDescriptor)
+		: _typeDescriptor(typeDescriptor)
 	{
-		assert(TypeDescriptorTypeFactory<member_t>().Build() == member.Type());
-		byte* objAddr = reinterpret_cast<byte*>(&obj);
-		byte* memberAddr = objAddr + member.Offset();
-		return *reinterpret_cast<member_t*>(memberAddr);
+		assert(TypeDescriptorTypeFactory<object_t>().Build() == typeDescriptor.Type());
 	}
+
+	void SetInstance(object_t& object)
+	{
+		_object = &object;
+	}
+
+	template<typename member_t>
+	member_t* ResolveMember(const std::string& memberName)
+	{
+		member_t* memberAddr = nullptr;
+		if (_object)
+		{
+			const TypeDescriptorMember* memberDescriptor = _typeDescriptor.GetMemberByName(memberName);
+			if (memberDescriptor != nullptr)
+			{
+				byte* objRawAddr = reinterpret_cast<byte*>(_object);
+				byte* memberRawAddr = objRawAddr + memberDescriptor->Offset();
+				memberAddr = reinterpret_cast<member_t*>(memberRawAddr);
+			}
+		}
+		return memberAddr;
+	}
+
+private:
+	TypeDescriptor _typeDescriptor;
+	object_t* _object;
 };

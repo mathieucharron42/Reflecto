@@ -19,7 +19,7 @@ namespace Microsoft
 			template<> inline std::wstring ToString<TypeDescriptorType>(const TypeDescriptorType& type)
 			{
 				std::string name = type.Name();
-				TypeExt::HashType hash = type.Hash();
+				typehash_t hash = type.Hash();
 				return StringExt::Format<std::wstring>(L"{Name=%s,TypeHash=%i}", name.c_str(), hash);
 			}
 

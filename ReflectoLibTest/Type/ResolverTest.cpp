@@ -32,8 +32,15 @@ namespace LibTest
 			Potato potato;
 			potato.Weight = expectedWeight;
 			
-			const float actualWeight = Resolver::Resolve<float>(potato, *descriptor.GetMemberByName("Weight"));
-			Assert::AreEqual(expectedWeight, actualWeight, L"Value is not expected");
+			Resolver<Potato> resolver{ descriptor };
+			resolver.SetInstance(potato);
+			
+			const float* actualWeight = resolver.ResolveMember<float>("Weight");
+			Assert::IsNotNull(actualWeight, L"Unable to resolve member"); 
+			if (actualWeight)
+			{
+				Assert::AreEqual(expectedWeight, *actualWeight, L"Value is not expected");
+			}
 		}
 
 		TEST_METHOD(ResolveMultiple)
@@ -65,17 +72,36 @@ namespace LibTest
 			potato.IsBaked = expectedIsBacked;
 			potato.CookedTime = expectedCookedTime;
 
-			const std::string actualName = Resolver::Resolve<std::string>(potato, *descriptor.GetMemberByName("Name"));
-			Assert::AreEqual(expectedName, actualName, L"Value is not expected");
+			Resolver<Potato> resolver{ descriptor };
+			resolver.SetInstance(potato);
 
-			const float actualWeight = Resolver::Resolve<float>(potato, *descriptor.GetMemberByName("Weight"));
-			Assert::AreEqual(expectedWeight, actualWeight, L"Value is not expected");
+			const std::string* actualName = resolver.ResolveMember<std::string>("Name");
+			Assert::IsNotNull(actualName, L"Unable to resolve member");
+			if (actualName)
+			{
+				Assert::AreEqual(expectedName, *actualName, L"Value is not expected");
+			}
 
-			const bool actualIsBacked = Resolver::Resolve<bool>(potato, *descriptor.GetMemberByName("IsBacked"));
-			Assert::AreEqual(expectedIsBacked, actualIsBacked, L"Value is not expected");
+			const float* actualWeight = resolver.ResolveMember<float>("Weight");
+			Assert::IsNotNull(actualWeight, L"Unable to resolve member");
+			if (actualWeight)
+			{
+				Assert::AreEqual(expectedWeight, *actualWeight, L"Value is not expected");
+			}
 
-			const int64_t actualCookedTime = Resolver::Resolve<int64_t>(potato, *descriptor.GetMemberByName("CookedTime"));
-			Assert::AreEqual(expectedCookedTime, actualCookedTime, L"Value is not expected");
+			const bool* actualIsBacked = resolver.ResolveMember<bool>("IsBacked");
+			Assert::IsNotNull(actualIsBacked, L"Unable to resolve member");
+			if (actualIsBacked)
+			{
+				Assert::AreEqual(expectedIsBacked, *actualIsBacked, L"Value is not expected");
+			}
+
+			const int64_t* actualCookedTime = resolver.ResolveMember<int64_t>("CookedTime");
+			Assert::IsNotNull(actualCookedTime, L"Unable to resolve member");
+			if (actualCookedTime)
+			{
+				Assert::AreEqual(expectedCookedTime, *actualCookedTime, L"Value is not expected");
+			}
 		}
 	};
 }

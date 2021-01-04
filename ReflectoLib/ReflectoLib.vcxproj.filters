@@ -75,6 +75,9 @@
     <ClInclude Include="Type\TypeDescriptorTypeFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Utils\NonCopyable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Lib.cpp">
