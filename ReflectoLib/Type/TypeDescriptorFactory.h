@@ -10,7 +10,14 @@ class TypeDescriptorFactory
 {
 public:
 	TypeDescriptorFactory()
+		: TypeDescriptorFactory(nullptr)
+	{
+
+	}
+
+	TypeDescriptorFactory(const TypeDescriptor* parentTypeDescriptor)
 		: _type(TypeDescriptorTypeFactory<ObjectType>().Build())
+		, _parent(parentTypeDescriptor)
 		, _dummy()
 	{
 
@@ -28,11 +35,12 @@ public:
 
 	TypeDescriptor Build()
 	{
-		return TypeDescriptor(_type, _members);
+		return TypeDescriptor(_type, _parent, _members);
 	}
 
 private:
 	ObjectType _dummy;
 	TypeDescriptorType _type;
+	const TypeDescriptor* _parent;
 	std::vector<TypeDescriptorMember> _members;
 };

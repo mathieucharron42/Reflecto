@@ -6,6 +6,7 @@
 
 #include "CppUnitTest.h"
 
+#include <tuple>
 #include <vector>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -29,7 +30,7 @@ namespace Microsoft
 					const std::wstring name = StringExt::ToWstring(members.Name());
 					const std::string& type = members.Type().Name();
 					const byte offset = members.Offset();
-					return StringExt::Format<std::wstring>(L"Name=%s,TypeHash=%s,Offset=%i", name.c_str(), type.c_str(), offset);
+					return StringExt::Format<std::wstring>(L"Name=%s,Type=%s,Offset=%i", name.c_str(), type.c_str(), offset);
 				});
 				return StringExt::Format<std::wstring>(L"[%s]", membersStr.c_str());
 			}
@@ -133,6 +134,126 @@ namespace LibTest
 			}();
 
 			Assert::AreEqual(expectedMembers, descriptor.Members(), L"Type members are unexpected");
+		}
+
+		TEST_METHOD(MultipleMembers)
+		{
+			class Potato
+			{
+			public:
+				std::string Name;
+				float Weight = 0.f;
+				int64_t CookedTime = 0;
+			};
+
+			const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>()
+				.Register(&Potato::Name, "Name")
+				.Register(&Potato::Weight, "Weight")
+				.Register(&Potato::CookedTime, "CookedTime")
+				.Build();
+
+			const TypeDescriptorType expectedType = TypeDescriptorTypeFactory<Potato>().Build();
+			Assert::AreEqual(expectedType, descriptor.Type(), L"Type hash is unexpected");
+
+			const std::size_t expectedMemberCount = 3;
+			Assert::AreEqual(expectedMemberCount, descriptor.Members().size(), L"Type members count is unexpected");
+
+			using member_information_t = std::tuple<std::string, TypeDescriptorType>;
+			std::vector<member_information_t> expectedMember = [] {
+				auto builderFunc = std::make_tuple<std::string, TypeDescriptorType>;
+				member_information_t member1 = builderFunc("Name", TypeDescriptorTypeFactory<std::string>().Build());
+				member_information_t member2 = builderFunc("Weight", TypeDescriptorTypeFactory<float>().Build());
+				member_information_t member3 = builderFunc("CookedTime", TypeDescriptorTypeFactory<int64_t>().Build());
+				return std::vector<member_information_t>{member1, member2, member3};
+			}();
+
+			for (std::size_t i = 0; i < descriptor.Members().size(); ++i)
+			{
+				const TypeDescriptorMember& member = descriptor.Members()[i];
+				const member_information_t& expectedMemberInfo = expectedMember[i];
+				Assert::AreEqual(std::get<0>(expectedMemberInfo), member.Name(), L"Type member name is unexpected");
+				Assert::AreEqual(std::get<1>(expectedMemberInfo), member.Type(), L"Type member type is unexpected");
+				if (i > 0)
+				{
+					const TypeDescriptorMember& previousMember = descriptor.Members()[i-1];
+					Assert::IsTrue(member.Offset() > previousMember.Offset(), L"Type member offset are out of order!");
+				}
+			}
+		}
+
+		TEST_METHOD(PublicInheritanceNoPadding)
+		{
+#pragma pack(push, 1)
+			class VegetableNoPadding
+			{
+			public:
+				float Weight = 0.f;
+				float Condition = 1.f;
+			};
+
+			class PotatoNoPadding : public VegetableNoPadding
+			{
+			public:
+				bool IsBacked = false;
+			};
+#pragma pack(pop)
+
+			const TypeDescriptor baseDescriptor = TypeDescriptorFactory<VegetableNoPadding>()
+				.Register(&VegetableNoPadding::Weight, "Weight")
+				.Register(&VegetableNoPadding::Condition, "Condition")
+			.Build();
+
+			const TypeDescriptor childDescriptor = TypeDescriptorFactory<PotatoNoPadding>(&baseDescriptor)
+				.Register(&PotatoNoPadding::IsBacked, "IsBacked")
+			.Build();
+
+			const TypeDescriptorType baseExpectedType = TypeDescriptorTypeFactory<VegetableNoPadding>().Build();
+			Assert::AreEqual(baseExpectedType, baseDescriptor.Type(), L"Type hash is unexpected");
+
+			const TypeDescriptorType childExpectedType = TypeDescriptorTypeFactory<PotatoNoPadding>().Build();
+			Assert::AreEqual(childExpectedType, childDescriptor.Type(), L"Type hash is unexpected");
+
+			using baseMember1_t = float;
+			using baseMember2_t = float;
+			const std::vector<TypeDescriptorMember> baseExpectedMembers = [] {
+				TypeDescriptorMember member1 = [] {
+					const TypeDescriptorType type = TypeDescriptorTypeFactory<baseMember1_t>().Build();
+					const std::string name = "Weight";
+					const byte offset = 0;
+					return TypeDescriptorMember{ type, name, offset };
+				}();
+
+				TypeDescriptorMember member2 = [] {
+					const TypeDescriptorType type = TypeDescriptorTypeFactory<baseMember2_t>().Build();
+					const std::string name = "Condition";
+					const byte offset = sizeof(baseMember1_t);
+					return TypeDescriptorMember{ type, name, offset };
+				}();
+
+				return std::vector<TypeDescriptorMember> { member1, member2 };
+			}();
+			Assert::AreEqual(baseExpectedMembers, baseDescriptor.Members(), L"Type members are unexpected");
+
+			using childMember1_t = bool;
+			const std::vector<TypeDescriptorMember> childExpectedMembers = [] {
+				TypeDescriptorMember member1 = [] {
+					const TypeDescriptorType type = TypeDescriptorTypeFactory<childMember1_t>().Build();
+					const std::string name = "IsBacked";
+					const byte offset = sizeof(baseMember1_t) + sizeof(baseMember2_t);
+					return TypeDescriptorMember{ type, name, offset };
+				}();
+
+				return std::vector<TypeDescriptorMember> { member1 };
+			}();
+			Assert::AreEqual(childExpectedMembers, childDescriptor.Members(), L"Type members are unexpected");
+
+			const std::vector<TypeDescriptorMember> childExpectedMembersRecursive = [&] {
+				std::vector<TypeDescriptorMember> recursive;
+				recursive.insert(recursive.end(), baseExpectedMembers.begin(), baseExpectedMembers.end());
+				recursive.insert(recursive.end(), childExpectedMembers.begin(), childExpectedMembers.end());
+				return recursive;
+			}();
+			Assert::AreEqual(childExpectedMembersRecursive, childDescriptor.MemberResursive(), L"Type recursive members are unexpected");
 		}
 	};
 }
