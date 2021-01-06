@@ -6,24 +6,24 @@
 
 using typehash_t = uint64_t;
 
-namespace TypeExt
+namespace type
 {
-	template <typename T>
+	template <typename type>
 	std::string GetClassName()
 	{
-		std::string fullName = typeid(T).name();
+		std::string fullName = typeid(type).name();
 		std::string clean = fullName.substr(fullName.find(" ")+1);
 		return clean;
 	}
 
-	template <typename TypeExt>
+	template <typename type>
 	typehash_t GetTypeHash()
 	{
-		return typeid(TypeExt).hash_code();
+		return typeid(type).hash_code();
 	}
 
-	template<typename ObjectType, typename MemberPointerType>
-	byte ComputeOffset(const ObjectType& sampleObj, MemberPointerType typename ObjectType::* memberPointer)
+	template<typename object_t, typename member_pointer_owning_t, typename member_type>
+	byte ComputeOffset(const object_t& sampleObj, member_type typename member_pointer_owning_t::* memberPointer)
 	{
 		const byte* dummyAddr = reinterpret_cast<const byte*>(&sampleObj);
 		const byte* memberAddr = reinterpret_cast<const byte*>(&(sampleObj.*memberPointer));

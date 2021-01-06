@@ -15,10 +15,10 @@ class Serializer
 public:
 	using TypeDescriptorMap = std::map<std::size_t, TypeDescriptor>;
 
-	template <typename ObjectType>
-	void Serialize(const ObjectType& obj, std::vector<byte>& bytes)
+	template <typename object_t>
+	void Serialize(const object_t& obj, std::vector<byte>& bytes)
 	{
-		const TypeDescriptor& descriptor = GetDescriptor<ObjectType>();
+		const TypeDescriptor& descriptor = GetDescriptor<object_t>();
 
 		//descriptor.Serialize(obj, bytes);
 
@@ -32,8 +32,8 @@ public:
 		}*/
 	}
 
-	template <typename ObjectType>
-	void Deserialize(const std::vector<byte>& bytes, ObjectType& obj)
+	template <typename object_t>
+	void Deserialize(const std::vector<byte>& bytes, object_t& obj)
 	{
 		/*std::vector<byte> copy = bytes;
 
@@ -111,10 +111,10 @@ private:
 		}
 	}*/
 
-	template <typename ObjectType>
+	template <typename object_t>
 	const TypeDescriptor& GetDescriptor() const
 	{
-		const std::size_t typeHash = TypeExt::template GetTypeHash<ObjectType>();
+		const std::size_t typeHash = type::template GetTypeHash<object_t>();
 		const TypeDescriptorMap::const_iterator found = _descriptorMap.find(typeHash);
 		assert(found != _descriptorMap.end());
 		return (*found).second;

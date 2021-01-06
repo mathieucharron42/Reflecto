@@ -14,6 +14,7 @@ class Resolver : private NonCopyable
 public:
 	Resolver(const TypeDescriptor& typeDescriptor)
 		: _typeDescriptor(typeDescriptor)
+		, _object(nullptr)
 	{
 		assert(TypeDescriptorTypeFactory<object_t>().Build() == typeDescriptor.Type());
 	}
@@ -29,14 +30,22 @@ public:
 		member_t* memberAddr = nullptr;
 		if (_object)
 		{
-			const TypeDescriptorMember* memberDescriptor = _typeDescriptor.GetMemberByName(memberName);
-			if (memberDescriptor != nullptr)
+			const TypeDescriptorMember* memberDescriptor = _typeDescriptor.GetMemberByNameRecursive(memberName);
+			if (memberDescriptor)
 			{
-				byte* objRawAddr = reinterpret_cast<byte*>(_object);
-				byte* memberRawAddr = objRawAddr + memberDescriptor->Offset();
-				memberAddr = reinterpret_cast<member_t*>(memberRawAddr);
+				memberAddr = ResolveMember<member_t>(*memberDescriptor);
 			}
 		}
+		return memberAddr;
+	}
+
+	template<typename member_t>
+	member_t* ResolveMember(const TypeDescriptorMember& memberDescriptor)
+	{
+		member_t* memberAddr = nullptr;
+		byte* objRawAddr = reinterpret_cast<byte*>(_object);
+		byte* memberRawAddr = objRawAddr + memberDescriptor.Offset();
+		memberAddr = reinterpret_cast<member_t*>(memberRawAddr);
 		return memberAddr;
 	}
 

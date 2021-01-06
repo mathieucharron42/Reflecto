@@ -255,5 +255,48 @@ namespace LibTest
 			}();
 			Assert::AreEqual(childExpectedMembersRecursive, childDescriptor.MemberResursive(), L"Type recursive members are unexpected");
 		}
+
+		TEST_METHOD(PublicInheritanceRegisterOnChild)
+		{
+			class Vegetable
+			{
+			public:
+				int Age = 0;
+				float Weight = 0.f;
+			};
+
+			class Potato : public Vegetable
+			{
+			};
+
+			const TypeDescriptor baseDescriptor = TypeDescriptorFactory<Vegetable>()	
+				.Register(&Vegetable::Age, "Age")
+			.Build();
+
+			const TypeDescriptor childDescriptor = TypeDescriptorFactory<Potato>(&baseDescriptor)
+				.Register(&Vegetable::Weight, "Weight")
+			.Build();
+
+			using member_information_t = std::tuple<std::string, TypeDescriptorType>;
+			std::vector<member_information_t> expectedMembers = [] {
+				auto builderFunc = std::make_tuple<std::string, TypeDescriptorType>;
+				member_information_t member1 = builderFunc("Age", TypeDescriptorTypeFactory<int>().Build());
+				member_information_t member2 = builderFunc("Weight", TypeDescriptorTypeFactory<float>().Build());
+				return std::vector<member_information_t>{member1, member2};
+			}();
+
+			for (std::size_t i = 0; i < childDescriptor.Members().size(); ++i)
+			{
+				const TypeDescriptorMember& member = childDescriptor.Members()[i];
+				const member_information_t& expectedMemberInfo = expectedMembers[i];
+				Assert::AreEqual(std::get<0>(expectedMemberInfo), member.Name(), L"Type member name is unexpected");
+				Assert::AreEqual(std::get<1>(expectedMemberInfo), member.Type(), L"Type member type is unexpected");
+				if (i > 0)
+				{
+					const TypeDescriptorMember& previousMember = childDescriptor.Members()[i - 1];
+					Assert::IsTrue(member.Offset() > previousMember.Offset(), L"Type member offset are out of order!");
+				}
+			}
+		}
 	};
 }

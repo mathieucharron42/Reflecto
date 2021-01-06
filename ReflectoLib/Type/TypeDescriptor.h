@@ -56,6 +56,22 @@ public:
 		return found != _members.end() ? &(*found) : nullptr;
 	}
 
+	const TypeDescriptorMember* GetMemberByNameRecursive(const std::string& name) const
+	{
+		const TypeDescriptorMember* member = nullptr;
+
+		if (_parent)
+		{
+			member = _parent->GetMemberByNameRecursive(name);
+		}
+
+		if (!member)
+		{
+			member = GetMemberByName(name);
+		}
+
+		return member;
+	}
 private:
 	TypeDescriptorType _type;
 	const TypeDescriptor* _parent;

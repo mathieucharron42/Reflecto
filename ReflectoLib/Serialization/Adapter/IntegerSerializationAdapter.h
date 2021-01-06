@@ -13,7 +13,7 @@ public:
 		
 	}
 
-	uint32_t Deserialize(const std::vector<byte>& bytes, T& obj)
+	uint32_t Deserialize(const std::vector<byte>& bytes, type& obj)
 	{
 		
 	}

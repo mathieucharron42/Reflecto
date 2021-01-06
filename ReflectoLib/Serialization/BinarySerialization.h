@@ -9,8 +9,8 @@
 
 struct BinarySerialization
 {
-    template <typename T>
-    static uint32_t Serialize(const T& obj, std::vector<byte>& bytes)
+    template <typename type>
+    static uint32_t Serialize(const type& obj, std::vector<byte>& bytes)
     {
         const uint32_t objSize = sizeof(obj);
         
@@ -37,15 +37,15 @@ struct BinarySerialization
         return static_cast<uint32_t>(obj.length() + 1);
     }
 
-    template <typename T>
+    template <typename type>
     static uint32_t Serialize(const byte* addr, std::vector<byte>& bytes)
     {
-        const T& val = reinterpret_cast<const T&>(*addr);
-        return Serialize<T>(val, bytes);
+        const type& val = reinterpret_cast<const type&>(*addr);
+        return Serialize<type>(val, bytes);
     }
 
-    template <typename T>
-    static uint32_t Deserialize(const std::vector<byte>& bytes, T& obj)
+    template <typename type>
+    static uint32_t Deserialize(const std::vector<byte>& bytes, type& obj)
     {
         const uint32_t objSize = sizeof(obj);
 
@@ -68,10 +68,10 @@ struct BinarySerialization
         return static_cast<uint32_t>(obj.length() + 1);
     }
 
-    template <typename T>
+    template <typename type>
     static uint32_t Deserialize(const std::vector<byte>& bytes, byte* addr)
     {
-        T& val = reinterpret_cast<T&>(*addr);
-        return Deserialize<T>(bytes, val);
+        type& val = reinterpret_cast<type&>(*addr);
+        return Deserialize<type>(bytes, val);
     }
 };

@@ -6,7 +6,7 @@
 #include <cassert>
 #include <tuple>
 
-template <typename SerializerType, typename ObjectType>
+template <typename SerializerType, typename object_t>
 class SerializationWorkbench
 {
 public:
@@ -27,7 +27,7 @@ public:
     void Execute(const MappingCollectionType<MappingTypes...>& mappings)
     {
         {
-            ObjectType original = BuildOriginal(mappings);
+            object_t original = BuildOriginal(mappings);
             std::vector<byte> bytes1;
             _serializer.Serialize(original, bytes1);
             io::WriteToFile(_traceFile, bytes1);
@@ -35,19 +35,19 @@ public:
 
         {
             std::vector<byte> bytes2 = io::ReadFromFile(_traceFile);
-            ObjectType deserialized;
-            _serializer.Deserialize<ObjectType>(bytes2, deserialized);
+            object_t deserialized;
+            _serializer.Deserialize<object_t>(bytes2, deserialized);
             Validate(mappings, deserialized);
         }
 
-        std::cout << "Validated " << TypeExt::GetClassName<ObjectType>() << " with " << TypeExt::GetClassName<SerializerType>() << " to '" << _traceFile << "'" << std::endl;
+        std::cout << "Validated " << type::GetClassName<object_t>() << " with " << type::GetClassName<SerializerType>() << " to '" << _traceFile << "'" << std::endl;
     }
 
 private:
     template<typename ... MappingTypes>
-    ObjectType BuildOriginal(const MappingCollectionType<MappingTypes...>& mappings)
+    object_t BuildOriginal(const MappingCollectionType<MappingTypes...>& mappings)
     {
-        ObjectType obj;
+        object_t obj;
 
         ExecuteMappings(mappings, [&obj](const auto& mappingPair) {
             auto memberPointer = mappingPair.first;
@@ -59,7 +59,7 @@ private:
     }
 
     template<typename ... MappingTypes>
-    void Validate(const MappingCollectionType<MappingTypes...>& mappings, const ObjectType& obj)
+    void Validate(const MappingCollectionType<MappingTypes...>& mappings, const object_t& obj)
     {
         ExecuteMappings(mappings, [&obj](const auto& mappingPair) {
             auto memberPointer = mappingPair.first;
@@ -92,8 +92,8 @@ auto BuildBindings(BindingTypes&&... bindings)
     return std::make_tuple(bindings...);
 }
 
-template<typename MemberPointerType, typename ValueType>
-auto Bind(MemberPointerType&& memberPointer, ValueType&& value)
+template<typename member_type, typename ValueType>
+auto Bind(member_type&& memberPointer, ValueType&& value)
 {
     return std::make_pair(memberPointer, value);
 }

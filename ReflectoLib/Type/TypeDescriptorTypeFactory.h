@@ -8,8 +8,8 @@ class TypeDescriptorTypeFactory
 {
 public:
 	TypeDescriptorTypeFactory()
-		: _name(TypeExt::GetClassName<type_t>())
-		, _hash(TypeExt::GetTypeHash<type_t>())
+		: _name(type::GetClassName<type_t>())
+		, _hash(type::GetTypeHash<type_t>())
 	{
 
 	}
