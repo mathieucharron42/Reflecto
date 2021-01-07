@@ -10,6 +10,8 @@ class MemberDescriptorFactory
 public:
 	MemberDescriptorFactory(object_t& sampleObj)
 		: _sampleObj(sampleObj)
+		, _name()
+		, _offset(0)
 	{ }
 
 	MemberDescriptorFactory& SetMember(typename member_t object_t::* memberPointer, const std::string& memberName)

@@ -285,15 +285,16 @@ namespace LibTest
 				return std::vector<member_information_t>{member1, member2};
 			}();
 
-			for (std::size_t i = 0; i < childDescriptor.Members().size(); ++i)
+			std::vector<MemberDescriptor> members = childDescriptor.MemberResursive();
+			for (std::size_t i = 0; i < members.size(); ++i)
 			{
-				const MemberDescriptor& member = childDescriptor.Members()[i];
+				const MemberDescriptor& member = members[i];
 				const member_information_t& expectedMemberInfo = expectedMembers[i];
 				Assert::AreEqual(std::get<0>(expectedMemberInfo), member.Name(), L"Type member name is unexpected");
 				Assert::AreEqual(std::get<1>(expectedMemberInfo), member.Type(), L"Type member type is unexpected");
 				if (i > 0)
 				{
-					const MemberDescriptor& previousMember = childDescriptor.Members()[i - 1];
+					const MemberDescriptor& previousMember = members[i - 1];
 					Assert::IsTrue(member.Offset() > previousMember.Offset(), L"Type member offset are out of order!");
 				}
 			}

@@ -182,7 +182,7 @@ namespace LibTest
 				Assert::AreEqual(expectedWeight, *actualWeight, L"Value is not expected");
 			}
 
-			const bool* actualIsBacked = resolver.ResolveMember<bool>(potato, "IsBacked");
+			const bool* actualIsBacked = resolver.ResolveMember<bool>(potato, "IsBaked");
 			Assert::IsNotNull(actualIsBacked, L"Unable to resolve member");
 			if (actualIsBacked)
 			{

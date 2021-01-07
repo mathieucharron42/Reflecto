@@ -31,6 +31,8 @@ public:
 			.SetMember(memberPointer, memberName)
 		.Build();
 
+		_members.push_back(member);
+
 		return *this;
 	}
 
