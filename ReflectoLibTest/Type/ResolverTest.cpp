@@ -33,9 +33,8 @@ namespace LibTest
 
 			Potato potato;
 			potato.Weight = expectedWeight;
-			resolver.SetInstance(potato);
 			
-			const float* actualWeight = resolver.ResolveMember<float>(descriptor.MemberResursive()[0]);
+			const float* actualWeight = resolver.ResolveMember<float>(potato, descriptor.MemberResursive()[0]);
 			Assert::IsNotNull(actualWeight, L"Unable to resolve member"); 
 			if (actualWeight)
 			{
@@ -61,9 +60,8 @@ namespace LibTest
 
 			Potato potato;
 			potato.Weight = expectedWeight;
-			resolver.SetInstance(potato);
 
-			const float* actualWeight = resolver.ResolveMember<float>("Weight");
+			const float* actualWeight = resolver.ResolveMember<float>(potato, "Weight");
 			Assert::IsNotNull(actualWeight, L"Unable to resolve member");
 			if (actualWeight)
 			{
@@ -102,30 +100,28 @@ namespace LibTest
 			potato.IsBaked = expectedIsBacked;
 			potato.CookedTime = expectedCookedTime;
 
-			resolver.SetInstance(potato);
-
-			const std::string* actualName = resolver.ResolveMember<std::string>("Name");
+			const std::string* actualName = resolver.ResolveMember<std::string>(potato, "Name");
 			Assert::IsNotNull(actualName, L"Unable to resolve member");
 			if (actualName)
 			{
 				Assert::AreEqual(expectedName, *actualName, L"Value is not expected");
 			}
 
-			const float* actualWeight = resolver.ResolveMember<float>("Weight");
+			const float* actualWeight = resolver.ResolveMember<float>(potato, "Weight");
 			Assert::IsNotNull(actualWeight, L"Unable to resolve member");
 			if (actualWeight)
 			{
 				Assert::AreEqual(expectedWeight, *actualWeight, L"Value is not expected");
 			}
 
-			const bool* actualIsBacked = resolver.ResolveMember<bool>("IsBacked");
+			const bool* actualIsBacked = resolver.ResolveMember<bool>(potato, "IsBacked");
 			Assert::IsNotNull(actualIsBacked, L"Unable to resolve member");
 			if (actualIsBacked)
 			{
 				Assert::AreEqual(expectedIsBacked, *actualIsBacked, L"Value is not expected");
 			}
 
-			const int64_t* actualCookedTime = resolver.ResolveMember<int64_t>("CookedTime");
+			const int64_t* actualCookedTime = resolver.ResolveMember<int64_t>(potato, "CookedTime");
 			Assert::IsNotNull(actualCookedTime, L"Unable to resolve member");
 			if (actualCookedTime)
 			{
@@ -172,30 +168,28 @@ namespace LibTest
 			potato.IsBaked = expectedIsBacked;
 			potato.CookedTime = expectedCookedTime;
 
-			resolver.SetInstance(potato);
-
-			const std::string* actualName = resolver.ResolveMember<std::string>("Name");
+			const std::string* actualName = resolver.ResolveMember<std::string>(potato, "Name");
 			Assert::IsNotNull(actualName, L"Unable to resolve member");
 			if (actualName)
 			{
 				Assert::AreEqual(expectedName, *actualName, L"Value is not expected");
 			}
 
-			const float* actualWeight = resolver.ResolveMember<float>("Weight");
+			const float* actualWeight = resolver.ResolveMember<float>(potato, "Weight");
 			Assert::IsNotNull(actualWeight, L"Unable to resolve member");
 			if (actualWeight)
 			{
 				Assert::AreEqual(expectedWeight, *actualWeight, L"Value is not expected");
 			}
 
-			const bool* actualIsBacked = resolver.ResolveMember<bool>("IsBacked");
+			const bool* actualIsBacked = resolver.ResolveMember<bool>(potato, "IsBacked");
 			Assert::IsNotNull(actualIsBacked, L"Unable to resolve member");
 			if (actualIsBacked)
 			{
 				Assert::AreEqual(expectedIsBacked, *actualIsBacked, L"Value is not expected");
 			}
 
-			const int64_t* actualCookedTime = resolver.ResolveMember<int64_t>("CookedTime");
+			const int64_t* actualCookedTime = resolver.ResolveMember<int64_t>(potato, "CookedTime");
 			Assert::IsNotNull(actualCookedTime, L"Unable to resolve member");
 			if (actualCookedTime)
 			{
@@ -225,13 +219,13 @@ namespace LibTest
 
 			const TypeDescriptor childDescriptor = TypeDescriptorFactory<Potato>(&baseDescriptor)
 				.Register(&Potato::Name, "Name")
-				.Register(&Potato::IsBaked, "IsBacked")
+				.Register(&Potato::IsBaked, "IsBaked")
 				.Register(&Potato::CookedTime, "CookedTime")
 			.Build();
 
 			Resolver<Vegetable> resolver{ baseDescriptor };
 			
-			const std::string expectedName = "Backed Potato Man";
+			const std::string expectedName = "Baked Potato Man";
 			const float expectedWeight = 42.24f;
 			const bool expectedIsBacked = true;
 			const int64_t expectedCookedTime = 666;
@@ -242,9 +236,7 @@ namespace LibTest
 			potato.IsBaked = expectedIsBacked;
 			potato.CookedTime = expectedCookedTime;
 
-			resolver.SetInstance(potato);
-
-			const float* actualWeight = resolver.ResolveMember<float>("Weight");
+			const float* actualWeight = resolver.ResolveMember<float>(potato, "Weight");
 			Assert::IsNotNull(actualWeight, L"Unable to resolve member");
 			if (actualWeight)
 			{
