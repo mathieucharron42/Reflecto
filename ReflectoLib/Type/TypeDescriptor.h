@@ -1,8 +1,8 @@
 #pragma once
 
 #include "TypeExt.h"
-#include "TypeDescriptorMember.h"
-#include "TypeDescriptorMethod.h"
+#include "MemberDescriptor.h"
+#include "MethodDescriptor.h"
 
 #include <memory>
 #include <optional>
@@ -12,11 +12,11 @@
 class TypeDescriptor
 {
 public:
-	TypeDescriptor(const TypeDescriptorType& type, const std::vector<TypeDescriptorMember>& members)
+	TypeDescriptor(const TypeDescriptorType& type, const std::vector<MemberDescriptor>& members)
 		: TypeDescriptor(type, nullptr, members)
 	{ }
 
-	TypeDescriptor(const TypeDescriptorType& type, const TypeDescriptor* parent, const std::vector<TypeDescriptorMember>& members)
+	TypeDescriptor(const TypeDescriptorType& type, const TypeDescriptor* parent, const std::vector<MemberDescriptor>& members)
 		: _type(type)
 		, _parent(parent)
 		, _members(members)
@@ -27,18 +27,18 @@ public:
 		return _type;
 	}
 
-	const std::vector<TypeDescriptorMember>& Members() const
+	const std::vector<MemberDescriptor>& Members() const
 	{
 		return _members;
 	}
 
-	std::vector<TypeDescriptorMember> MemberResursive() const
+	std::vector<MemberDescriptor> MemberResursive() const
 	{
-		std::vector<TypeDescriptorMember> memberRecursive;
+		std::vector<MemberDescriptor> memberRecursive;
 
 		if (_parent)
 		{
-			std::vector<TypeDescriptorMember> parentMembers = _parent->MemberResursive();
+			std::vector<MemberDescriptor> parentMembers = _parent->MemberResursive();
 			memberRecursive.insert(memberRecursive.end(), parentMembers.begin(), parentMembers.end());
 		}
 
@@ -47,18 +47,18 @@ public:
 		return memberRecursive;
 	}
 
-	const TypeDescriptorMember* GetMemberByName(const std::string& name) const
+	const MemberDescriptor* GetMemberByName(const std::string& name) const
 	{
-		auto found = std::find_if(_members.begin(), _members.end(), [&](const TypeDescriptorMember& member){
+		auto found = std::find_if(_members.begin(), _members.end(), [&](const MemberDescriptor& member){
 			return member.Name() == name;
 		});
 
 		return found != _members.end() ? &(*found) : nullptr;
 	}
 
-	const TypeDescriptorMember* GetMemberByNameRecursive(const std::string& name) const
+	const MemberDescriptor* GetMemberByNameRecursive(const std::string& name) const
 	{
-		const TypeDescriptorMember* member = nullptr;
+		const MemberDescriptor* member = nullptr;
 
 		if (_parent)
 		{
@@ -75,5 +75,5 @@ public:
 private:
 	TypeDescriptorType _type;
 	const TypeDescriptor* _parent;
-	std::vector<TypeDescriptorMember> _members;
+	std::vector<MemberDescriptor> _members;
 };

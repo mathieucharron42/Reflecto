@@ -24,9 +24,9 @@ namespace Microsoft
 				return StringExt::Format<std::wstring>(L"{Name=%s,TypeHash=%i}", name.c_str(), hash);
 			}
 
-			template<> inline std::wstring ToString<std::vector<TypeDescriptorMember>>(const std::vector<TypeDescriptorMember>& members)
+			template<> inline std::wstring ToString<std::vector<MemberDescriptor>>(const std::vector<MemberDescriptor>& members)
 			{
-				const std::wstring membersStr = StringExt::Join<std::wstring>(members, L",", [](const TypeDescriptorMember& members) {
+				const std::wstring membersStr = StringExt::Join<std::wstring>(members, L",", [](const MemberDescriptor& members) {
 					const std::wstring name = StringExt::ToWstring(members.Name());
 					const std::string& type = members.Type().Name();
 					const byte offset = members.Offset();
@@ -35,9 +35,9 @@ namespace Microsoft
 				return StringExt::Format<std::wstring>(L"[%s]", membersStr.c_str());
 			}
 
-			template<> inline std::wstring ToString<std::vector<TypeDescriptorMethod>>(const std::vector<TypeDescriptorMethod>& methods)
+			template<> inline std::wstring ToString<std::vector<MethodDescriptor>>(const std::vector<MethodDescriptor>& methods)
 			{
-				const std::wstring membersStr = StringExt::Join<std::wstring>(methods, L",", [](const TypeDescriptorMethod& method) {
+				const std::wstring membersStr = StringExt::Join<std::wstring>(methods, L",", [](const MethodDescriptor& method) {
 					const std::wstring name = StringExt::ToWstring(method.Name());
 					return StringExt::Format<std::wstring>(L"Name=%s", name.c_str());
 					});
@@ -59,7 +59,7 @@ namespace LibTest
 			TypeDescriptorType expectedType = TypeDescriptorTypeFactory<uint32_t>().Build();
 			Assert::AreEqual(expectedType, descriptor.Type(), L"Type hash is unexpected");
 			
-			std::vector<TypeDescriptorMember> expectedMembers;
+			std::vector<MemberDescriptor> expectedMembers;
 			Assert::AreEqual(expectedMembers, descriptor.Members(), L"Type members are unexpected");
 		}
 
@@ -78,11 +78,11 @@ namespace LibTest
 			const TypeDescriptorType expectedType = TypeDescriptorTypeFactory<Potato>().Build();
 			Assert::AreEqual(expectedType, descriptor.Type(), L"Type hash is unexpected");
 
-			const std::vector<TypeDescriptorMember> expectedMembers = [] {
+			const std::vector<MemberDescriptor> expectedMembers = [] {
 				const TypeDescriptorType type = TypeDescriptorTypeFactory<float>().Build();
 				const std::string name = "Weight";
 				const byte offset = 0;
-				return std::vector<TypeDescriptorMember>{ TypeDescriptorMember(type, name, offset) };
+				return std::vector<MemberDescriptor>{ MemberDescriptor(type, name, offset) };
 			}();
 			Assert::AreEqual(expectedMembers, descriptor.Members(), L"Type members are unexpected");
 		}
@@ -108,29 +108,29 @@ namespace LibTest
 			const TypeDescriptorType expectedType = TypeDescriptorTypeFactory<PotatoNoPadding>().Build();
 			Assert::AreEqual(expectedType, descriptor.Type(), L"Type hash is unexpected");
 
-			const std::vector<TypeDescriptorMember> expectedMembers = [] {
+			const std::vector<MemberDescriptor> expectedMembers = [] {
 				using member1_t = std::string;
-				const TypeDescriptorMember member1 = [] {
+				const MemberDescriptor member1 = [] {
 					const TypeDescriptorType type = TypeDescriptorTypeFactory<member1_t>().Build();
 					const std::string name = "Name";
 					const byte offset = 0;
-					return TypeDescriptorMember(type, name, offset);
+					return MemberDescriptor(type, name, offset);
 				}();
 				using member2_t = float;
-				const TypeDescriptorMember member2 = [] {
+				const MemberDescriptor member2 = [] {
 					const TypeDescriptorType type = TypeDescriptorTypeFactory<member2_t>().Build();
 					const std::string name = "Weight";
 					const byte offset = sizeof(member1_t);
-					return TypeDescriptorMember(type, name, offset);
+					return MemberDescriptor(type, name, offset);
 				}();
 				using member3_t = int64_t;
-				const TypeDescriptorMember member3 = [] {
+				const MemberDescriptor member3 = [] {
 					const TypeDescriptorType type = TypeDescriptorTypeFactory<member3_t>().Build();
 					const std::string name = "CookedTime";
 					const byte offset = sizeof(member1_t) + sizeof(member2_t);
-					return TypeDescriptorMember(type, name, offset);
+					return MemberDescriptor(type, name, offset);
 				}();
-				return std::vector<TypeDescriptorMember>{member1, member2, member3};
+				return std::vector<MemberDescriptor>{member1, member2, member3};
 			}();
 
 			Assert::AreEqual(expectedMembers, descriptor.Members(), L"Type members are unexpected");
@@ -169,13 +169,13 @@ namespace LibTest
 
 			for (std::size_t i = 0; i < descriptor.Members().size(); ++i)
 			{
-				const TypeDescriptorMember& member = descriptor.Members()[i];
+				const MemberDescriptor& member = descriptor.Members()[i];
 				const member_information_t& expectedMemberInfo = expectedMember[i];
 				Assert::AreEqual(std::get<0>(expectedMemberInfo), member.Name(), L"Type member name is unexpected");
 				Assert::AreEqual(std::get<1>(expectedMemberInfo), member.Type(), L"Type member type is unexpected");
 				if (i > 0)
 				{
-					const TypeDescriptorMember& previousMember = descriptor.Members()[i-1];
+					const MemberDescriptor& previousMember = descriptor.Members()[i-1];
 					Assert::IsTrue(member.Offset() > previousMember.Offset(), L"Type member offset are out of order!");
 				}
 			}
@@ -215,40 +215,40 @@ namespace LibTest
 
 			using baseMember1_t = float;
 			using baseMember2_t = float;
-			const std::vector<TypeDescriptorMember> baseExpectedMembers = [] {
-				TypeDescriptorMember member1 = [] {
+			const std::vector<MemberDescriptor> baseExpectedMembers = [] {
+				MemberDescriptor member1 = [] {
 					const TypeDescriptorType type = TypeDescriptorTypeFactory<baseMember1_t>().Build();
 					const std::string name = "Weight";
 					const byte offset = 0;
-					return TypeDescriptorMember{ type, name, offset };
+					return MemberDescriptor{ type, name, offset };
 				}();
 
-				TypeDescriptorMember member2 = [] {
+				MemberDescriptor member2 = [] {
 					const TypeDescriptorType type = TypeDescriptorTypeFactory<baseMember2_t>().Build();
 					const std::string name = "Condition";
 					const byte offset = sizeof(baseMember1_t);
-					return TypeDescriptorMember{ type, name, offset };
+					return MemberDescriptor{ type, name, offset };
 				}();
 
-				return std::vector<TypeDescriptorMember> { member1, member2 };
+				return std::vector<MemberDescriptor> { member1, member2 };
 			}();
 			Assert::AreEqual(baseExpectedMembers, baseDescriptor.Members(), L"Type members are unexpected");
 
 			using childMember1_t = bool;
-			const std::vector<TypeDescriptorMember> childExpectedMembers = [] {
-				TypeDescriptorMember member1 = [] {
+			const std::vector<MemberDescriptor> childExpectedMembers = [] {
+				MemberDescriptor member1 = [] {
 					const TypeDescriptorType type = TypeDescriptorTypeFactory<childMember1_t>().Build();
 					const std::string name = "IsBacked";
 					const byte offset = sizeof(baseMember1_t) + sizeof(baseMember2_t);
-					return TypeDescriptorMember{ type, name, offset };
+					return MemberDescriptor{ type, name, offset };
 				}();
 
-				return std::vector<TypeDescriptorMember> { member1 };
+				return std::vector<MemberDescriptor> { member1 };
 			}();
 			Assert::AreEqual(childExpectedMembers, childDescriptor.Members(), L"Type members are unexpected");
 
-			const std::vector<TypeDescriptorMember> childExpectedMembersRecursive = [&] {
-				std::vector<TypeDescriptorMember> recursive;
+			const std::vector<MemberDescriptor> childExpectedMembersRecursive = [&] {
+				std::vector<MemberDescriptor> recursive;
 				recursive.insert(recursive.end(), baseExpectedMembers.begin(), baseExpectedMembers.end());
 				recursive.insert(recursive.end(), childExpectedMembers.begin(), childExpectedMembers.end());
 				return recursive;
@@ -287,13 +287,13 @@ namespace LibTest
 
 			for (std::size_t i = 0; i < childDescriptor.Members().size(); ++i)
 			{
-				const TypeDescriptorMember& member = childDescriptor.Members()[i];
+				const MemberDescriptor& member = childDescriptor.Members()[i];
 				const member_information_t& expectedMemberInfo = expectedMembers[i];
 				Assert::AreEqual(std::get<0>(expectedMemberInfo), member.Name(), L"Type member name is unexpected");
 				Assert::AreEqual(std::get<1>(expectedMemberInfo), member.Type(), L"Type member type is unexpected");
 				if (i > 0)
 				{
-					const TypeDescriptorMember& previousMember = childDescriptor.Members()[i - 1];
+					const MemberDescriptor& previousMember = childDescriptor.Members()[i - 1];
 					Assert::IsTrue(member.Offset() > previousMember.Offset(), L"Type member offset are out of order!");
 				}
 			}

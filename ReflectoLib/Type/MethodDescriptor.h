@@ -2,10 +2,10 @@
 
 #include <string>
 
-class TypeDescriptorMethod
+class MethodDescriptor
 {
 public:
-	TypeDescriptorMethod(const std::string& name)
+	MethodDescriptor(const std::string& name)
 		: _name(name)
 	{ }
 
@@ -14,7 +14,7 @@ public:
 		return _name;
 	}
 
-	bool operator==(const TypeDescriptorMethod& other) const
+	bool operator==(const MethodDescriptor& other) const
 	{
 		return _name == other._name;
 	}

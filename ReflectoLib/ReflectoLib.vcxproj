@@ -158,12 +158,13 @@
     <ClInclude Include="Serialization\Adapter\IntegerSerializationAdapter.h" />
     <ClInclude Include="Serialization\Adapter\ISerializationAdapter.h" />
     <ClInclude Include="Serialization\Serializer.h" />
+    <ClInclude Include="Type\MemberDescriptorFactory.h" />
     <ClInclude Include="Type\Resolver.h" />
     <ClInclude Include="Type\TypeDescriptorType.h" />
     <ClInclude Include="Type\TypeDescriptor.h" />
     <ClInclude Include="Type\TypeDescriptorFactory.h" />
-    <ClInclude Include="Type\TypeDescriptorMember.h" />
-    <ClInclude Include="Type\TypeDescriptorMethod.h" />
+    <ClInclude Include="Type\MemberDescriptor.h" />
+    <ClInclude Include="Type\MethodDescriptor.h" />
     <ClInclude Include="Type\TypeDescriptorTypeFactory.h" />
     <ClInclude Include="Utils\io.h" />
     <ClInclude Include="Serialization\BinarySerialization.h" />

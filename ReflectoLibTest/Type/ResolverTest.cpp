@@ -83,7 +83,7 @@ namespace LibTest
 			const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>()
 				.Register(&Potato::Name, "Name")
 				.Register(&Potato::Weight, "Weight")
-				.Register(&Potato::IsBaked, "IsBacked")
+				.Register(&Potato::IsBaked, "IsBaked")
 				.Register(&Potato::CookedTime, "CookedTime")
 			.Build();
 
@@ -114,7 +114,7 @@ namespace LibTest
 				Assert::AreEqual(expectedWeight, *actualWeight, L"Value is not expected");
 			}
 
-			const bool* actualIsBacked = resolver.ResolveMember<bool>(potato, "IsBacked");
+			const bool* actualIsBacked = resolver.ResolveMember<bool>(potato, "IsBaked");
 			Assert::IsNotNull(actualIsBacked, L"Unable to resolve member");
 			if (actualIsBacked)
 			{
@@ -151,7 +151,7 @@ namespace LibTest
 
 			const TypeDescriptor childDescriptor = TypeDescriptorFactory<Potato>(&baseDescriptor)
 				.Register(&Potato::Name, "Name")
-				.Register(&Potato::IsBaked, "IsBacked")
+				.Register(&Potato::IsBaked, "IsBaked")
 				.Register(&Potato::CookedTime, "CookedTime")
 			.Build();
 

@@ -2,7 +2,7 @@
 
 #include "Definitions.h"
 #include "Type/TypeDescriptor.h"
-#include "Type/TypeDescriptorMember.h"
+#include "Type/MemberDescriptor.h"
 
 #include <cassert>
 #include <map>

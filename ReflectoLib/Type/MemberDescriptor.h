@@ -7,10 +7,10 @@
 #include <stdint.h>
 #include <string>
 
-class TypeDescriptorMember
+class MemberDescriptor
 {
 public:
-	TypeDescriptorMember(const TypeDescriptorType& type, const std::string& name, byte offset)
+	MemberDescriptor(const TypeDescriptorType& type, const std::string& name, byte offset)
 		: _type(type)
 		, _name(name)
 		, _offset(offset)
@@ -31,7 +31,7 @@ public:
 		return _offset;
 	}
 
-	bool operator==(const TypeDescriptorMember& other) const
+	bool operator==(const MemberDescriptor& other) const
 	{
 		return _type == other._type 
 			&& _name == other._name 

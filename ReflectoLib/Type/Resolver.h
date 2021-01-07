@@ -23,7 +23,7 @@ public:
 	member_t* ResolveMember(object_t& object, const std::string& memberName)
 	{
 		member_t* memberAddr = nullptr;
-		const TypeDescriptorMember* memberDescriptor = _typeDescriptor.GetMemberByNameRecursive(memberName);
+		const MemberDescriptor* memberDescriptor = _typeDescriptor.GetMemberByNameRecursive(memberName);
 		if (memberDescriptor)
 		{
 			memberAddr = ResolveMember<member_t>(object, *memberDescriptor);
@@ -32,7 +32,7 @@ public:
 	}
 
 	template<typename member_t>
-	member_t* ResolveMember(object_t& object, const TypeDescriptorMember& memberDescriptor)
+	member_t* ResolveMember(object_t& object, const MemberDescriptor& memberDescriptor)
 	{
 		member_t* memberAddr = nullptr;
 		byte* objRawAddr = reinterpret_cast<byte*>(&object);

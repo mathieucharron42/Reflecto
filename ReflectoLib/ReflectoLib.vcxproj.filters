@@ -57,12 +57,6 @@
     <ClInclude Include="Type\TypeDescriptorFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Type\TypeDescriptorMember.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Type\TypeDescriptorMethod.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Type\Resolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -72,10 +66,19 @@
     <ClInclude Include="Type\TypeDescriptorType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Utils\NonCopyable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type\MemberDescriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type\MethodDescriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Type\TypeDescriptorTypeFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\NonCopyable.h">
+    <ClInclude Include="Type\MemberDescriptorFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

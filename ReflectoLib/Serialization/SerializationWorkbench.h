@@ -92,8 +92,8 @@ auto BuildBindings(BindingTypes&&... bindings)
     return std::make_tuple(bindings...);
 }
 
-template<typename member_type, typename ValueType>
-auto Bind(member_type&& memberPointer, ValueType&& value)
+template<typename member_t, typename ValueType>
+auto Bind(member_t&& memberPointer, ValueType&& value)
 {
     return std::make_pair(memberPointer, value);
 }

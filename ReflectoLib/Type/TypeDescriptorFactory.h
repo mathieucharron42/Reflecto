@@ -1,9 +1,10 @@
 #pragma once
 
+#include "MemberDescriptor.h"
+#include "MemberDescriptorFactory.h"
 #include "Resolver.h"
 #include "TypeDescriptor.h"
 #include "TypeDescriptorType.h"
-#include "TypeDescriptorTypeFactory.h"
 
 template <typename object_t>
 class TypeDescriptorFactory
@@ -16,19 +17,19 @@ public:
 	}
 
 	TypeDescriptorFactory(const TypeDescriptor* parentTypeDescriptor)
-		: _type(TypeDescriptorTypeFactory<object_t>().Build())
+		: _sampleObj()
+		, _type(TypeDescriptorTypeFactory<object_t>().Build())
 		, _parent(parentTypeDescriptor)
-		, _dummy()
 	{
 
 	}
 
-	template <typename member_type, typename object_t>
-	TypeDescriptorFactory& Register(typename member_type typename object_t::* memberPointer, const std::string& memberName)
+	template <typename member_t, typename object_t>
+	TypeDescriptorFactory& Register(typename member_t typename object_t::* memberPointer, const std::string& memberName)
 	{
-		const TypeDescriptorType memberType = TypeDescriptorTypeFactory<member_type>().Build();
-		const byte memberOffset = type::ComputeOffset(_dummy, memberPointer);
-		_members.push_back(TypeDescriptorMember{ memberType, memberName, memberOffset });
+		MemberDescriptor member = MemberDescriptorFactory<object_t, member_t>(_sampleObj)
+			.SetMember(memberPointer, memberName)
+		.Build();
 
 		return *this;
 	}
@@ -39,8 +40,8 @@ public:
 	}
 
 private:
-	object_t _dummy;
+	object_t _sampleObj;
 	TypeDescriptorType _type;
 	const TypeDescriptor* _parent;
-	std::vector<TypeDescriptorMember> _members;
+	std::vector<MemberDescriptor> _members;
 };
