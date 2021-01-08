@@ -166,6 +166,7 @@
     <ClInclude Include="Type\MemberDescriptor.h" />
     <ClInclude Include="Type\MethodDescriptor.h" />
     <ClInclude Include="Type\TypeDescriptorTypeFactory.h" />
+    <ClInclude Include="Utils\EncapsulationBreaker.h" />
     <ClInclude Include="Utils\io.h" />
     <ClInclude Include="Serialization\BinarySerialization.h" />
     <ClInclude Include="SampleTypes.h" />

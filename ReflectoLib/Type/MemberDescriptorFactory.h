@@ -16,8 +16,14 @@ public:
 
 	MemberDescriptorFactory& SetMember(typename member_t object_t::* memberPointer, const std::string& memberName)
 	{
+		byte offset = TypeExt::ComputeOffset(_sampleObj, memberPointer);
+		return SetMember(offset, memberName);
+	}
+
+	MemberDescriptorFactory& SetMember(byte offset, const std::string& memberName)
+	{
 		_name = memberName;
-		_offset = TypeExt::ComputeOffset(_sampleObj, memberPointer);
+		_offset = offset;
 		return *this;
 	}
 

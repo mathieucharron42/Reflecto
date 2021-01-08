@@ -3,6 +3,7 @@
 #include "Type/Resolver.h"
 #include "Type/TypeDescriptor.h"
 #include "Type/TypeDescriptorFactory.h"
+#include "Utils/EncapsulationBreaker.h"
 
 #include "CppUnitTest.h"
 
@@ -48,7 +49,22 @@ namespace Microsoft
 }
 
 namespace LibTest
-{	
+{
+#pragma pack(push, 1)
+	class PrivatePotato
+	{
+	private:
+		float _weight = 0.f;
+		std::string _name;
+	};
+#pragma pack(pop)
+
+	struct PrivatePotatoWeightTag : public TypeMemberTag<PrivatePotato, float> { };
+	struct PrivatePotatoNameTag : public TypeMemberTag<PrivatePotato, std::string> { };
+
+	template struct EncapsulationBreaker<PrivatePotatoWeightTag, &PrivatePotato::_weight>;
+	template struct EncapsulationBreaker<PrivatePotatoNameTag, &PrivatePotato::_name>;
+
 	TEST_CLASS(TypeDescriptorTest)
 	{
 	public:
@@ -179,6 +195,34 @@ namespace LibTest
 					Assert::IsTrue(member.Offset() > previousMember.Offset(), L"Type member offset are out of order!");
 				}
 			}
+		}
+
+		TEST_METHOD(PrivateMember)
+		{
+			const TypeDescriptor descriptor = TypeDescriptorFactory<PrivatePotato>()
+				.Register(PryPrivate(PrivatePotatoWeightTag()), "Weight")
+				.Register(PryPrivate(PrivatePotatoNameTag()), "Name")
+			.Build();
+
+			const TypeDescriptorType expectedType = TypeDescriptorTypeFactory<PrivatePotato>().Build();
+			Assert::AreEqual(expectedType, descriptor.Type(), L"Type hash is unexpected");
+
+			const std::vector<MemberDescriptor> expectedMembers = [] {
+				const MemberDescriptor member1 = [] {
+					const TypeDescriptorType type = TypeDescriptorTypeFactory<float>().Build();
+					const std::string name = "Weight";
+					const byte offset = 0;
+					return MemberDescriptor(type, name, offset);
+				}();
+				const MemberDescriptor member2 = [] {
+					const TypeDescriptorType type = TypeDescriptorTypeFactory<std::string>().Build();
+					const std::string name = "Name";
+					const byte offset = sizeof(float);
+					return MemberDescriptor(type, name, offset);
+				}();
+				return std::vector<MemberDescriptor>{member1, member2};
+			}();
+			Assert::AreEqual(expectedMembers, descriptor.Members(), L"Type members are unexpected");
 		}
 
 		TEST_METHOD(PublicInheritanceNoPadding)
