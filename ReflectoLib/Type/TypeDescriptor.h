@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TypeExt.h"
+#include "ConstructorDescriptor.h"
 #include "MemberDescriptor.h"
 #include "MethodDescriptor.h"
 
@@ -12,19 +13,25 @@
 class TypeDescriptor
 {
 public:
-	TypeDescriptor(const TypeDescriptorType& type, const std::vector<MemberDescriptor>& members)
-		: TypeDescriptor(type, nullptr, members)
+	TypeDescriptor(const TypeDescriptorType& type, const ConstructorDescriptor& constructor, const std::vector<MemberDescriptor>& members)
+		: TypeDescriptor(type, nullptr, constructor, members)
 	{ }
 
-	TypeDescriptor(const TypeDescriptorType& type, const TypeDescriptor* parent, const std::vector<MemberDescriptor>& members)
+	TypeDescriptor(const TypeDescriptorType& type, const TypeDescriptor* parent, const ConstructorDescriptor& constructor, const std::vector<MemberDescriptor>& members)
 		: _type(type)
 		, _parent(parent)
+		, _constructor(constructor)
 		, _members(members)
 	{ }
 
 	const TypeDescriptorType& Type() const
 	{
 		return _type;
+	}
+
+	const ConstructorDescriptor Constructor() const
+	{
+		return _constructor;
 	}
 
 	const std::vector<MemberDescriptor>& Members() const
@@ -75,5 +82,6 @@ public:
 private:
 	TypeDescriptorType _type;
 	const TypeDescriptor* _parent;
+	ConstructorDescriptor _constructor;
 	std::vector<MemberDescriptor> _members;
 };

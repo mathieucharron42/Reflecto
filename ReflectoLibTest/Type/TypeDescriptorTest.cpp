@@ -343,5 +343,15 @@ namespace LibTest
 				}
 			}
 		}
+
+		TEST_METHOD(Constructor)
+		{
+			class Potato {};
+
+			const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>().Build();
+
+			const ConstructorDescriptor& constructorDescriptor = descriptor.Constructor();
+			Assert::IsTrue(static_cast<bool>(constructorDescriptor.Function()), L"No constructor function set!");
+		}
 	};
 }

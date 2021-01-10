@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ConstructorDescriptor.h"
+#include "ConstructorDescriptorFactory.h"
 #include "MemberDescriptor.h"
 #include "MemberDescriptorFactory.h"
 #include "Resolver.h"
@@ -22,6 +24,7 @@ public:
 		: _sampleObj()
 		, _type(TypeDescriptorTypeFactory<object_t>().Build())
 		, _parent(parentTypeDescriptor)
+		, _constructor(ConstructorDescriptorFactory<object_t>().Build())
 	{
 
 	}
@@ -40,12 +43,13 @@ public:
 
 	TypeDescriptor Build()
 	{
-		return TypeDescriptor(_type, _parent, _members);
+		return TypeDescriptor(_type, _parent, _constructor, _members);
 	}
 
 private:
 	object_t _sampleObj;
 	TypeDescriptorType _type;
 	const TypeDescriptor* _parent;
+	ConstructorDescriptor _constructor;
 	std::vector<MemberDescriptor> _members;
 };

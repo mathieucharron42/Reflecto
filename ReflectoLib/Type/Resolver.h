@@ -18,7 +18,13 @@ public:
 		assert(TypeDescriptorTypeFactory<object_t>().Build() == typeDescriptor.Type());
 	}
 
-	
+	object_t* Instantiate()
+	{
+		const ConstructorDescriptor& constructorDescriptor = _typeDescriptor.Constructor();
+		void* instance = (constructorDescriptor.Function())();
+		return static_cast<object_t*>(instance);
+	}
+
 	template<typename member_t>
 	member_t* ResolveMember(object_t& object, const std::string& memberName)
 	{

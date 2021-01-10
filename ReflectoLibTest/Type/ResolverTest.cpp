@@ -243,5 +243,108 @@ namespace LibTest
 				Assert::AreEqual(expectedWeight, *actualWeight, L"Value is not expected");
 			}
 		}
+
+		TEST_METHOD(Instantiate)
+		{
+			class Potato 
+			{
+			public:
+				int Weight;
+			};
+
+			const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>().Build();
+
+			Resolver<Potato> resolver{ descriptor };
+			
+			Potato* potato = resolver.Instantiate();
+			Assert::IsNotNull(potato, L"Unable to build new instance");
+
+			const int expectedWeight = 42;
+			potato->Weight = expectedWeight;
+			Assert::AreEqual(expectedWeight, potato->Weight, L"Unexpected value on member of instantiated instance");
+
+			delete potato;
+		}
+
+		TEST_METHOD(InstantiateInheritance)
+		{
+			class Vegetable
+			{
+			public:
+				virtual void Func1() { }
+				int Weight = 0;
+			};
+
+			class Potato : public Vegetable
+			{
+			public:
+				virtual void Func1() override { }
+				float Tastiness = 0.f;
+			};
+
+			const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>().Build();
+
+			Resolver<Potato> resolver{ descriptor };
+
+			Potato* potato = resolver.Instantiate();
+			Assert::IsNotNull(potato, L"Unable to build new instance");
+
+			const int expectedWeight = 42;
+			const float expectedTastiness = 1.f;
+			potato->Weight = expectedWeight;
+			potato->Tastiness = expectedTastiness;
+			Assert::AreEqual(expectedWeight, potato->Weight, L"Unexpected value on member of instantiated instance");
+			Assert::AreEqual(expectedTastiness, potato->Tastiness, L"Unexpected value on member of instantiated instance");
+
+			delete potato;
+		}
+
+
+		TEST_METHOD(InstantiateAndResolveMember)
+		{
+			class Vegetable
+			{
+			public:
+				virtual void Func1() { }
+				int Weight = 0;
+			};
+
+			class Potato : public Vegetable
+			{
+			public:
+				virtual void Func1() override { }
+				float Tastiness = 0.f;
+			};
+
+
+			const TypeDescriptor baseDescriptor = TypeDescriptorFactory<Vegetable>()
+				.Register(&Vegetable::Weight, "Weight")
+			.Build();
+			const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>(&baseDescriptor)
+				.Register(&Potato::Tastiness, "Tastiness")
+			.Build();
+
+			Resolver<Potato> resolver{ descriptor };
+
+			Potato* potato = resolver.Instantiate();
+			Assert::IsNotNull(potato, L"Unable to build new instance");
+
+			const int expectedWeight = 42;
+			const float expectedTastiness = 1.f;
+			
+			auto weightMember = resolver.ResolveMember<int>(*potato, "Weight");
+			auto tastinessMember = resolver.ResolveMember<float>(*potato, "Tastiness");
+
+			Assert::IsNotNull(weightMember, L"Unable to resolve member!");
+			Assert::IsNotNull(weightMember, L"Unable to resolve member!");
+
+			*weightMember = expectedWeight;
+			*tastinessMember = expectedTastiness;
+
+			Assert::AreEqual(expectedWeight, potato->Weight, L"Unexpected value on member of instantiated instance");
+			Assert::AreEqual(expectedTastiness, potato->Tastiness, L"Unexpected value on member of instantiated instance");
+
+			delete potato;
+		}
 	};
 }

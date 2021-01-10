@@ -158,6 +158,8 @@
     <ClInclude Include="Serialization\Adapter\IntegerSerializationAdapter.h" />
     <ClInclude Include="Serialization\Adapter\ISerializationAdapter.h" />
     <ClInclude Include="Serialization\Serializer.h" />
+    <ClInclude Include="Type\ConstructorDescriptor.h" />
+    <ClInclude Include="Type\ConstructorDescriptorFactory.h" />
     <ClInclude Include="Type\MemberDescriptorFactory.h" />
     <ClInclude Include="Type\Resolver.h" />
     <ClInclude Include="Type\TypeDescriptorType.h" />
