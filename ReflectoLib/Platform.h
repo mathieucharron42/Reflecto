@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Definitions.h"
+#include "Common/Definitions.h"
 
 namespace Platform
 {

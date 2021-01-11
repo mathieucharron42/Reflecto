@@ -1,6 +1,6 @@
 #include "../TestExtensions.h"
 
-#include "Type/Resolver.h"
+#include "Resolver/Resolver.h"
 #include "Type/TypeDescriptor.h"
 #include "Type/TypeDescriptorFactory.h"
 

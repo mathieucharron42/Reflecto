@@ -15,34 +15,20 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SampleTypes.h">
+    <ClInclude Include="Common\Definitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\TextSerialization.h">
+    <ClInclude Include="Common\Utils\EncapsulationBreaker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Platform.h">
+    <ClInclude Include="Common\Utils\io.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\BinarySerialization.h">
+    <ClInclude Include="Common\Utils\NonCopyable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\SerializationWorkbench.h">
+    <ClInclude Include="Common\Utils\StringExt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\Adapter\IntegerSerializationAdapter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Serialization\Adapter\ISerializationAdapter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Serialization\Serializer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Lib.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

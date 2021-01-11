@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Definitions.h"
-#include "Utils/StringExt.h"
+#include "Common/Definitions.h"
+#include "Common/Utils/StringExt.h"
 
 #include "CppUnitTest.h"
 

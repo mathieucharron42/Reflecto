@@ -22,3 +22,4 @@ public:
 private:
 	ConstructorDescriptor::construction_func_t _constructor;
 };
+

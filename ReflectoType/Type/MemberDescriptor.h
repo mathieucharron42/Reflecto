@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Definitions.h"
 #include "TypeDescriptorType.h"
 #include "TypeExt.h"
+
+#include "Common/Definitions.h"
 
 #include <stdint.h>
 #include <string>

@@ -13,36 +13,43 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Type">
+      <UniqueIdentifier>{8a912321-1cbe-4988-be5b-5edddfada622}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SampleTypes.h">
+    <ClInclude Include="Type\TypeExt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\TextSerialization.h">
+    <ClInclude Include="Type\ConstructorDescriptor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Platform.h">
+    <ClInclude Include="Type\ConstructorDescriptorFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\BinarySerialization.h">
+    <ClInclude Include="Type\MemberDescriptor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\SerializationWorkbench.h">
+    <ClInclude Include="Type\MemberDescriptorFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\Adapter\IntegerSerializationAdapter.h">
+    <ClInclude Include="Type\MethodDescriptor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\Adapter\ISerializationAdapter.h">
+    <ClInclude Include="Type\TypeDescriptor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\Serializer.h">
+    <ClInclude Include="Type\TypeDescriptorFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Lib.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClInclude Include="Type\TypeDescriptorType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type\TypeDescriptorTypeFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resolver\Resolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

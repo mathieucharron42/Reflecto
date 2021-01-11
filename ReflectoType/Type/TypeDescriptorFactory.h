@@ -4,10 +4,9 @@
 #include "ConstructorDescriptorFactory.h"
 #include "MemberDescriptor.h"
 #include "MemberDescriptorFactory.h"
-#include "Resolver.h"
+#include "Resolver/Resolver.h"
 #include "TypeDescriptor.h"
 #include "TypeDescriptorType.h"
-
 
 
 template <typename object_t>

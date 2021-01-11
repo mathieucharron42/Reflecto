@@ -13,7 +13,7 @@ namespace LibTest
 	public:
 		TEST_METHOD(SerializeTest)
 		{
-			Serializer serializer;
+			//Serializer serializer;
 
 			std::vector<byte> bytes;
 

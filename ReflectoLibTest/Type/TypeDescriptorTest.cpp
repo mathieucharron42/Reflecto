@@ -1,12 +1,12 @@
 #include "../TestExtensions.h"
 
-#include "Type/Resolver.h"
+#include "Resolver/Resolver.h"
 #include "Type/TypeDescriptor.h"
 #include "Type/TypeDescriptorFactory.h"
-#include "Utils/EncapsulationBreaker.h"
+
+#include "Common/Utils/EncapsulationBreaker.h"
 
 #include "CppUnitTest.h"
-
 #include <tuple>
 #include <vector>
 
@@ -166,7 +166,7 @@ namespace LibTest
 				.Register(&Potato::Name, "Name")
 				.Register(&Potato::Weight, "Weight")
 				.Register(&Potato::CookedTime, "CookedTime")
-				.Build();
+			.Build();
 
 			const TypeDescriptorType expectedType = TypeDescriptorTypeFactory<Potato>().Build();
 			Assert::AreEqual(expectedType, descriptor.Type(), L"Type hash is unexpected");

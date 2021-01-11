@@ -152,31 +152,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Definitions.h" />
-    <ClInclude Include="framework.h" />
     <ClInclude Include="Platform.h" />
     <ClInclude Include="Serialization\Adapter\IntegerSerializationAdapter.h" />
     <ClInclude Include="Serialization\Adapter\ISerializationAdapter.h" />
     <ClInclude Include="Serialization\Serializer.h" />
-    <ClInclude Include="Type\ConstructorDescriptor.h" />
-    <ClInclude Include="Type\ConstructorDescriptorFactory.h" />
-    <ClInclude Include="Type\MemberDescriptorFactory.h" />
-    <ClInclude Include="Type\Resolver.h" />
-    <ClInclude Include="Type\TypeDescriptorType.h" />
-    <ClInclude Include="Type\TypeDescriptor.h" />
-    <ClInclude Include="Type\TypeDescriptorFactory.h" />
-    <ClInclude Include="Type\MemberDescriptor.h" />
-    <ClInclude Include="Type\MethodDescriptor.h" />
-    <ClInclude Include="Type\TypeDescriptorTypeFactory.h" />
-    <ClInclude Include="Utils\EncapsulationBreaker.h" />
-    <ClInclude Include="Utils\io.h" />
     <ClInclude Include="Serialization\BinarySerialization.h" />
     <ClInclude Include="SampleTypes.h" />
     <ClInclude Include="Serialization\SerializationWorkbench.h" />
     <ClInclude Include="Serialization\TextSerialization.h" />
-    <ClInclude Include="Type\TypeExt.h" />
-    <ClInclude Include="Utils\NonCopyable.h" />
-    <ClInclude Include="Utils\StringExt.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Lib.cpp" />

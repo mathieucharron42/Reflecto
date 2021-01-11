@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Definitions.h"
+#include "Common/Definitions.h"
+
 #include <functional>
 
 class ConstructorDescriptor

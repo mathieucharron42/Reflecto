@@ -1,9 +1,10 @@
 #pragma once
 
-#include "../Definitions.h"
-#include "TypeDescriptor.h"
-#include "TypeDescriptorTypeFactory.h"
-#include "Utils/NonCopyable.h"
+#include "Type/TypeDescriptor.h"
+#include "Type/TypeDescriptorTypeFactory.h"
+
+#include "Common/Definitions.h"
+#include "Common/Utils/NonCopyable.h"
 
 #include <assert.h>
 #include <optional>

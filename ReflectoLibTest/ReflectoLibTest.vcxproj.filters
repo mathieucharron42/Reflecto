@@ -29,13 +29,13 @@
     <ClCompile Include="SerializerTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\StringExtTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Type\TypeDescriptorTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Type\ResolverTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\StringExtTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
