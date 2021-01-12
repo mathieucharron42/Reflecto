@@ -8,14 +8,21 @@
 template<typename tag_t, typename tag_t::member_pointer_t M>
 struct EncapsulationBreaker
 {
-	friend typename tag_t::member_pointer_t PryPrivate(tag_t)
+	friend typename tag_t::member_pointer_t GetPrivateMemberPointer(tag_t)
 	{
 		return M;
+	}
+
+	friend typename auto GetPrivateMember(typename tag_t::object_t_t& object, tag_t)
+	{
+		tag_t::member_pointer_t memberPointer = GetPrivateMemberPointer(tag_t());
+		return &(object.*memberPointer);
 	}
 };
 
 template <typename object_t, typename member_t>
 struct TypeMemberTag
 {
+	using object_t_t = object_t;
 	using member_pointer_t = member_t object_t::*;
 };

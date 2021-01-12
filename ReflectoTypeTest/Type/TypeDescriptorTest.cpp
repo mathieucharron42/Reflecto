@@ -1,10 +1,9 @@
-#include "../TestExtensions.h"
-
 #include "Resolver/Resolver.h"
 #include "Type/TypeDescriptor.h"
 #include "Type/TypeDescriptorFactory.h"
 
 #include "Common/Utils/EncapsulationBreaker.h"
+#include "Common/Utils/StringExt.h"
 
 #include "CppUnitTest.h"
 #include <tuple>
@@ -200,8 +199,8 @@ namespace LibTest
 		TEST_METHOD(PrivateMember)
 		{
 			const TypeDescriptor descriptor = TypeDescriptorFactory<PrivatePotato>()
-				.Register(PryPrivate(PrivatePotatoWeightTag()), "Weight")
-				.Register(PryPrivate(PrivatePotatoNameTag()), "Name")
+				.Register(GetPrivateMemberPointer(PrivatePotatoWeightTag()), "Weight")
+				.Register(GetPrivateMemberPointer(PrivatePotatoNameTag()), "Name")
 			.Build();
 
 			const TypeDescriptorType expectedType = TypeDescriptorTypeFactory<PrivatePotato>().Build();

@@ -3,6 +3,7 @@
 #include "Common/Definitions.h"
 
 #include <string>
+#include <typeinfo>
 
 using typehash_t = uint64_t;
 

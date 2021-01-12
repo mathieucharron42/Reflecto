@@ -1,5 +1,3 @@
-#include "../TestExtensions.h"
-
 #include "Resolver/Resolver.h"
 #include "Type/TypeDescriptor.h"
 #include "Type/TypeDescriptorFactory.h"
