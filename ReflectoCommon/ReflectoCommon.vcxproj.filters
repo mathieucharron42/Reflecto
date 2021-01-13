@@ -21,13 +21,13 @@
     <ClInclude Include="Common\Utils\EncapsulationBreaker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Utils\io.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Common\Utils\NonCopyable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Common\Utils\StringExt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Utils\IOExt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

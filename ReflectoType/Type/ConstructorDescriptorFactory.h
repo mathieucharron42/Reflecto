@@ -2,24 +2,29 @@
 
 #include "ConstructorDescriptor.h"
 
-template <typename object_t>
-class ConstructorDescriptorFactory
+namespace Reflecto
 {
-public:
-	ConstructorDescriptorFactory()
+	namespace Type
 	{
-		_constructor = []() -> void*
+		template <typename object_t>
+		class ConstructorDescriptorFactory
 		{
-			return new object_t{};
+		public:
+			ConstructorDescriptorFactory()
+			{
+				_constructor = []() -> void*
+				{
+					return new object_t{};
+				};
+			}
+
+			ConstructorDescriptor Build()
+			{
+				return ConstructorDescriptor{ _constructor };
+			}
+
+		private:
+			ConstructorDescriptor::construction_func_t _constructor;
 		};
 	}
-
-	ConstructorDescriptor Build()
-	{
-		return ConstructorDescriptor{_constructor};
-	}
-
-private:
-	ConstructorDescriptor::construction_func_t _constructor;
-};
-
+}

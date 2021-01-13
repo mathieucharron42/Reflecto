@@ -1,3 +1,8 @@
 #pragma once
 
-using byte = unsigned char; // or uint8_t
+#include <stdint.h>
+
+namespace Reflecto
+{
+	using byte = uint8_t;
+}

@@ -6,72 +6,74 @@
 #include <cassert>
 #include <string>
 #include <vector>
-
-struct BinarySerialization
+namespace Reflecto
 {
-    template <typename type>
-    static uint32_t Serialize(const type& obj, std::vector<byte>& bytes)
+    struct BinarySerialization
     {
-        const uint32_t objSize = sizeof(obj);
-        
-        const byte* begin = reinterpret_cast<const byte*>(&obj);
-        const byte* end = begin + objSize;
-        const auto dest = std::back_inserter(bytes);
+        template <typename type>
+        static uint32_t Serialize(const type& obj, std::vector<byte>& bytes)
+        {
+            const uint32_t objSize = sizeof(obj);
 
-        std::copy(begin, end, dest);
+            const byte* begin = reinterpret_cast<const byte*>(&obj);
+            const byte* end = begin + objSize;
+            const auto dest = std::back_inserter(bytes);
 
-        return objSize;
-    }
+            std::copy(begin, end, dest);
 
-    template <>
-    static uint32_t Serialize<std::string>(const std::string& obj, std::vector<byte>& bytes)
-    {
-        const char* characters = obj.c_str();
+            return objSize;
+        }
 
-        const byte* begin = reinterpret_cast<const byte*>(characters);
-        const byte* end = begin + obj.length() + 1;
-        const auto dest = std::back_inserter(bytes);
+        template <>
+        static uint32_t Serialize<std::string>(const std::string& obj, std::vector<byte>& bytes)
+        {
+            const char* characters = obj.c_str();
 
-        std::copy(begin, end, dest);
+            const byte* begin = reinterpret_cast<const byte*>(characters);
+            const byte* end = begin + obj.length() + 1;
+            const auto dest = std::back_inserter(bytes);
 
-        return static_cast<uint32_t>(obj.length() + 1);
-    }
+            std::copy(begin, end, dest);
 
-    template <typename type>
-    static uint32_t Serialize(const byte* addr, std::vector<byte>& bytes)
-    {
-        const type& val = reinterpret_cast<const type&>(*addr);
-        return Serialize<type>(val, bytes);
-    }
+            return static_cast<uint32_t>(obj.length() + 1);
+        }
 
-    template <typename type>
-    static uint32_t Deserialize(const std::vector<byte>& bytes, type& obj)
-    {
-        const uint32_t objSize = sizeof(obj);
+        template <typename type>
+        static uint32_t Serialize(const byte* addr, std::vector<byte>& bytes)
+        {
+            const type& val = reinterpret_cast<const type&>(*addr);
+            return Serialize<type>(val, bytes);
+        }
 
-        const std::vector<byte>::const_iterator begin = bytes.begin();
-        const std::vector<byte>::const_iterator end = begin + objSize;
-        byte* dest = reinterpret_cast<byte*>(&obj);
+        template <typename type>
+        static uint32_t Deserialize(const std::vector<byte>& bytes, type& obj)
+        {
+            const uint32_t objSize = sizeof(obj);
 
-        std::copy(begin, end, dest);
+            const std::vector<byte>::const_iterator begin = bytes.begin();
+            const std::vector<byte>::const_iterator end = begin + objSize;
+            byte* dest = reinterpret_cast<byte*>(&obj);
 
-        return objSize;
-    }
+            std::copy(begin, end, dest);
 
-    template <>
-    static uint32_t Deserialize<std::string>(const std::vector<byte>& bytes, std::string& obj)
-    {
-        const char* characters = reinterpret_cast<const char*>(bytes.data());
+            return objSize;
+        }
 
-        obj = std::string(characters);
+        template <>
+        static uint32_t Deserialize<std::string>(const std::vector<byte>& bytes, std::string& obj)
+        {
+            const char* characters = reinterpret_cast<const char*>(bytes.data());
 
-        return static_cast<uint32_t>(obj.length() + 1);
-    }
+            obj = std::string(characters);
 
-    template <typename type>
-    static uint32_t Deserialize(const std::vector<byte>& bytes, byte* addr)
-    {
-        type& val = reinterpret_cast<type&>(*addr);
-        return Deserialize<type>(bytes, val);
-    }
-};
+            return static_cast<uint32_t>(obj.length() + 1);
+        }
+
+        template <typename type>
+        static uint32_t Deserialize(const std::vector<byte>& bytes, byte* addr)
+        {
+            type& val = reinterpret_cast<type&>(*addr);
+            return Deserialize<type>(bytes, val);
+        }
+    };
+}

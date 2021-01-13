@@ -14,10 +14,10 @@ namespace Microsoft
 	{
 		namespace CppUnitTestFramework
 		{
-			template<> inline std::wstring ToString<std::vector<byte>>(const std::vector<byte>& vector)
+			template<> inline std::wstring ToString<std::vector<Reflecto::byte>>(const std::vector<Reflecto::byte>& vector)
 			{
-				std::wstring elements = StringExt::Join<std::wstring>(vector, L",", [](byte b) { return std::to_wstring(b); });
-				return StringExt::Format<std::wstring>(L"[%s]", elements.c_str());
+				std::wstring elements = Reflecto::Utils::StringExt::Join<std::wstring>(vector, L",", [](Reflecto::byte b) { return std::to_wstring(b); });
+				return Reflecto::Utils::StringExt::Format<std::wstring>(L"[%s]", elements.c_str());
 			}
 		}
 	}

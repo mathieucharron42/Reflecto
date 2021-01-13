@@ -4,38 +4,44 @@
 #include "TypeDescriptor.h"
 #include "TypeDescriptorFactory.h"
 
-template <typename object_t, typename member_t>
-class MemberDescriptorFactory
+namespace Reflecto
 {
-public:
-	MemberDescriptorFactory(object_t& sampleObj)
-		: _sampleObj(sampleObj)
-		, _name()
-		, _offset(0)
-	{ }
-
-	MemberDescriptorFactory& SetMember(typename member_t object_t::* memberPointer, const std::string& memberName)
+	namespace Type
 	{
-		byte offset = TypeExt::ComputeOffset(_sampleObj, memberPointer);
-		return SetMember(offset, memberName);
+		template <typename object_t, typename member_t>
+		class MemberDescriptorFactory
+		{
+		public:
+			MemberDescriptorFactory(object_t& sampleObj)
+				: _sampleObj(sampleObj)
+				, _name()
+				, _offset(0)
+			{ }
+
+			MemberDescriptorFactory& SetMember(typename member_t object_t::* memberPointer, const std::string& memberName)
+			{
+				byte offset = TypeExt::ComputeOffset(_sampleObj, memberPointer);
+				return SetMember(offset, memberName);
+			}
+
+			MemberDescriptorFactory& SetMember(byte offset, const std::string& memberName)
+			{
+				_name = memberName;
+				_offset = offset;
+				return *this;
+			}
+
+			MemberDescriptor Build()
+			{
+				TypeDescriptorType type = TypeDescriptorTypeFactory<member_t>().Build();
+
+				return MemberDescriptor{ type, _name, _offset };
+			}
+
+		private:
+			object_t _sampleObj;
+			std::string _name;
+			byte _offset;
+		};
 	}
-
-	MemberDescriptorFactory& SetMember(byte offset, const std::string& memberName)
-	{
-		_name = memberName;
-		_offset = offset;
-		return *this;
-	}
-
-	MemberDescriptor Build()
-	{
-		TypeDescriptorType type = TypeDescriptorTypeFactory<member_t>().Build();
-
-		return MemberDescriptor{ type, _name, _offset };
-	}
-
-private:
-	object_t _sampleObj;
-	std::string _name;
-	byte _offset;
-};
+}

@@ -4,17 +4,23 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace ReflectoCommonTest
+namespace Reflecto
 {
-	TEST_CLASS(NonCopyable)
+	namespace Utils
 	{
-	public:
-		TEST_METHOD(IsNonCopyable)
+		namespace Test
 		{
-			class TestClass : public NonCopyable
-			{ };
-			
-			Assert::IsFalse(std::is_trivially_copyable_v<TestClass>, L"NonCopyable is unexpectedly copyable!");
+			TEST_CLASS(NonCopyable)
+			{
+			public:
+				TEST_METHOD(IsNonCopyable)
+				{
+					class TestClass : public NonCopyable
+					{ };
+
+					Assert::IsFalse(std::is_trivially_copyable_v<TestClass>, L"NonCopyable is unexpectedly copyable!");
+				}
+			};
 		}
-	};
+	}
 }

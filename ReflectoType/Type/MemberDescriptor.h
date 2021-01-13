@@ -8,39 +8,45 @@
 #include <stdint.h>
 #include <string>
 
-class MemberDescriptor
+namespace Reflecto
 {
-public:
-	MemberDescriptor(const TypeDescriptorType& type, const std::string& name, byte offset)
-		: _type(type)
-		, _name(name)
-		, _offset(offset)
-	{ }
-
-	const TypeDescriptorType& Type() const
+	namespace Type
 	{
-		return _type;
-	}
+		class MemberDescriptor
+		{
+		public:
+			MemberDescriptor(const TypeDescriptorType& type, const std::string& name, byte offset)
+				: _type(type)
+				, _name(name)
+				, _offset(offset)
+			{ }
 
-	const std::string& Name() const
-	{
-		return _name;
-	}
+			const TypeDescriptorType& Type() const
+			{
+				return _type;
+			}
 
-	const uint32_t Offset() const
-	{
-		return _offset;
-	}
+			const std::string& Name() const
+			{
+				return _name;
+			}
 
-	bool operator==(const MemberDescriptor& other) const
-	{
-		return _type == other._type 
-			&& _name == other._name 
-			&& _offset == other._offset;
-	}
+			const uint32_t Offset() const
+			{
+				return _offset;
+			}
 
-private:
-	TypeDescriptorType _type;
-	std::string _name;
-	uint32_t _offset;
-};
+			bool operator==(const MemberDescriptor& other) const
+			{
+				return _type == other._type
+					&& _name == other._name
+					&& _offset == other._offset;
+			}
+
+		private:
+			TypeDescriptorType _type;
+			std::string _name;
+			uint32_t _offset;
+		};
+	}
+}

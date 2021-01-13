@@ -1,12 +1,17 @@
 #pragma once
-
-class NonCopyable
+namespace Reflecto
 {
-public:
-	NonCopyable(const NonCopyable&) = delete;
-	NonCopyable& operator = (const NonCopyable&) = delete;
+	namespace Utils
+	{
+		class NonCopyable
+		{
+		public:
+			NonCopyable(const NonCopyable&) = delete;
+			NonCopyable& operator = (const NonCopyable&) = delete;
 
-protected:
-	NonCopyable() = default;
-	~NonCopyable() = default;
-};
+		protected:
+			NonCopyable() = default;
+			~NonCopyable() = default;
+		};
+	}
+}

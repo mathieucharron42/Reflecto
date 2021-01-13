@@ -2,12 +2,15 @@
 
 #include "Common/Definitions.h"
 
-namespace Platform
+namespace Reflecto
 {
-	static bool IsLittleEndian()
+	namespace Platform
 	{
-		static short int number = 0x1;
-		static byte* ptr = reinterpret_cast<byte*>(&number);
-		return (ptr[0] == 1);
+		static bool IsLittleEndian()
+		{
+			static short int number = 0x1;
+			static byte* ptr = reinterpret_cast<byte*>(&number);
+			return (ptr[0] == 1);
+		}
 	}
 }

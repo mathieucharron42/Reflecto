@@ -5,30 +5,36 @@
 #include <string>
 #include <typeinfo>
 
-using typehash_t = uint64_t;
-
-namespace TypeExt
+namespace Reflecto
 {
-	template <typename type>
-	std::string GetClassName()
+	namespace Type
 	{
-		std::string fullName = typeid(type).name();
-		std::string clean = fullName.substr(fullName.find(" ")+1);
-		return clean;
-	}
+		using typehash_t = uint64_t;
 
-	template <typename type>
-	typehash_t GetTypeHash()
-	{
-		return typeid(type).hash_code();
-	}
+		namespace TypeExt
+		{
+			template <typename type>
+			std::string GetClassName()
+			{
+				std::string fullName = typeid(type).name();
+				std::string clean = fullName.substr(fullName.find(" ") + 1);
+				return clean;
+			}
 
-	template<typename object_t, typename member_pointer_owning_t, typename member_t>
-	byte ComputeOffset(const object_t& sampleObj, member_t typename member_pointer_owning_t::* memberPointer)
-	{
-		const byte* dummyAddr = reinterpret_cast<const byte*>(&sampleObj);
-		const byte* memberAddr = reinterpret_cast<const byte*>(&(sampleObj.*memberPointer));
-		const byte offset = static_cast<byte>(memberAddr - dummyAddr);
-		return offset;
+			template <typename type>
+			typehash_t GetTypeHash()
+			{
+				return typeid(type).hash_code();
+			}
+
+			template<typename object_t, typename member_pointer_owning_t, typename member_t>
+			byte ComputeOffset(const object_t& sampleObj, member_t typename member_pointer_owning_t::* memberPointer)
+			{
+				const byte* dummyAddr = reinterpret_cast<const byte*>(&sampleObj);
+				const byte* memberAddr = reinterpret_cast<const byte*>(&(sampleObj.*memberPointer));
+				const byte offset = static_cast<byte>(memberAddr - dummyAddr);
+				return offset;
+			}
+		}
 	}
 }
