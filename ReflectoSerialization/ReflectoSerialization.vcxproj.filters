@@ -15,24 +15,42 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Common\Definitions.h">
+    <ClInclude Include="Serialization\SerializationExt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Utils\EncapsulationBreaker.h">
+    <ClInclude Include="Serialization\Serializer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Utils\NonCopyable.h">
+    <ClInclude Include="Serialization\TextSerialization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Utils\StringExt.h">
+    <ClInclude Include="Serialization\Strategy\PODSerializationStrategy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Utils\IOExt.h">
+    <ClInclude Include="Serialization\Strategy\TypeSerializationStrategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization\SerializationFormat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization\Writer\ISerializationWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization\Writer\JsonSerializationWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization\Writer\SerializationWriterTypeTrait.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization\Strategy\JsonSerializationStrategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization\SerializationMetaType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source.cpp">
+    <ClCompile Include="Serialization\Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

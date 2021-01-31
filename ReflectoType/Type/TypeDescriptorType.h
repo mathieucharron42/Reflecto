@@ -30,6 +30,11 @@ namespace Reflecto
 				return _name == type._name && _hash == type._hash;
 			}
 
+			bool operator<(const  TypeDescriptorType& type) const
+			{
+				return _hash < type.Hash();
+			}
+
 		private:
 			std::string _name;
 			typehash_t _hash;

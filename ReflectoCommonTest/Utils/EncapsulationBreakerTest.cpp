@@ -14,7 +14,7 @@ namespace Reflecto
 			class PrivateTestClass
 			{
 			public:
-				int i;
+				int i = 0;
 
 				static int PrivateTestClass::* GetIPtr()
 				{
@@ -48,7 +48,7 @@ namespace Reflecto
 
 			private:
 				std::string _j;
-				float _k;
+				float _k = 0;
 			};
 
 			struct IMemberTag : public TypeMemberTag<PrivateTestClass, int> { };
