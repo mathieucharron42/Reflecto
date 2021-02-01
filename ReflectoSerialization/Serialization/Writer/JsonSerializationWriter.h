@@ -23,32 +23,32 @@ namespace Reflecto
 			
 			void WriteInteger32(int32_t value)
 			{
-				GetCurrentElement() = value;
+				GetCurrentElement().Json = value;
 			}
 
 			void WriteInteger64(int64_t value)
 			{
-				GetCurrentElement() = value;
+				GetCurrentElement().Json = value;
 			}
 
 			void WriteFloat(float value)
 			{
-				GetCurrentElement() = value;
+				GetCurrentElement().Json = value;
 			}
 
 			void WriteDouble(double value)
 			{
-				GetCurrentElement() = value;
+				GetCurrentElement().Json = value;
 			}
 
 			void WriteString(const std::string& value)
 			{
-				GetCurrentElement() = value;
+				GetCurrentElement().Json = value;
 			}
 
 			void WriteBoolean(bool value)
 			{
-				GetCurrentElement() = value;
+				GetCurrentElement().Json = value;
 			}
 
 			void WriteWriter(const std::string& propertyName, const JsonSerializationWriter& value)
@@ -58,16 +58,16 @@ namespace Reflecto
 
 			void WriteBeginObjectProperty(const std::string& propertyName)
 			{
-				_currentPropertyName = propertyName;
-				PushNewElement();
+				Element elem;
+				elem.PropertyName = propertyName;
+				PushNewElement(elem);
 			}
 
 			void WriteEndObjectProperty()
 			{
-				Json::Value elem = GetCurrentElement();
+				Element elem = GetCurrentElement();
 				PopElement();
-				GetCurrentElement()[_currentPropertyName] = elem;
-				_currentPropertyName.clear();
+				GetCurrentElement().Json[elem.PropertyName] = elem.Json;
 			}
 
 			void WriteBeginArrayElement()
@@ -77,9 +77,9 @@ namespace Reflecto
 
 			void WriteEndArrayElement()
 			{
-				Json::Value elem = GetCurrentElement();
+				Element elem = GetCurrentElement();
 				PopElement();
-				GetCurrentElement().append(elem);
+				GetCurrentElement().Json.append(elem.Json);
 			}
 
 			void Transpose(std::string& str)
@@ -91,14 +91,20 @@ namespace Reflecto
 				}();
 
 				std::stringstream ss;
-				writer->write(GetCurrentElement(), &ss);
+				writer->write(GetCurrentElement().Json, &ss);
 				str = ss.str();
 			}
 
 		private:
-			void PushNewElement(const Json::Value& obj = Json::Value())
+			struct Element
 			{
-				_stack.push(obj);
+				std::string PropertyName;
+				Json::Value Json;
+			};
+
+			void PushNewElement(const Element& element = Element())
+			{
+				_stack.push(element);
 			}
 
 			void PopElement()
@@ -106,20 +112,20 @@ namespace Reflecto
 				return _stack.pop();
 			}
 
-			Json::Value& GetCurrentElement()
+			Element& GetCurrentElement()
 			{
 				assert(!_stack.empty());
 				return _stack.top();
 			}
 
-			const Json::Value& GetCurrentElement() const
+			const Element& GetCurrentElement() const
 			{
 				assert(!_stack.empty());
 				return _stack.top();
 			}
 
-			std::stack<Json::Value> _stack;
-			std::string _currentPropertyName;
+			std::stack<Element> _stack;
+			std::stack<std::string> _propertyNames;
 		};
 	}
 }

@@ -131,7 +131,7 @@ namespace Reflecto
 					const std::string expected = R"([1,2,3])";
 					Assert::AreEqual(expected, actual, L"Unexpected serialization");
 				}
-
+				
 				TEST_METHOD(SerializeObject)
 				{
 					JsonSerializationWriter writer;
@@ -152,6 +152,52 @@ namespace Reflecto
 					writer.Transpose(actual);
 
 					const std::string expected = R"({"Age":1,"Friendliness":0.5,"Name":"Mr. Potato Head"})";
+					Assert::AreEqual(expected, actual, L"Unexpected serialization");
+				}
+
+				TEST_METHOD(SerializeComplexObject)
+				{
+					JsonSerializationWriter writer;
+
+					writer.WriteBeginObjectProperty("Name");
+					writer.WriteString("Mr. Potato Head");
+					writer.WriteEndObjectProperty();
+
+					writer.WriteBeginObjectProperty("Eyes");
+					{
+						writer.WriteBeginObjectProperty("Size");
+						writer.WriteInteger32(5);
+						writer.WriteEndObjectProperty();
+						writer.WriteBeginObjectProperty("Color");
+						writer.WriteString("black");
+						writer.WriteEndObjectProperty();
+					}
+					writer.WriteEndObjectProperty();
+
+					writer.WriteBeginObjectProperty("Mouth");
+					writer.WriteEndObjectProperty();
+
+					writer.WriteBeginObjectProperty("Legs");
+					{
+						writer.WriteBeginObjectProperty("PossibleColors");
+						writer.WriteBeginArrayElement();
+						writer.WriteString("blue");
+						writer.WriteEndArrayElement();
+						writer.WriteBeginArrayElement();
+						writer.WriteString("orange");
+						writer.WriteEndArrayElement();
+						writer.WriteBeginArrayElement();
+						writer.WriteString("white");
+						writer.WriteEndArrayElement();
+						writer.WriteEndObjectProperty();
+
+					}
+					writer.WriteEndObjectProperty();
+					
+					std::string actual;
+					writer.Transpose(actual);
+
+					const std::string expected = R"({"Eyes":{"Color":"black","Size":5},"Legs":{"PossibleColors":["blue","orange","white"]},"Mouth":null,"Name":"Mr. Potato Head"})";
 					Assert::AreEqual(expected, actual, L"Unexpected serialization");
 				}
 			};
