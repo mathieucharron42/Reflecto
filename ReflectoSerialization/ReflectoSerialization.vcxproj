@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClInclude Include="Serialization\SerializationMetaType.h" />
     <ClInclude Include="Serialization\Strategy\JsonSerializationStrategy.h" />
-    <ClInclude Include="Serialization\Writer\ISerializationWriter.h" />
     <ClInclude Include="Serialization\SerializationExt.h" />
     <ClInclude Include="Serialization\SerializationFormat.h" />
     <ClInclude Include="Serialization\Serializer.h" />
@@ -29,7 +28,6 @@
     <ClInclude Include="Serialization\TextSerialization.h" />
     <ClInclude Include="Serialization\Strategy\TypeSerializationStrategy.h" />
     <ClInclude Include="Serialization\Writer\JsonSerializationWriter.h" />
-    <ClInclude Include="Serialization\Writer\SerializationWriterTypeTrait.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ReflectoCommon\ReflectoCommon.vcxproj">
@@ -116,7 +114,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)ReflectoType;$(SolutionDir)ReflectoCommon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)ReflectoType;$(SolutionDir)JsonCpp;$(SolutionDir)ReflectoCommon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

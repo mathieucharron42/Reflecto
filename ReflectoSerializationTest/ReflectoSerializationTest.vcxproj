@@ -19,10 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="JsonSerializationWriterTest.cpp" />
     <ClCompile Include="SerializerTest.cpp" />
     <ClCompile Include="TextSerialization.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\JsonCpp\JsonCpp.vcxproj">
+      <Project>{bdfe2d9f-5a3d-44b7-88b2-4ff7035af21c}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\ReflectoSerialization\ReflectoSerialization.vcxproj">
       <Project>{3f966c5e-af4a-4375-9954-234f5bcf304e}</Project>
     </ProjectReference>
@@ -101,7 +105,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(SolutionDir)ReflectoSerialization;$(SolutionDir)ReflectoCommon;$(SolutionDir)ReflectoType;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(SolutionDir)ReflectoSerialization;$(SolutionDir)ReflectoCommon;$(SolutionDir)JsonCpp;$(SolutionDir)ReflectoType;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
       <PrecompiledHeaderFile>

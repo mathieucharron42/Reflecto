@@ -1,13 +1,11 @@
 #pragma once
 
 #include "Common/Definitions.h"
-#include "Type/TypeDescriptorType.h"
-#include "Serialization/TextSerialization.h"
-#include "Serialization/Writer/ISerializationWriter.h"
-#include "Serialization/Writer/SerializationWriterTypeTrait.h"
 
+#include "jsoncpp/json/json.h"
+
+#include <assert.h>
 #include <stack>
-#include <string>
 #include <sstream>
 #include <vector>
 
@@ -18,53 +16,110 @@ namespace Reflecto
 		class JsonSerializationWriter
 		{
 		public:
-			void WriteBeginObject()
+			JsonSerializationWriter()
 			{
-				_bufferStack.emplace();
-				_bufferStack.top().WriteBeginObject();
+				PushNewElement();
+			}
+			
+			void WriteInteger32(int32_t value)
+			{
+				GetCurrentElement() = value;
 			}
 
-			void WriteEndObject()
+			void WriteInteger64(int64_t value)
 			{
-				_bufferStack.top().WriteEndObject();
-				_bufferStack.pop();
+				GetCurrentElement() = value;
 			}
 
-			void Transpose(std::vector<byte>& bytes)
+			void WriteFloat(float value)
 			{
-				//TextSerialization::Serialize(_buffer.str(), bytes);
+				GetCurrentElement() = value;
+			}
+
+			void WriteDouble(double value)
+			{
+				GetCurrentElement() = value;
+			}
+
+			void WriteString(const std::string& value)
+			{
+				GetCurrentElement() = value;
+			}
+
+			void WriteBoolean(bool value)
+			{
+				GetCurrentElement() = value;
+			}
+
+			void WriteWriter(const std::string& propertyName, const JsonSerializationWriter& value)
+			{
+				GetCurrentElement() = value.GetCurrentElement();
+			}
+
+			void WriteBeginObjectProperty(const std::string& propertyName)
+			{
+				_currentPropertyName = propertyName;
+				PushNewElement();
+			}
+
+			void WriteEndObjectProperty()
+			{
+				Json::Value elem = GetCurrentElement();
+				PopElement();
+				GetCurrentElement()[_currentPropertyName] = elem;
+				_currentPropertyName.clear();
+			}
+
+			void WriteBeginArrayElement()
+			{
+				PushNewElement();
+			}
+
+			void WriteEndArrayElement()
+			{
+				Json::Value elem = GetCurrentElement();
+				PopElement();
+				GetCurrentElement().append(elem);
+			}
+
+			void Transpose(std::string& str)
+			{
+				std::unique_ptr<Json::StreamWriter> writer = [&] {
+					Json::StreamWriterBuilder builder;
+					builder["indentation"] = "";
+					return std::unique_ptr<Json::StreamWriter>(builder.newStreamWriter());
+				}();
+
+				std::stringstream ss;
+				writer->write(GetCurrentElement(), &ss);
+				str = ss.str();
 			}
 
 		private:
-			class JsonBuffer
+			void PushNewElement(const Json::Value& obj = Json::Value())
 			{
-			public:
-				void WriteBeginObject()
-				{
-					_buffer << "{";
-				}
+				_stack.push(obj);
+			}
 
-				void WriteObjectContent(const JsonBuffer& objectBuffer)
-				{
-					_buffer << objectBuffer.ToString();
-				}
+			void PopElement()
+			{
+				return _stack.pop();
+			}
 
-				void WriteEndObject()
-				{
-					_buffer << "}";
-				}
+			Json::Value& GetCurrentElement()
+			{
+				assert(!_stack.empty());
+				return _stack.top();
+			}
 
-				std::string ToString() const
-				{
-					return _buffer.str();
-				}
+			const Json::Value& GetCurrentElement() const
+			{
+				assert(!_stack.empty());
+				return _stack.top();
+			}
 
-			private:
-				std::stringstream _buffer;
-			};
-
-			std::stack<JsonBuffer> _bufferStack;
+			std::stack<Json::Value> _stack;
+			std::string _currentPropertyName;
 		};
-
 	}
 }

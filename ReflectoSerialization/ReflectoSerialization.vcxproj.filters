@@ -33,13 +33,7 @@
     <ClInclude Include="Serialization\SerializationFormat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\Writer\ISerializationWriter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Serialization\Writer\JsonSerializationWriter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Serialization\Writer\SerializationWriterTypeTrait.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Serialization\Strategy\JsonSerializationStrategy.h">

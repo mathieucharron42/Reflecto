@@ -1,11 +1,8 @@
 #pragma once
 
 #include "Common/Definitions.h"
-#include "Serialization/Writer/ISerializationWriter.h"
-#include "Serialization/SerializationMetaType.h"
-#include "Serialization/Strategy/TypeSerializationStrategy.h"
-#include "Serialization/Writer/SerializationWriterTypeTrait.h"
 #include "Type/TypeDescriptor.h"
+#include "Writer/JsonSerializationWriter.h"
 
 #include <cassert>
 #include <map>
@@ -16,26 +13,11 @@ namespace Reflecto
 {
 	namespace Serialization
 	{
-		template<typename serialization_format_t>
-		struct SerializationWriterTypeTrait { };
-
-		template<>
-		struct SerializationWriterTypeTrait<JsonSerializationFormat> { using type = JsonSerializationWriter; };
-
-		template<typename serialization_format_t>
-		struct SerializationValueTypeTrait { };
-
-		template<>
-		struct SerializationValueTypeTrait<JsonSerializationFormat> { using type = const char; };
-
-
-		template<typename serialization_format_t>
+		template<typename serialization_writer_t>
 		class Serializer
 		{
 		public:
-			using serialization_writer_t = typename SerializationWriterTypeTrait<serialization_format_t>::type;
-			using serialization_unit_t = typename SerializationValueTypeTrait<serialization_format_t>::type;
-			using serialization_strategy_t = typename std::function<void(const void*, TypeMetaType&, std::string&)>;
+			using serialization_strategy_t = typename std::function<void(const void*, JsonSerializationWriter& writer)>;
 
 			template<typename object_t>
 			void Serialize(const object_t& obj, std::vector<byte>& bytes)
@@ -52,13 +34,11 @@ namespace Reflecto
 					writer.WriteBeginObject();
 					
 					std::string type = descriptor.Type().Name();
-					//writer.WriteObjectProperty("type", TypeMetaType::String, type);
+					writer.WriteObjectPropertyString("type", type);
 
-					TypeMetaType metaType;
-					std::string objSerialized;
-					serializationStrategy(&obj, metaType, objSerialized);
-					
-					//writer.WriteObjectProperty("value", metaType, objSerialized);
+					serialization_writer_t valueWriter;
+					serializationStrategy(&obj, valueWriter);
+					writer.WriteObjectPropertyWriter("value", objSerialized);
 
 					writer.WriteEndObject();
 				}
