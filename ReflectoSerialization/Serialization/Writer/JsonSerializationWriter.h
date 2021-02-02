@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Common/Definitions.h"
+#include "Serialization/TextSerialization.h"
 
+#include "Common/Definitions.h"
 #include "jsoncpp/json/json.h"
 
 #include <assert.h>
@@ -93,6 +94,14 @@ namespace Reflecto
 				std::stringstream ss;
 				writer->write(GetCurrentElement().Json, &ss);
 				str = ss.str();
+			}
+
+			void Transpose(std::vector<byte>& bytes)
+			{
+				std::string str;
+				Transpose(str);
+
+				TextSerialization::Serialize(str, bytes);
 			}
 
 		private:

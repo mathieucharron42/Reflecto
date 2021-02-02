@@ -79,7 +79,7 @@ namespace Reflecto
 					const TypeDescriptor descriptor = TypeDescriptorFactory<uint32_t>().Build();
 
 					TypeDescriptorType expectedType = TypeDescriptorTypeFactory<uint32_t>().Build();
-					Assert::AreEqual(expectedType, descriptor.Type(), L"Type hash is unexpected");
+					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
 
 					std::vector<MemberDescriptor> expectedMembers;
 					Assert::AreEqual(expectedMembers, descriptor.Members(), L"Type members are unexpected");
@@ -98,7 +98,7 @@ namespace Reflecto
 						.Build();
 
 					const TypeDescriptorType expectedType = TypeDescriptorTypeFactory<Potato>().Build();
-					Assert::AreEqual(expectedType, descriptor.Type(), L"Type hash is unexpected");
+					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
 
 					const std::vector<MemberDescriptor> expectedMembers = [] {
 						const TypeDescriptorType type = TypeDescriptorTypeFactory<float>().Build();
@@ -128,7 +128,7 @@ namespace Reflecto
 						.Build();
 
 					const TypeDescriptorType expectedType = TypeDescriptorTypeFactory<PotatoNoPadding>().Build();
-					Assert::AreEqual(expectedType, descriptor.Type(), L"Type hash is unexpected");
+					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
 
 					const std::vector<MemberDescriptor> expectedMembers = [] {
 						using member1_t = std::string;
@@ -175,7 +175,7 @@ namespace Reflecto
 						.Build();
 
 					const TypeDescriptorType expectedType = TypeDescriptorTypeFactory<Potato>().Build();
-					Assert::AreEqual(expectedType, descriptor.Type(), L"Type hash is unexpected");
+					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
 
 					const std::size_t expectedMemberCount = 3;
 					Assert::AreEqual(expectedMemberCount, descriptor.Members().size(), L"Type members count is unexpected");
@@ -211,7 +211,7 @@ namespace Reflecto
 						.Build();
 
 					const TypeDescriptorType expectedType = TypeDescriptorTypeFactory<PrivatePotato>().Build();
-					Assert::AreEqual(expectedType, descriptor.Type(), L"Type hash is unexpected");
+					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
 
 					const std::vector<MemberDescriptor> expectedMembers = [] {
 						const MemberDescriptor member1 = [] {
@@ -258,10 +258,10 @@ namespace Reflecto
 						.Build();
 
 					const TypeDescriptorType baseExpectedType = TypeDescriptorTypeFactory<VegetableNoPadding>().Build();
-					Assert::AreEqual(baseExpectedType, baseDescriptor.Type(), L"Type hash is unexpected");
+					Assert::AreEqual(baseExpectedType, baseDescriptor.Type(), L"Type is unexpected");
 
 					const TypeDescriptorType childExpectedType = TypeDescriptorTypeFactory<PotatoNoPadding>().Build();
-					Assert::AreEqual(childExpectedType, childDescriptor.Type(), L"Type hash is unexpected");
+					Assert::AreEqual(childExpectedType, childDescriptor.Type(), L"Type is unexpected");
 
 					using baseMember1_t = float;
 					using baseMember2_t = float;

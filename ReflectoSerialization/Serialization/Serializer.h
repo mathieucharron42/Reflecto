@@ -2,7 +2,6 @@
 
 #include "Common/Definitions.h"
 #include "Type/TypeDescriptor.h"
-#include "Writer/JsonSerializationWriter.h"
 
 #include <cassert>
 #include <map>
@@ -17,33 +16,20 @@ namespace Reflecto
 		class Serializer
 		{
 		public:
-			using serialization_strategy_t = typename std::function<void(const void*, JsonSerializationWriter& writer)>;
+			using serialization_strategy_t = typename std::function<void(const Serializer<serialization_writer_t>& serializer, const Type::TypeDescriptor& descriptor, const void*, serialization_writer_t& writer)>;
 
-			template<typename object_t>
-			void Serialize(const object_t& obj, std::vector<byte>& bytes)
+			
+			void Serialize(const Type::TypeDescriptorType& type, const void* value, serialization_writer_t& writer) const
 			{
-				serialization_writer_t writer;
+				const TypeInformation* typeInformation = GetTypeInformation(type);
+				Serialize(typeInformation, value, writer);
+			}
 
-				const TypeInformation* typeInformation = GetTypeInformation<object_t>();
-
-				if (typeInformation)
-				{
-					const Type::TypeDescriptor& descriptor = typeInformation->Descriptor;
-					const serialization_strategy_t serializationStrategy = typeInformation->SerializationStrategy;
-
-					writer.WriteBeginObject();
-					
-					std::string type = descriptor.Type().Name();
-					writer.WriteObjectPropertyString("type", type);
-
-					serialization_writer_t valueWriter;
-					serializationStrategy(&obj, valueWriter);
-					writer.WriteObjectPropertyWriter("value", objSerialized);
-
-					writer.WriteEndObject();
-				}
-
-				writer.Transpose(bytes);
+			template<typename value_t>
+			void Serialize(const value_t& value, serialization_writer_t& writer) const
+			{
+				Type::TypeDescriptorType type = Type::TypeDescriptorTypeFactory<value_t>().Build();
+				Serialize(type, &value, writer);
 			}
 
 			void RegisterType(const Type::TypeDescriptor& typeDescriptor, serialization_strategy_t strategy)
@@ -51,6 +37,14 @@ namespace Reflecto
 				const TypeInformation information = { typeDescriptor, strategy };
 				_typeInformations.insert({ typeDescriptor.Type(), information });
 			}
+
+			template<typename value_t>
+			void RegisterType(serialization_strategy_t strategy)
+			{
+				Type::TypeDescriptor type = Type::TypeDescriptorTypeFactory<value_t>().Build();
+				RegisterType(type, strategy);
+			}
+
 
 		private:
 			struct TypeInformation
@@ -60,6 +54,23 @@ namespace Reflecto
 			};
 
 			using TypeInformationMap = std::map<Type::TypeDescriptorType, TypeInformation>;
+
+			void Serialize(const TypeInformation* typeInformation, const void* value, serialization_writer_t& writer) const
+			{
+				if (typeInformation)
+				{
+					const Type::TypeDescriptor& descriptor = typeInformation->Descriptor;
+					const serialization_strategy_t serializationStrategy = typeInformation->SerializationStrategy;
+
+					writer.WriteBeginObjectProperty("type");
+					writer.WriteString(descriptor.Type().Name());
+					writer.WriteEndObjectProperty();
+
+					writer.WriteBeginObjectProperty("value");
+					serializationStrategy(*this, descriptor, value, writer);
+					writer.WriteEndObjectProperty();
+				}
+			}
 
 			template<typename object_t>
 			const TypeInformation* GetTypeInformation() const

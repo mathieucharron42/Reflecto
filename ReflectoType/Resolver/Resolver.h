@@ -33,11 +33,17 @@ namespace Reflecto
 			template<typename member_t>
 			member_t* ResolveMember(object_t& object, const std::string& memberName)
 			{
-				member_t* memberAddr = nullptr;
+				member_t* memberAddr = reinterpret_cast<member_t*>(ResolveMember(object, memberName));
+				return memberAddr;
+			}
+
+			void* ResolveMember(object_t& object, const std::string& memberName)
+			{
+				void* memberAddr = nullptr;
 				const MemberDescriptor* memberDescriptor = _typeDescriptor.GetMemberByNameRecursive(memberName);
 				if (memberDescriptor)
 				{
-					memberAddr = ResolveMember<member_t>(object, *memberDescriptor);
+					memberAddr = ResolveMember(object, *memberDescriptor);
 				}
 				return memberAddr;
 			}
@@ -45,11 +51,22 @@ namespace Reflecto
 			template<typename member_t>
 			member_t* ResolveMember(object_t& object, const MemberDescriptor& memberDescriptor)
 			{
-				member_t* memberAddr = nullptr;
+				member_t* memberAddr = reinterpret_cast<member_t*>(ResolveMember(object, memberDescriptor));
+				return memberAddr;
+			}
+
+			void* ResolveMember(object_t& object, const MemberDescriptor& memberDescriptor)
+			{
 				byte* objRawAddr = reinterpret_cast<byte*>(&object);
 				byte* memberRawAddr = objRawAddr + memberDescriptor.Offset();
-				memberAddr = reinterpret_cast<member_t*>(memberRawAddr);
-				return memberAddr;
+				return memberRawAddr;
+			}
+
+			const void* ResolveMember(const object_t& object, const MemberDescriptor& memberDescriptor)
+			{
+				const byte* objRawAddr = reinterpret_cast<const byte*>(&object);
+				const byte* memberRawAddr = objRawAddr + memberDescriptor.Offset();
+				return memberRawAddr;
 			}
 
 		private:
