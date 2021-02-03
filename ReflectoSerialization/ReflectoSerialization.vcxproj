@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Serialization\SerializationMetaType.h" />
+    <ClInclude Include="Serialization\SerializerFactory.h" />
     <ClInclude Include="Serialization\Strategy\JsonSerializationStrategy.h" />
     <ClInclude Include="Serialization\SerializationExt.h" />
     <ClInclude Include="Serialization\SerializationFormat.h" />

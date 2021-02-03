@@ -8,6 +8,8 @@
 #include "TypeDescriptor.h"
 #include "TypeDescriptorType.h"
 
+#include "Type/TypeLibrary.h"
+
 namespace Reflecto
 {
 	namespace Type
@@ -16,15 +18,15 @@ namespace Reflecto
 		class TypeDescriptorFactory
 		{
 		public:
-			TypeDescriptorFactory()
-				: TypeDescriptorFactory(nullptr)
+			TypeDescriptorFactory(const Type::TypeLibrary& typeLibrary)
+				: TypeDescriptorFactory(typeLibrary, nullptr)
 			{
 
 			}
 
-			TypeDescriptorFactory(const TypeDescriptor* parentTypeDescriptor)
-				: _sampleObj()
-				, _type(TypeDescriptorTypeFactory<object_t>().Build())
+			TypeDescriptorFactory(const Type::TypeLibrary& typeLibrary, const TypeDescriptor* parentTypeDescriptor)
+				: _typeLibrary(typeLibrary)
+				, _sampleObj()
 				, _parent(parentTypeDescriptor)
 				, _constructor(ConstructorDescriptorFactory<object_t>().Build())
 			{
@@ -34,7 +36,7 @@ namespace Reflecto
 			template <typename member_t, typename object_t>
 			TypeDescriptorFactory& Register(typename member_t typename object_t::* memberPointer, const std::string& memberName)
 			{
-				MemberDescriptor member = MemberDescriptorFactory<object_t, member_t>(_sampleObj)
+				MemberDescriptor member = MemberDescriptorFactory<object_t, member_t>(_typeLibrary, _sampleObj)
 					.SetMember(memberPointer, memberName)
 					.Build();
 
@@ -45,12 +47,14 @@ namespace Reflecto
 
 			TypeDescriptor Build()
 			{
-				return TypeDescriptor(_type, _parent, _constructor, _members);
+				const TypeDescriptorType* type = _typeLibrary.Get<object_t>();
+				assert(type);
+				return TypeDescriptor(*type, _parent, _constructor, _members);
 			}
 
 		private:
+			Type::TypeLibrary _typeLibrary;
 			object_t _sampleObj;
-			TypeDescriptorType _type;
 			const TypeDescriptor* _parent;
 			ConstructorDescriptor _constructor;
 			std::vector<MemberDescriptor> _members;

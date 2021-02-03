@@ -1,7 +1,9 @@
 #pragma once
 
-#include "TypeDescriptorType.h"
-#include "TypeExt.h"
+#include "Type/TypeDescriptorTypeFactory.h"
+#include "Type/TypeDescriptorType.h"
+#include "Type/TypeExt.h"
+
 
 #include <assert.h>
 #include <map>
@@ -14,17 +16,24 @@ namespace Reflecto
 		class TypeLibrary
 		{
 		public:
-			void Add(const TypeDescriptorType& type)
+			TypeLibrary(const std::vector<TypeDescriptorType>& types)
+				: _types(types)
 			{
-				assert(!GetByHash(type.Hash()));
-				assert(!GetByName(type.Name()));
-				_types.push_back(type);
-			}
 
+			}
+			
 			template<class type_t>
 			const TypeDescriptorType* Get() const
 			{
 				return GetByHash(TypeExt::GetTypeHash<type_t>());
+			}
+
+			template<class type_t>
+			TypeDescriptorType GetChecked() const
+			{
+				const TypeDescriptorType* found = Get<type_t>();
+				assert(found);
+				return *found;
 			}
 
 			const TypeDescriptorType* GetByHash(const typehash_t& hash) const

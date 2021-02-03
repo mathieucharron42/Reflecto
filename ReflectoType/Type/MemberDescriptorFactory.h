@@ -3,6 +3,9 @@
 #include "MemberDescriptor.h"
 #include "TypeDescriptor.h"
 #include "TypeDescriptorFactory.h"
+#include "TypeLibrary.h"
+
+#include <assert.h>
 
 namespace Reflecto
 {
@@ -12,8 +15,9 @@ namespace Reflecto
 		class MemberDescriptorFactory
 		{
 		public:
-			MemberDescriptorFactory(object_t& sampleObj)
-				: _sampleObj(sampleObj)
+			MemberDescriptorFactory(const TypeLibrary& typeLibrary, object_t& sampleObj)
+				: _typeLibrary(typeLibrary)
+				, _sampleObj(sampleObj)
 				, _name()
 				, _offset(0)
 			{ }
@@ -33,12 +37,13 @@ namespace Reflecto
 
 			MemberDescriptor Build()
 			{
-				TypeDescriptorType type = TypeDescriptorTypeFactory<member_t>().Build();
-
-				return MemberDescriptor{ type, _name, _offset };
+				const TypeDescriptorType* type = _typeLibrary.Get<member_t>();
+				assert(type);
+				return MemberDescriptor{ *type, _name, _offset };
 			}
 
 		private:
+			TypeLibrary _typeLibrary;
 			object_t _sampleObj;
 			std::string _name;
 			byte _offset;

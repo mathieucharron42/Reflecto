@@ -1,6 +1,8 @@
 #include "Resolver/Resolver.h"
 #include "Type/TypeDescriptor.h"
 #include "Type/TypeDescriptorFactory.h"
+#include "Type/TypeLibrary.h"
+#include "Type/TypeLibraryFactory.h"
 
 #include "CppUnitTest.h"
 
@@ -25,9 +27,14 @@ namespace Reflecto
 						float Weight = 0.f;
 					};
 
-					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>()
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<Potato>("Potato")
+						.Add<float>("float")
+					.Build();
+
+					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>(typeLibrary)
 						.Register(&Potato::Weight, "Weight")
-						.Build();
+					.Build();
 
 					Resolver<Potato> resolver{ descriptor };
 
@@ -52,7 +59,12 @@ namespace Reflecto
 						float Weight = 0.f;
 					};
 
-					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>()
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<Potato>("Potato")
+						.Add<float>("float")
+					.Build();
+
+					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>(typeLibrary)
 						.Register(&Potato::Weight, "Weight")
 						.Build();
 
@@ -82,12 +94,20 @@ namespace Reflecto
 						int64_t CookedTime = 0;
 					};
 
-					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>()
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<Potato>("Potato")
+						.Add<int64_t>("int64")
+						.Add<float>("float")
+						.Add<bool>("bool")
+						.Add<std::string>("string")
+					.Build();
+
+					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>(typeLibrary)
 						.Register(&Potato::Name, "Name")
 						.Register(&Potato::Weight, "Weight")
 						.Register(&Potato::IsBaked, "IsBaked")
 						.Register(&Potato::CookedTime, "CookedTime")
-						.Build();
+					.Build();
 
 					Resolver<Potato> resolver{ descriptor };
 
@@ -147,15 +167,24 @@ namespace Reflecto
 						int64_t CookedTime = 0;
 					};
 
-					const TypeDescriptor baseDescriptor = TypeDescriptorFactory<Vegetable>()
-						.Register(&Vegetable::Weight, "Weight")
-						.Build();
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<Potato>("Potato")
+						.Add<Vegetable>("Vegetable")
+						.Add<int64_t>("int64")
+						.Add<float>("float")
+						.Add<bool>("bool")
+						.Add<std::string>("string")
+					.Build();
 
-					const TypeDescriptor childDescriptor = TypeDescriptorFactory<Potato>(&baseDescriptor)
+					const TypeDescriptor baseDescriptor = TypeDescriptorFactory<Vegetable>(typeLibrary)
+						.Register(&Vegetable::Weight, "Weight")
+					.Build();
+
+					const TypeDescriptor childDescriptor = TypeDescriptorFactory<Potato>(typeLibrary, &baseDescriptor)
 						.Register(&Potato::Name, "Name")
 						.Register(&Potato::IsBaked, "IsBaked")
 						.Register(&Potato::CookedTime, "CookedTime")
-						.Build();
+					.Build();
 
 					Resolver<Potato> resolver{ childDescriptor };
 
@@ -215,15 +244,24 @@ namespace Reflecto
 						int64_t CookedTime = 0;
 					};
 
-					const TypeDescriptor baseDescriptor = TypeDescriptorFactory<Vegetable>()
-						.Register(&Vegetable::Weight, "Weight")
-						.Build();
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<Potato>("Potato")
+						.Add<Vegetable>("Vegetable")
+						.Add<int64_t>("int64")
+						.Add<float>("float")
+						.Add<bool>("bool")
+						.Add<std::string>("string")
+					.Build();
 
-					const TypeDescriptor childDescriptor = TypeDescriptorFactory<Potato>(&baseDescriptor)
+					const TypeDescriptor baseDescriptor = TypeDescriptorFactory<Vegetable>(typeLibrary)
+						.Register(&Vegetable::Weight, "Weight")
+					.Build();
+
+					const TypeDescriptor childDescriptor = TypeDescriptorFactory<Potato>(typeLibrary, &baseDescriptor)
 						.Register(&Potato::Name, "Name")
 						.Register(&Potato::IsBaked, "IsBaked")
 						.Register(&Potato::CookedTime, "CookedTime")
-						.Build();
+					.Build();
 
 					Resolver<Vegetable> resolver{ baseDescriptor };
 
@@ -254,7 +292,12 @@ namespace Reflecto
 						int Weight;
 					};
 
-					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>().Build();
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<Potato>("Potato")
+						.Add<int>("int")
+					.Build();
+
+					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>(typeLibrary).Build();
 
 					Resolver<Potato> resolver{ descriptor };
 
@@ -284,7 +327,14 @@ namespace Reflecto
 						float Tastiness = 0.f;
 					};
 
-					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>().Build();
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<Potato>("Potato")
+						.Add<Vegetable>("Vegetable")
+						.Add<int>("int")
+						.Add<float>("float")
+					.Build();
+
+					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>(typeLibrary).Build();
 
 					Resolver<Potato> resolver{ descriptor };
 
@@ -318,18 +368,25 @@ namespace Reflecto
 						float Tastiness = 0.f;
 					};
 
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<Vegetable>("Vegetable")
+						.Add<Potato>("Potato")
+						.Add<float>("float")
+						.Add<int>("int")
+					.Build();
 
-					const TypeDescriptor baseDescriptor = TypeDescriptorFactory<Vegetable>()
+					const TypeDescriptor baseDescriptor = TypeDescriptorFactory<Vegetable>(typeLibrary)
 						.Register(&Vegetable::Weight, "Weight")
-						.Build();
-					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>(&baseDescriptor)
+					.Build();
+
+					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>(typeLibrary, &baseDescriptor)
 						.Register(&Potato::Tastiness, "Tastiness")
-						.Build();
+					.Build();
 
 					Resolver<Potato> resolver{ descriptor };
 
-					Potato* potato = resolver.Instantiate();
-					Assert::IsNotNull(potato, L"Unable to build new instance");
+					std::unique_ptr<Potato> potato = std::unique_ptr<Potato>(resolver.Instantiate());
+					Assert::IsNotNull(potato.get(), L"Unable to build new instance");
 
 					const int expectedWeight = 42;
 					const float expectedTastiness = 1.f;
@@ -345,8 +402,6 @@ namespace Reflecto
 
 					Assert::AreEqual(expectedWeight, potato->Weight, L"Unexpected value on member of instantiated instance");
 					Assert::AreEqual(expectedTastiness, potato->Tastiness, L"Unexpected value on member of instantiated instance");
-
-					delete potato;
 				}
 			};
 		}

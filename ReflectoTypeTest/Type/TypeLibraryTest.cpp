@@ -1,6 +1,7 @@
 #include "Type/TypeDescriptorType.h"
 #include "Type/TypeDescriptorTypeFactory.h"
 #include "Type/TypeLibrary.h"
+#include "Type/TypeLibraryFactory.h"
 
 #include "CppUnitTest.h"
 #include <tuple>
@@ -19,14 +20,16 @@ namespace Reflecto
 			public:
 				TEST_METHOD(GetByHash)
 				{
-					TypeLibrary testLibrary;
-					TypeDescriptorType testUIntType = TypeDescriptorTypeFactory<uint32_t>().Build();
-					testLibrary.Add(testUIntType);
-					TypeDescriptorType testStringType = TypeDescriptorTypeFactory<std::string>().Build();
-					testLibrary.Add(testStringType);
-					TypeDescriptorType testFloatType = TypeDescriptorTypeFactory<float>().Build();
-					testLibrary.Add(testFloatType);
+					TypeDescriptorType testUIntType = TypeDescriptorTypeFactory<uint32_t>("uint32").Build();
+					TypeDescriptorType testStringType = TypeDescriptorTypeFactory<std::string>("string").Build();
+					TypeDescriptorType testFloatType = TypeDescriptorTypeFactory<float>("float").Build();
 
+					TypeLibrary testLibrary = TypeLibraryFactory()
+						.Add(testUIntType)
+						.Add(testStringType)
+						.Add(testFloatType)
+					.Build();
+					
 					Assert::IsTrue(*testLibrary.Get<uint32_t>() == testUIntType, L"Unexpected type");
 					Assert::IsTrue(*testLibrary.Get<float>() == testFloatType, L"Unexpected type");
 				
@@ -36,13 +39,15 @@ namespace Reflecto
 
 				TEST_METHOD(GetByName)
 				{
-					TypeLibrary testLibrary;
 					TypeDescriptorType testUIntType = TypeDescriptorTypeFactory<uint32_t>("uint32").Build();
-					testLibrary.Add(testUIntType);
 					TypeDescriptorType testStringType = TypeDescriptorTypeFactory<std::string>("string").Build();
-					testLibrary.Add(testStringType);
 					TypeDescriptorType testFloatType = TypeDescriptorTypeFactory<float>("float").Build();
-					testLibrary.Add(testFloatType);
+
+					TypeLibrary testLibrary = TypeLibraryFactory()
+						.Add(testUIntType)
+						.Add(testStringType)
+						.Add(testFloatType)
+					.Build();
 
 					Assert::IsTrue(*testLibrary.GetByName("uint32") == testUIntType, L"Unexpected type");
 					Assert::IsTrue(*testLibrary.GetByName("string") == testStringType, L"Unexpected type");

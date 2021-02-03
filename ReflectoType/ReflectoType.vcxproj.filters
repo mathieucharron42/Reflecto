@@ -54,6 +54,9 @@
     <ClInclude Include="Type\TypeLibrary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Type\TypeLibraryFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TypeLibrary.cpp">

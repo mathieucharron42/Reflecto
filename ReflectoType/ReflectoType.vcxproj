@@ -167,6 +167,7 @@
     <ClInclude Include="Type\TypeDescriptorTypeFactory.h" />
     <ClInclude Include="Type\TypeExt.h" />
     <ClInclude Include="Type\TypeLibrary.h" />
+    <ClInclude Include="Type\TypeLibraryFactory.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TypeLibrary.cpp" />

@@ -11,12 +11,6 @@ namespace Reflecto
 		class TypeDescriptorTypeFactory
 		{
 		public:
-			TypeDescriptorTypeFactory()
-				: TypeDescriptorTypeFactory(TypeExt::GetClassName<type_t>())
-			{
-
-			}
-
 			TypeDescriptorTypeFactory(const std::string& name)
 				: _name(name)
 				, _hash(TypeExt::GetTypeHash<type_t>())

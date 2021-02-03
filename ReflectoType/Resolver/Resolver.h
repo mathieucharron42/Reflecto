@@ -20,7 +20,7 @@ namespace Reflecto
 			Resolver(const TypeDescriptor& typeDescriptor)
 				: _typeDescriptor(typeDescriptor)
 			{
-				assert(TypeDescriptorTypeFactory<object_t>().Build() == typeDescriptor.Type());
+				assert(TypeExt::GetTypeHash<object_t>() == typeDescriptor.Type().Hash());
 			}
 
 			object_t* Instantiate()

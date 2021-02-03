@@ -1,6 +1,8 @@
 #include "Resolver/Resolver.h"
 #include "Type/TypeDescriptor.h"
 #include "Type/TypeDescriptorFactory.h"
+#include "Type/TypeLibrary.h"
+#include "Type/TypeLibraryFactory.h"
 
 #include "Common/Utils/EncapsulationBreaker.h"
 #include "Common/Utils/StringExt.h"
@@ -76,9 +78,13 @@ namespace Reflecto
 			public:
 				TEST_METHOD(EmptyType)
 				{
-					const TypeDescriptor descriptor = TypeDescriptorFactory<uint32_t>().Build();
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<uint32_t>("uint32")
+					.Build();
 
-					TypeDescriptorType expectedType = TypeDescriptorTypeFactory<uint32_t>().Build();
+					const TypeDescriptor descriptor = TypeDescriptorFactory<uint32_t>(typeLibrary).Build();
+
+					const TypeDescriptorType& expectedType = *typeLibrary.Get<uint32_t>();
 					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
 
 					std::vector<MemberDescriptor> expectedMembers;
@@ -93,15 +99,20 @@ namespace Reflecto
 						float Weight = 0.f;
 					};
 
-					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>()
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<Potato>("Potato")
+						.Add<float>("float")
+					.Build();
+
+					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>(typeLibrary)
 						.Register(&Potato::Weight, "Weight")
 						.Build();
 
-					const TypeDescriptorType expectedType = TypeDescriptorTypeFactory<Potato>().Build();
+					const TypeDescriptorType& expectedType = *typeLibrary.Get<Potato>();
 					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
 
-					const std::vector<MemberDescriptor> expectedMembers = [] {
-						const TypeDescriptorType type = TypeDescriptorTypeFactory<float>().Build();
+					const std::vector<MemberDescriptor> expectedMembers = [&] {
+						const TypeDescriptorType type = typeLibrary.GetChecked<float>();
 						const std::string name = "Weight";
 						const byte offset = 0;
 						return std::vector<MemberDescriptor>{ MemberDescriptor(type, name, offset) };
@@ -109,7 +120,7 @@ namespace Reflecto
 					Assert::AreEqual(expectedMembers, descriptor.Members(), L"Type members are unexpected");
 				}
 
-				TEST_METHOD(MultipleMembersNoPadding)
+				TEST_METHOD(MultipleMembers)
 				{
 #pragma pack(push, 1)
 					class PotatoNoPadding
@@ -121,33 +132,40 @@ namespace Reflecto
 					};
 #pragma pack(pop)
 
-					const TypeDescriptor descriptor = TypeDescriptorFactory<PotatoNoPadding>()
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<PotatoNoPadding>("PotatoNoPadding")
+						.Add<std::string>("string")
+						.Add<float>("float")
+						.Add<int64_t>("int64")
+					.Build();
+
+					const TypeDescriptor descriptor = TypeDescriptorFactory<PotatoNoPadding>(typeLibrary)
 						.Register(&PotatoNoPadding::Name, "Name")
 						.Register(&PotatoNoPadding::Weight, "Weight")
 						.Register(&PotatoNoPadding::CookedTime, "CookedTime")
-						.Build();
+					.Build();
 
-					const TypeDescriptorType expectedType = TypeDescriptorTypeFactory<PotatoNoPadding>().Build();
+					const TypeDescriptorType& expectedType = *typeLibrary.Get<PotatoNoPadding>();
 					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
 
-					const std::vector<MemberDescriptor> expectedMembers = [] {
+					const std::vector<MemberDescriptor> expectedMembers = [&] {
 						using member1_t = std::string;
-						const MemberDescriptor member1 = [] {
-							const TypeDescriptorType type = TypeDescriptorTypeFactory<member1_t>().Build();
+						const MemberDescriptor member1 = [&] {
+							const TypeDescriptorType type = typeLibrary.GetChecked<member1_t>();
 							const std::string name = "Name";
 							const byte offset = 0;
 							return MemberDescriptor(type, name, offset);
 						}();
 						using member2_t = float;
-						const MemberDescriptor member2 = [] {
-							const TypeDescriptorType type = TypeDescriptorTypeFactory<member2_t>().Build();
+						const MemberDescriptor member2 = [&] {
+							const TypeDescriptorType type = typeLibrary.GetChecked<member2_t>();
 							const std::string name = "Weight";
 							const byte offset = sizeof(member1_t);
 							return MemberDescriptor(type, name, offset);
 						}();
 						using member3_t = int64_t;
-						const MemberDescriptor member3 = [] {
-							const TypeDescriptorType type = TypeDescriptorTypeFactory<member3_t>().Build();
+						const MemberDescriptor member3 = [&] {
+							const TypeDescriptorType type = typeLibrary.GetChecked<member3_t>();
 							const std::string name = "CookedTime";
 							const byte offset = sizeof(member1_t) + sizeof(member2_t);
 							return MemberDescriptor(type, name, offset);
@@ -158,70 +176,31 @@ namespace Reflecto
 					Assert::AreEqual(expectedMembers, descriptor.Members(), L"Type members are unexpected");
 				}
 
-				TEST_METHOD(MultipleMembers)
-				{
-					class Potato
-					{
-					public:
-						std::string Name;
-						float Weight = 0.f;
-						int64_t CookedTime = 0;
-					};
-
-					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>()
-						.Register(&Potato::Name, "Name")
-						.Register(&Potato::Weight, "Weight")
-						.Register(&Potato::CookedTime, "CookedTime")
-						.Build();
-
-					const TypeDescriptorType expectedType = TypeDescriptorTypeFactory<Potato>().Build();
-					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
-
-					const std::size_t expectedMemberCount = 3;
-					Assert::AreEqual(expectedMemberCount, descriptor.Members().size(), L"Type members count is unexpected");
-
-					using member_information_t = std::tuple<std::string, TypeDescriptorType>;
-					std::vector<member_information_t> expectedMember = [] {
-						auto builderFunc = std::make_tuple<std::string, TypeDescriptorType>;
-						member_information_t member1 = builderFunc("Name", TypeDescriptorTypeFactory<std::string>().Build());
-						member_information_t member2 = builderFunc("Weight", TypeDescriptorTypeFactory<float>().Build());
-						member_information_t member3 = builderFunc("CookedTime", TypeDescriptorTypeFactory<int64_t>().Build());
-						return std::vector<member_information_t>{member1, member2, member3};
-					}();
-
-					for (std::size_t i = 0; i < descriptor.Members().size(); ++i)
-					{
-						const MemberDescriptor& member = descriptor.Members()[i];
-						const member_information_t& expectedMemberInfo = expectedMember[i];
-						Assert::AreEqual(std::get<0>(expectedMemberInfo), member.Name(), L"Type member name is unexpected");
-						Assert::AreEqual(std::get<1>(expectedMemberInfo), member.Type(), L"Type member type is unexpected");
-						if (i > 0)
-						{
-							const MemberDescriptor& previousMember = descriptor.Members()[i - 1];
-							Assert::IsTrue(member.Offset() > previousMember.Offset(), L"Type member offset are out of order!");
-						}
-					}
-				}
-
 				TEST_METHOD(PrivateMember)
 				{
-					const TypeDescriptor descriptor = TypeDescriptorFactory<PrivatePotato>()
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<PrivatePotato>("PrivatePotato")
+						.Add<float>("float")
+						.Add<std::string>("string")
+					.Build();
+
+					const TypeDescriptor descriptor = TypeDescriptorFactory<PrivatePotato>(typeLibrary)
 						.Register(GetPrivateMemberPointer(PrivatePotatoWeightTag()), "Weight")
 						.Register(GetPrivateMemberPointer(PrivatePotatoNameTag()), "Name")
-						.Build();
+					.Build();
 
-					const TypeDescriptorType expectedType = TypeDescriptorTypeFactory<PrivatePotato>().Build();
+					const TypeDescriptorType& expectedType = *typeLibrary.Get<PrivatePotato>();
 					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
 
-					const std::vector<MemberDescriptor> expectedMembers = [] {
-						const MemberDescriptor member1 = [] {
-							const TypeDescriptorType type = TypeDescriptorTypeFactory<float>().Build();
+					const std::vector<MemberDescriptor> expectedMembers = [&] {
+						const MemberDescriptor member1 = [&] {
+							const TypeDescriptorType type = typeLibrary.GetChecked<float>();
 							const std::string name = "Weight";
 							const byte offset = 0;
 							return MemberDescriptor(type, name, offset);
 						}();
-						const MemberDescriptor member2 = [] {
-							const TypeDescriptorType type = TypeDescriptorTypeFactory<std::string>().Build();
+						const MemberDescriptor member2 = [&] {
+							const TypeDescriptorType type = typeLibrary.GetChecked<std::string>();
 							const std::string name = "Name";
 							const byte offset = sizeof(float);
 							return MemberDescriptor(type, name, offset);
@@ -231,7 +210,7 @@ namespace Reflecto
 					Assert::AreEqual(expectedMembers, descriptor.Members(), L"Type members are unexpected");
 				}
 
-				TEST_METHOD(PublicInheritanceNoPadding)
+				TEST_METHOD(PublicInheritance)
 				{
 #pragma pack(push, 1)
 					class VegetableNoPadding
@@ -248,33 +227,40 @@ namespace Reflecto
 					};
 #pragma pack(pop)
 
-					const TypeDescriptor baseDescriptor = TypeDescriptorFactory<VegetableNoPadding>()
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<VegetableNoPadding>("VegetableNoPadding")
+						.Add<PotatoNoPadding>("PotatoNoPadding")
+						.Add<float>("float")
+						.Add<bool>("bool")
+					.Build();
+
+					const TypeDescriptor baseDescriptor = TypeDescriptorFactory<VegetableNoPadding>(typeLibrary)
 						.Register(&VegetableNoPadding::Weight, "Weight")
 						.Register(&VegetableNoPadding::Condition, "Condition")
-						.Build();
+					.Build();
 
-					const TypeDescriptor childDescriptor = TypeDescriptorFactory<PotatoNoPadding>(&baseDescriptor)
+					const TypeDescriptor childDescriptor = TypeDescriptorFactory<PotatoNoPadding>(typeLibrary, &baseDescriptor)
 						.Register(&PotatoNoPadding::IsBacked, "IsBacked")
 						.Build();
 
-					const TypeDescriptorType baseExpectedType = TypeDescriptorTypeFactory<VegetableNoPadding>().Build();
+					const TypeDescriptorType baseExpectedType = *typeLibrary.Get<VegetableNoPadding>();
 					Assert::AreEqual(baseExpectedType, baseDescriptor.Type(), L"Type is unexpected");
 
-					const TypeDescriptorType childExpectedType = TypeDescriptorTypeFactory<PotatoNoPadding>().Build();
+					const TypeDescriptorType childExpectedType = *typeLibrary.Get<PotatoNoPadding>();
 					Assert::AreEqual(childExpectedType, childDescriptor.Type(), L"Type is unexpected");
 
 					using baseMember1_t = float;
 					using baseMember2_t = float;
-					const std::vector<MemberDescriptor> baseExpectedMembers = [] {
-						MemberDescriptor member1 = [] {
-							const TypeDescriptorType type = TypeDescriptorTypeFactory<baseMember1_t>().Build();
+					const std::vector<MemberDescriptor> baseExpectedMembers = [&] {
+						const MemberDescriptor member1 = [&] {
+							const TypeDescriptorType type = *typeLibrary.Get<baseMember1_t>();
 							const std::string name = "Weight";
 							const byte offset = 0;
 							return MemberDescriptor{ type, name, offset };
 						}();
 
-						MemberDescriptor member2 = [] {
-							const TypeDescriptorType type = TypeDescriptorTypeFactory<baseMember2_t>().Build();
+						const MemberDescriptor member2 = [&] {
+							const TypeDescriptorType type = *typeLibrary.Get<baseMember2_t>();
 							const std::string name = "Condition";
 							const byte offset = sizeof(baseMember1_t);
 							return MemberDescriptor{ type, name, offset };
@@ -285,9 +271,9 @@ namespace Reflecto
 					Assert::AreEqual(baseExpectedMembers, baseDescriptor.Members(), L"Type members are unexpected");
 
 					using childMember1_t = bool;
-					const std::vector<MemberDescriptor> childExpectedMembers = [] {
-						MemberDescriptor member1 = [] {
-							const TypeDescriptorType type = TypeDescriptorTypeFactory<childMember1_t>().Build();
+					const std::vector<MemberDescriptor> childExpectedMembers = [&] {
+						const MemberDescriptor member1 = [&] {
+							const TypeDescriptorType type = *typeLibrary.Get<childMember1_t>();
 							const std::string name = "IsBacked";
 							const byte offset = sizeof(baseMember1_t) + sizeof(baseMember2_t);
 							return MemberDescriptor{ type, name, offset };
@@ -306,7 +292,7 @@ namespace Reflecto
 					Assert::AreEqual(childExpectedMembersRecursive, childDescriptor.MemberResursive(), L"Type recursive members are unexpected");
 				}
 
-				TEST_METHOD(PublicInheritanceRegisterOnChild)
+				TEST_METHOD(PublicInheritanceRegisterOnChildClass)
 				{
 					class Vegetable
 					{
@@ -319,19 +305,26 @@ namespace Reflecto
 					{
 					};
 
-					const TypeDescriptor baseDescriptor = TypeDescriptorFactory<Vegetable>()
-						.Register(&Vegetable::Age, "Age")
-						.Build();
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<Vegetable>("Vegetable")
+						.Add<Potato>("Potato")
+						.Add<int>("int")
+						.Add<float>("float")
+					.Build();
 
-					const TypeDescriptor childDescriptor = TypeDescriptorFactory<Potato>(&baseDescriptor)
+					const TypeDescriptor baseDescriptor = TypeDescriptorFactory<Vegetable>(typeLibrary)
+						.Register(&Vegetable::Age, "Age")
+					.Build();
+
+					const TypeDescriptor childDescriptor = TypeDescriptorFactory<Potato>(typeLibrary, &baseDescriptor)
 						.Register(&Vegetable::Weight, "Weight")
-						.Build();
+					.Build();
 
 					using member_information_t = std::tuple<std::string, TypeDescriptorType>;
-					std::vector<member_information_t> expectedMembers = [] {
+					std::vector<member_information_t> expectedMembers = [&] {
 						auto builderFunc = std::make_tuple<std::string, TypeDescriptorType>;
-						member_information_t member1 = builderFunc("Age", TypeDescriptorTypeFactory<int>().Build());
-						member_information_t member2 = builderFunc("Weight", TypeDescriptorTypeFactory<float>().Build());
+						member_information_t member1 = builderFunc("Age", typeLibrary.GetChecked<int>());
+						member_information_t member2 = builderFunc("Weight", typeLibrary.GetChecked<float>());
 						return std::vector<member_information_t>{member1, member2};
 					}();
 
@@ -354,7 +347,9 @@ namespace Reflecto
 				{
 					class Potato {};
 
-					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>().Build();
+					const TypeLibrary typeLibrary = TypeLibraryFactory().Add<Potato>("Potato").Build();
+
+					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>(typeLibrary).Build();
 
 					const ConstructorDescriptor& constructorDescriptor = descriptor.Constructor();
 					Assert::IsTrue(static_cast<bool>(constructorDescriptor.Function()), L"No constructor function set!");

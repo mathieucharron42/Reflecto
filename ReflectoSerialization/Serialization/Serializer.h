@@ -2,6 +2,7 @@
 
 #include "Common/Definitions.h"
 #include "Type/TypeDescriptor.h"
+#include "Type/TypeLibrary.h"
 
 #include <cassert>
 #include <map>
@@ -18,7 +19,12 @@ namespace Reflecto
 		public:
 			using serialization_strategy_t = typename std::function<void(const Serializer<serialization_writer_t>& serializer, const Type::TypeDescriptor& descriptor, const void*, serialization_writer_t& writer)>;
 
-			
+			Serializer(const Type::TypeLibrary& library)
+				: _typeLibrary(library)
+			{
+
+			}
+
 			void Serialize(const Type::TypeDescriptorType& type, const void* value, serialization_writer_t& writer) const
 			{
 				const TypeInformation* typeInformation = GetTypeInformation(type);
@@ -28,8 +34,9 @@ namespace Reflecto
 			template<typename value_t>
 			void Serialize(const value_t& value, serialization_writer_t& writer) const
 			{
-				Type::TypeDescriptorType type = Type::TypeDescriptorTypeFactory<value_t>().Build();
-				Serialize(type, &value, writer);
+				const Type::TypeDescriptorType* type = _typeLibrary.Get<value_t>();
+				assert(type); 
+				Serialize(*type, &value, writer);
 			}
 
 			void RegisterType(const Type::TypeDescriptor& typeDescriptor, serialization_strategy_t strategy)
@@ -41,8 +48,9 @@ namespace Reflecto
 			template<typename value_t>
 			void RegisterType(serialization_strategy_t strategy)
 			{
-				Type::TypeDescriptor type = Type::TypeDescriptorTypeFactory<value_t>().Build();
-				RegisterType(type, strategy);
+				const Type::TypeDescriptor* type = _typeLibrary.Get<value_t>();
+				assert(type);
+				RegisterType(*type, strategy);
 			}
 
 
@@ -72,19 +80,13 @@ namespace Reflecto
 				}
 			}
 
-			template<typename object_t>
-			const TypeInformation* GetTypeInformation() const
-			{
-				Type::TypeDescriptorType type = Type::TypeDescriptorTypeFactory<object_t>().Build();
-				return GetTypeInformation(type);
-			}
-
 			const TypeInformation* GetTypeInformation(const Type::TypeDescriptorType& type) const
 			{
 				TypeInformationMap::const_iterator found = _typeInformations.find(type);
 				return found != _typeInformations.end() ? &(*found).second : nullptr;
 			}
 
+			Type::TypeLibrary _typeLibrary;
 			TypeInformationMap _typeInformations;
 		};
 	}
