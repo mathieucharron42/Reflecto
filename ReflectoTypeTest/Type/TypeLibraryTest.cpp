@@ -37,15 +37,15 @@ namespace Reflecto
 				TEST_METHOD(GetByName)
 				{
 					TypeLibrary testLibrary;
-					TypeDescriptorType testUIntType = TypeDescriptorTypeFactory<uint32_t>().Build();
+					TypeDescriptorType testUIntType = TypeDescriptorTypeFactory<uint32_t>("uint32").Build();
 					testLibrary.Add(testUIntType);
-					TypeDescriptorType testStringType = TypeDescriptorTypeFactory<std::string>().Build();
+					TypeDescriptorType testStringType = TypeDescriptorTypeFactory<std::string>("string").Build();
 					testLibrary.Add(testStringType);
-					TypeDescriptorType testFloatType = TypeDescriptorTypeFactory<float>().Build();
+					TypeDescriptorType testFloatType = TypeDescriptorTypeFactory<float>("float").Build();
 					testLibrary.Add(testFloatType);
 
 					Assert::IsTrue(*testLibrary.GetByName("uint32") == testUIntType, L"Unexpected type");
-					Assert::IsTrue(*testLibrary.GetByName("string") == testFloatType, L"Unexpected type");
+					Assert::IsTrue(*testLibrary.GetByName("string") == testStringType, L"Unexpected type");
 				}
 
 			};
