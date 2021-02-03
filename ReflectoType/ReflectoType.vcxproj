@@ -91,7 +91,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)ReflectoCommon</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ReflectoCommon;$(SolutionDir)</AdditionalIncludeDirectories>
       <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
@@ -166,6 +166,7 @@
     <ClInclude Include="Type\TypeDescriptorType.h" />
     <ClInclude Include="Type\TypeDescriptorTypeFactory.h" />
     <ClInclude Include="Type\TypeExt.h" />
+    <ClInclude Include="Type\TypeLibrary.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TypeLibrary.cpp" />

@@ -166,6 +166,7 @@
   <ItemGroup>
     <ClCompile Include="Resolver\ResolverTest.cpp" />
     <ClCompile Include="Type\TypeDescriptorTest.cpp" />
+    <ClCompile Include="Type\TypeLibraryTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ReflectoType\ReflectoType.vcxproj">
