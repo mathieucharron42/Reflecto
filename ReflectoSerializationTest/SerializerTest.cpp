@@ -34,7 +34,6 @@ namespace Reflecto
 
 					const Type::TypeDescriptor intDescriptor = Type::TypeDescriptorFactory<int32_t>(testTypeLibrary).Build();
 
-				
 					Serializer<JsonSerializationWriter> serializer = SerializerFactory<JsonSerializationWriter>(testTypeLibrary).Build();
 					serializer.RegisterType(intDescriptor, JsonSerializationStrategy::SerializeInt32);
 
@@ -50,11 +49,15 @@ namespace Reflecto
 					Assert::AreEqual(expectedStr, actualStr, L"Serialized bytes are unexpected!");
 				}
 
-				/*TEST_METHOD(SerializeString)
+				TEST_METHOD(SerializeString)
 				{
-					const Type::TypeDescriptor strDescriptor = Type::TypeDescriptorFactory<std::string>().Build();
+					Type::TypeLibrary testTypeLibrary = Type::TypeLibraryFactory()
+						.Add<std::string>("string")
+					.Build();
 
-					Serializer<JsonSerializationWriter> serializer;
+					const Type::TypeDescriptor strDescriptor = Type::TypeDescriptorFactory<std::string>(testTypeLibrary).Build();
+
+					Serializer<JsonSerializationWriter> serializer(testTypeLibrary);
 					serializer.RegisterType(strDescriptor, JsonSerializationStrategy::SerializeString);
 
 					std::string testValue = "test";
@@ -78,14 +81,20 @@ namespace Reflecto
 						int32_t Age = 0;
 					};
 
-					const Type::TypeDescriptor strDescriptor = Type::TypeDescriptorFactory<std::string>().Build();
-					const Type::TypeDescriptor int32Descriptor = Type::TypeDescriptorFactory<int32_t>().Build();
-					const Type::TypeDescriptor objDescriptor = Type::TypeDescriptorFactory<PersonTestObject>()
+					Type::TypeLibrary testTypeLibrary = Type::TypeLibraryFactory()
+						.Add<PersonTestObject>("PersonTestObject")
+						.Add<std::string>("string")
+						.Add<int32_t>("int32")
+					.Build();
+
+					const Type::TypeDescriptor strDescriptor = Type::TypeDescriptorFactory<std::string>(testTypeLibrary).Build();
+					const Type::TypeDescriptor int32Descriptor = Type::TypeDescriptorFactory<int32_t>(testTypeLibrary).Build();
+					const Type::TypeDescriptor objDescriptor = Type::TypeDescriptorFactory<PersonTestObject>(testTypeLibrary)
 						.Register(&PersonTestObject::Name, "Name")
 						.Register(&PersonTestObject::Age, "Age")
 					.Build();
 
-					Serializer<JsonSerializationWriter> serializer;
+					Serializer<JsonSerializationWriter> serializer(testTypeLibrary);
 					serializer.RegisterType(int32Descriptor, JsonSerializationStrategy::SerializeInt32);
 					serializer.RegisterType(strDescriptor, JsonSerializationStrategy::SerializeString);
 					serializer.RegisterType(objDescriptor, JsonSerializationStrategy::SerializeObject<PersonTestObject>);
@@ -107,7 +116,7 @@ namespace Reflecto
 					std::string expectedAgeStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), int32Descriptor.Type().Name().c_str(), testValueAge);
 					std::string expectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Age":%s,"Name":%s}})"), objDescriptor.Type().Name().c_str(), expectedAgeStr.c_str(), expectedNameStr.c_str());
 					Assert::AreEqual(expectedStr, actualStr, L"Serialized bytes are unexpected!");
-				}*/
+				}
 			};
 		}
 	}
