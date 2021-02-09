@@ -28,9 +28,7 @@ namespace Reflecto
 			Serializer(const Type::TypeLibrary& library, const TypeInformationMap& typeInformation)
 				: _typeLibrary(library)
 				, _typeInformations(typeInformation)
-			{
-
-			}
+			{ }
 
 			void Serialize(const Type::TypeDescriptorType& type, const void* value, serialization_writer_t& writer) const
 			{

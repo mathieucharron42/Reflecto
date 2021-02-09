@@ -74,7 +74,6 @@ namespace Reflecto
 					Assert::AreEqual(expectedStr, actualStr, L"Serialized bytes are unexpected!");
 				}
 
-
 				TEST_METHOD(SerializeObject)
 				{
 					struct PersonTestObject
@@ -118,6 +117,37 @@ namespace Reflecto
 					std::string expectedNameStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), strDescriptor.Type().Name().c_str(), testValueName.c_str());
 					std::string expectedAgeStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), int32Descriptor.Type().Name().c_str(), testValueAge);
 					std::string expectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Age":%s,"Name":%s}})"), objDescriptor.Type().Name().c_str(), expectedAgeStr.c_str(), expectedNameStr.c_str());
+					Assert::AreEqual(expectedStr, actualStr, L"Serialized bytes are unexpected!");
+				}
+
+
+				TEST_METHOD(SerializeVector)
+				{
+					Type::TypeLibrary testTypeLibrary = Type::TypeLibraryFactory()
+						.Add<std::string>("string")
+						.Add<std::vector<std::string>>("vector<string>")
+					.Build();
+
+					const Type::TypeDescriptor strDescriptor = Type::TypeDescriptorFactory<std::string>(testTypeLibrary).Build();
+					const Type::TypeDescriptor vectorStringDescriptor = Type::TypeDescriptorFactory<std::vector<std::string>>(testTypeLibrary).Build();
+
+					Serializer<JsonSerializationWriter> serializer = SerializerFactory<JsonSerializationWriter>(testTypeLibrary)
+						.LearnType(strDescriptor, SerializationStrategy::SerializeString)
+						.LearnType(vectorStringDescriptor, SerializationStrategy::SerializeCollection<std::vector<std::string>>)
+					.Build();
+
+					std::vector<std::string> testValue = { "uno", "dos", "tres" };
+
+					JsonSerializationWriter writer;
+					serializer.Serialize(testValue, writer);
+
+					std::string actualStr;
+					writer.Transpose(actualStr);
+
+					std::string value1ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), strDescriptor.Type().Name().c_str(), "uno");
+					std::string value2ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), strDescriptor.Type().Name().c_str(), "dos");
+					std::string value3ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), strDescriptor.Type().Name().c_str(), "tres");
+					std::string expectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":[%s,%s,%s]})"), vectorStringDescriptor.Type().Name().c_str(), value1ExpectedStr.c_str(), value2ExpectedStr.c_str(), value3ExpectedStr.c_str());
 					Assert::AreEqual(expectedStr, actualStr, L"Serialized bytes are unexpected!");
 				}
 			};

@@ -37,6 +37,20 @@ namespace Reflecto
 					writer.WriteEndObjectProperty();
 				}
 			}
+
+			template<class object_t>
+			void SerializeCollection(const Serializer<JsonSerializationWriter> serializer, const Type::TypeDescriptor& typeDesriptor, const void* value, JsonSerializationWriter& writer)
+			{
+				using element_t = typename object_t::value_type;
+
+				const object_t& valueObject = *reinterpret_cast<const object_t*>(value);
+				for (const element_t& element : valueObject)
+				{
+					writer.WriteBeginArrayElement();
+					serializer.Serialize(element, writer);
+					writer.WriteEndArrayElement();
+				}
+			}
 		}
 	}
 }
