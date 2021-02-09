@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Serialization/Writer/ISerializationWriter.h"
+
 #include "Common/Definitions.h"
 #include "Type/TypeDescriptor.h"
 #include "Type/TypeLibrary.h"
@@ -13,11 +15,11 @@ namespace Reflecto
 {
 	namespace Serialization
 	{
-		template<typename serialization_writer_t>
 		class Serializer
 		{
 		public:				
-			using serialization_strategy_t = typename std::function<void(const Serializer<serialization_writer_t>& serializer, const Type::TypeDescriptor& descriptor, const void*, serialization_writer_t& writer)>;
+
+			using serialization_strategy_t = typename std::function<void(const Serializer& serializer, const Type::TypeDescriptor& descriptor, const void*, ISerializationWriter& writer)>;
 			struct TypeInformation
 			{
 				Type::TypeDescriptor Descriptor;
@@ -30,13 +32,15 @@ namespace Reflecto
 				, _typeInformations(typeInformation)
 			{ }
 
+
+			template<typename serialization_writer_t>
 			void Serialize(const Type::TypeDescriptorType& type, const void* value, serialization_writer_t& writer) const
 			{
 				const TypeInformation* typeInformation = GetTypeInformation(type);
 				Serialize(typeInformation, value, writer);
 			}
 
-			template<typename value_t>
+			template<typename value_t, typename serialization_writer_t>
 			void Serialize(const value_t& value, serialization_writer_t& writer) const
 			{
 				const Type::TypeDescriptorType* type = _typeLibrary.Get<value_t>();
@@ -45,8 +49,10 @@ namespace Reflecto
 			}
 
 		private:
+			template<typename serialization_writer_t>
 			void Serialize(const TypeInformation* typeInformation, const void* value, serialization_writer_t& writer) const
 			{
+				assert(typeInformation);
 				if (typeInformation)
 				{
 					const Type::TypeDescriptor& descriptor = typeInformation->Descriptor;

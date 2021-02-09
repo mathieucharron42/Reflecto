@@ -45,6 +45,9 @@
     <ClInclude Include="Serialization\SerializerFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Serialization\Writer\ISerializationWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Serialization\Source.cpp">

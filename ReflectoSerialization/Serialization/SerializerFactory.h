@@ -8,11 +8,10 @@ namespace Reflecto
 {
 	namespace Serialization
 	{
-		template<typename serialization_writer_t>
 		class SerializerFactory
 		{
 		public:
-			using SerializationStrategy = typename Serializer<serialization_writer_t>::serialization_strategy_t;
+			using SerializationStrategy = typename Serializer::serialization_strategy_t;
 
 			SerializerFactory(const Type::TypeLibrary& library)
 				: _typeLibrary(library)
@@ -20,20 +19,20 @@ namespace Reflecto
 
 			}
 
-			SerializerFactory<serialization_writer_t>& LearnType(const Type::TypeDescriptor& typeDescriptor, SerializationStrategy strategy)
+			SerializerFactory& LearnType(const Type::TypeDescriptor& typeDescriptor, SerializationStrategy strategy)
 			{
 				const TypeInformation information = { typeDescriptor, strategy };
 				_typeInformations.insert({ typeDescriptor.Type(), information });
 				return *this;
 			}
 
-			Serializer<serialization_writer_t> Build()
+			Serializer Build()
 			{
-				return Serializer<serialization_writer_t>(_typeLibrary, _typeInformations);
+				return Serializer(_typeLibrary, _typeInformations);
 			}
 
 		private:
-			using TypeInformation = typename Serializer<serialization_writer_t>::TypeInformation;
+			using TypeInformation = typename Serializer::TypeInformation;
 			
 			Type::TypeLibrary _typeLibrary;
 			std::map<Type::TypeDescriptorType, TypeInformation> _typeInformations;

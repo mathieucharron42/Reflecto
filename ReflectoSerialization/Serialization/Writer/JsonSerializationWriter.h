@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Serialization/TextSerialization.h"
+#include "Serialization/Writer/ISerializationWriter.h"
 
 #include "Common/Definitions.h"
 #include "jsoncpp/json/json.h"
@@ -14,7 +15,7 @@ namespace Reflecto
 {
 	namespace Serialization
 	{
-		class JsonSerializationWriter
+		class JsonSerializationWriter : public ISerializationWriter
 		{
 		public:
 			JsonSerializationWriter()
@@ -22,32 +23,32 @@ namespace Reflecto
 				PushNewElement();
 			}
 			
-			void WriteInteger32(int32_t value)
+			virtual void WriteInteger32(int32_t value) override
 			{
 				GetCurrentElement().Json = value;
 			}
 
-			void WriteInteger64(int64_t value)
+			virtual void WriteInteger64(int64_t value) override
 			{
 				GetCurrentElement().Json = value;
 			}
 
-			void WriteFloat(float value)
+			virtual void WriteFloat(float value) override
 			{
 				GetCurrentElement().Json = value;
 			}
 
-			void WriteDouble(double value)
+			virtual void WriteDouble(double value) override
 			{
 				GetCurrentElement().Json = value;
 			}
 
-			void WriteString(const std::string& value)
+			virtual void WriteString(const std::string& value) override
 			{
 				GetCurrentElement().Json = value;
 			}
 
-			void WriteBoolean(bool value)
+			virtual void WriteBoolean(bool value) override
 			{
 				GetCurrentElement().Json = value;
 			}
@@ -57,26 +58,26 @@ namespace Reflecto
 				GetCurrentElement() = value.GetCurrentElement();
 			}
 
-			void WriteBeginObjectProperty(const std::string& propertyName)
+			virtual void WriteBeginObjectProperty(const std::string& propertyName) override
 			{
 				Element elem;
 				elem.PropertyName = propertyName;
 				PushNewElement(elem);
 			}
 
-			void WriteEndObjectProperty()
+			virtual void WriteEndObjectProperty() override
 			{
 				Element elem = GetCurrentElement();
 				PopElement();
 				GetCurrentElement().Json[elem.PropertyName] = elem.Json;
 			}
 
-			void WriteBeginArrayElement()
+			virtual void WriteBeginArrayElement() override
 			{
 				PushNewElement();
 			}
 
-			void WriteEndArrayElement()
+			virtual void WriteEndArrayElement() override
 			{
 				Element elem = GetCurrentElement();
 				PopElement();

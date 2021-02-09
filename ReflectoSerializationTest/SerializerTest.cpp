@@ -34,7 +34,7 @@ namespace Reflecto
 
 					const Type::TypeDescriptor intDescriptor = Type::TypeDescriptorFactory<int32_t>(testTypeLibrary).Build();
 
-					Serializer<JsonSerializationWriter> serializer = SerializerFactory<JsonSerializationWriter>(testTypeLibrary)
+					Serializer serializer = SerializerFactory(testTypeLibrary)
 						.LearnType(intDescriptor, SerializationStrategy::SerializeInt32)
 					.Build();
 
@@ -58,7 +58,7 @@ namespace Reflecto
 
 					const Type::TypeDescriptor strDescriptor = Type::TypeDescriptorFactory<std::string>(testTypeLibrary).Build();
 
-					Serializer<JsonSerializationWriter> serializer = SerializerFactory<JsonSerializationWriter>(testTypeLibrary)
+					Serializer serializer = SerializerFactory(testTypeLibrary)
 						.LearnType(strDescriptor, SerializationStrategy::SerializeString)
 					.Build();
 
@@ -95,7 +95,7 @@ namespace Reflecto
 						.Register(&PersonTestObject::Age, "Age")
 					.Build();
 
-					Serializer<JsonSerializationWriter> serializer = SerializerFactory<JsonSerializationWriter>(testTypeLibrary)
+					Serializer serializer = SerializerFactory(testTypeLibrary)
 						.LearnType(int32Descriptor, SerializationStrategy::SerializeInt32)
 						.LearnType(strDescriptor, SerializationStrategy::SerializeString)
 						.LearnType(objDescriptor, SerializationStrategy::SerializeObject<PersonTestObject>)
@@ -131,7 +131,7 @@ namespace Reflecto
 					const Type::TypeDescriptor strDescriptor = Type::TypeDescriptorFactory<std::string>(testTypeLibrary).Build();
 					const Type::TypeDescriptor vectorStringDescriptor = Type::TypeDescriptorFactory<std::vector<std::string>>(testTypeLibrary).Build();
 
-					Serializer<JsonSerializationWriter> serializer = SerializerFactory<JsonSerializationWriter>(testTypeLibrary)
+					Serializer serializer = SerializerFactory(testTypeLibrary)
 						.LearnType(strDescriptor, SerializationStrategy::SerializeString)
 						.LearnType(vectorStringDescriptor, SerializationStrategy::SerializeCollection<std::vector<std::string>>)
 					.Build();

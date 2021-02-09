@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Serialization/Serializer.h"
 #include "Serialization/Writer/JsonSerializationWriter.h"
 
 #include "Type/TypeDescriptor.h"
@@ -12,20 +13,20 @@ namespace Reflecto
 	{
 		namespace SerializationStrategy
 		{
-			void SerializeInt32(const Serializer<JsonSerializationWriter> serializer, const Type::TypeDescriptor& typeDesriptor, const void* value, JsonSerializationWriter& writer)
+			void SerializeInt32(const Serializer& serializer, const Type::TypeDescriptor& typeDesriptor, const void* value, ISerializationWriter& writer)
 			{
 				const int32_t& valInt = *reinterpret_cast<const int32_t*>(value);
 				writer.WriteInteger32(valInt);
 			}
 
-			void SerializeString(const Serializer<JsonSerializationWriter> serializer, const Type::TypeDescriptor& typeDesriptor, const void* value, JsonSerializationWriter& writer)
+			void SerializeString(const Serializer& serializer, const Type::TypeDescriptor& typeDesriptor, const void* value, ISerializationWriter& writer)
 			{
 				const std::string& valueStr = *reinterpret_cast<const std::string*>(value);
 				writer.WriteString(valueStr);
 			}
 
 			template<class object_t>
-			void SerializeObject(const Serializer<JsonSerializationWriter> serializer, const Type::TypeDescriptor& typeDesriptor, const void* value, JsonSerializationWriter& writer)
+			void SerializeObject(const Serializer& serializer, const Type::TypeDescriptor& typeDesriptor, const void* value, ISerializationWriter& writer)
 			{
 				const object_t& valueObject = *reinterpret_cast<const object_t*>(value);
 				Type::Resolver<object_t> resolver(typeDesriptor);
@@ -39,7 +40,7 @@ namespace Reflecto
 			}
 
 			template<class object_t>
-			void SerializeCollection(const Serializer<JsonSerializationWriter> serializer, const Type::TypeDescriptor& typeDesriptor, const void* value, JsonSerializationWriter& writer)
+			void SerializeCollection(const Serializer& serializer, const Type::TypeDescriptor& typeDesriptor, const void* value, ISerializationWriter& writer)
 			{
 				using element_t = typename object_t::value_type;
 
