@@ -15,10 +15,10 @@ namespace Reflecto
 		class TypeLibraryFactory
 		{
 		public:
-			template<class type_t>
+			template<class value_t>
 			TypeLibraryFactory& Add(const std::string& typeName)
 			{
-				const TypeDescriptorType type = TypeDescriptorTypeFactory<type_t>(typeName).Build();
+				const TypeDescriptorType type = TypeDescriptorTypeFactory<value_t>(typeName).Build();
 				Add(type);
 				return *this;
 			}

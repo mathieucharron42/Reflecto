@@ -13,13 +13,13 @@ namespace Reflecto
 	{
 		namespace SerializationStrategy
 		{
-			void SerializeInt32(const Serializer& serializer, const Type::TypeDescriptor& typeDesriptor, const void* value, ISerializationWriter& writer)
+			void SerializeInt32(const Serializer& serializer, const void* value, ISerializationWriter& writer)
 			{
 				const int32_t& valInt = *reinterpret_cast<const int32_t*>(value);
 				writer.WriteInteger32(valInt);
 			}
 
-			void SerializeString(const Serializer& serializer, const Type::TypeDescriptor& typeDesriptor, const void* value, ISerializationWriter& writer)
+			void SerializeString(const Serializer& serializer, const void* value, ISerializationWriter& writer)
 			{
 				const std::string& valueStr = *reinterpret_cast<const std::string*>(value);
 				writer.WriteString(valueStr);
@@ -40,7 +40,7 @@ namespace Reflecto
 			}
 
 			template<class object_t>
-			void SerializeCollection(const Serializer& serializer, const Type::TypeDescriptor& typeDesriptor, const void* value, ISerializationWriter& writer)
+			void SerializeCollection(const Serializer& serializer, const void* value, ISerializationWriter& writer)
 			{
 				using element_t = typename object_t::value_type;
 

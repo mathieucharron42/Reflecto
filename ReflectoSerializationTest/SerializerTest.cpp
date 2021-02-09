@@ -13,9 +13,11 @@
 
 #include "CppUnitTest.h"
 
+#include <functional>
 #include <vector>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+using namespace std::placeholders;
 
 namespace Reflecto
 {
@@ -32,10 +34,8 @@ namespace Reflecto
 						.Add<int32_t>("int32")
 					.Build();
 
-					const Type::TypeDescriptor intDescriptor = Type::TypeDescriptorFactory<int32_t>(testTypeLibrary).Build();
-
 					Serializer serializer = SerializerFactory(testTypeLibrary)
-						.LearnType(intDescriptor, SerializationStrategy::SerializeInt32)
+						.LearnType<int32_t>(SerializationStrategy::SerializeInt32)
 					.Build();
 
 					int32_t testValue = 42;
@@ -46,7 +46,7 @@ namespace Reflecto
 					std::string actualStr;
 					writer.Transpose(actualStr);
 
-					std::string expectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%i})"), intDescriptor.Type().Name().c_str(), testValue);
+					std::string expectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%i})"), "int32", testValue);
 					Assert::AreEqual(expectedStr, actualStr, L"Serialized bytes are unexpected!");
 				}
 
@@ -56,10 +56,8 @@ namespace Reflecto
 						.Add<std::string>("string")
 					.Build();
 
-					const Type::TypeDescriptor strDescriptor = Type::TypeDescriptorFactory<std::string>(testTypeLibrary).Build();
-
 					Serializer serializer = SerializerFactory(testTypeLibrary)
-						.LearnType(strDescriptor, SerializationStrategy::SerializeString)
+						.LearnType<std::string>(SerializationStrategy::SerializeString)
 					.Build();
 
 					std::string testValue = "test";
@@ -70,7 +68,7 @@ namespace Reflecto
 					std::string actualStr;
 					writer.Transpose(actualStr);
 
-					std::string expectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), strDescriptor.Type().Name().c_str(), testValue.c_str());
+					std::string expectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testValue.c_str());
 					Assert::AreEqual(expectedStr, actualStr, L"Serialized bytes are unexpected!");
 				}
 
@@ -96,9 +94,9 @@ namespace Reflecto
 					.Build();
 
 					Serializer serializer = SerializerFactory(testTypeLibrary)
-						.LearnType(int32Descriptor, SerializationStrategy::SerializeInt32)
-						.LearnType(strDescriptor, SerializationStrategy::SerializeString)
-						.LearnType(objDescriptor, SerializationStrategy::SerializeObject<PersonTestObject>)
+						.LearnType<int32_t>(SerializationStrategy::SerializeInt32)
+						.LearnType<std::string>(SerializationStrategy::SerializeString)
+						.LearnType<PersonTestObject>(std::bind(&SerializationStrategy::SerializeObject<PersonTestObject>, _1, objDescriptor, _2, _3))
 					.Build();
 
 				
@@ -128,12 +126,9 @@ namespace Reflecto
 						.Add<std::vector<std::string>>("vector<string>")
 					.Build();
 
-					const Type::TypeDescriptor strDescriptor = Type::TypeDescriptorFactory<std::string>(testTypeLibrary).Build();
-					const Type::TypeDescriptor vectorStringDescriptor = Type::TypeDescriptorFactory<std::vector<std::string>>(testTypeLibrary).Build();
-
 					Serializer serializer = SerializerFactory(testTypeLibrary)
-						.LearnType(strDescriptor, SerializationStrategy::SerializeString)
-						.LearnType(vectorStringDescriptor, SerializationStrategy::SerializeCollection<std::vector<std::string>>)
+						.LearnType<std::string>(SerializationStrategy::SerializeString)
+						.LearnType<std::vector<std::string>>(SerializationStrategy::SerializeCollection<std::vector<std::string>>)
 					.Build();
 
 					std::vector<std::string> testValue = { "uno", "dos", "tres" };
@@ -144,10 +139,10 @@ namespace Reflecto
 					std::string actualStr;
 					writer.Transpose(actualStr);
 
-					std::string value1ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), strDescriptor.Type().Name().c_str(), "uno");
-					std::string value2ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), strDescriptor.Type().Name().c_str(), "dos");
-					std::string value3ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), strDescriptor.Type().Name().c_str(), "tres");
-					std::string expectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":[%s,%s,%s]})"), vectorStringDescriptor.Type().Name().c_str(), value1ExpectedStr.c_str(), value2ExpectedStr.c_str(), value3ExpectedStr.c_str());
+					std::string value1ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "uno");
+					std::string value2ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "dos");
+					std::string value3ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "tres");
+					std::string expectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":[%s,%s,%s]})"), "vector<string>", value1ExpectedStr.c_str(), value2ExpectedStr.c_str(), value3ExpectedStr.c_str());
 					Assert::AreEqual(expectedStr, actualStr, L"Serialized bytes are unexpected!");
 				}
 			};

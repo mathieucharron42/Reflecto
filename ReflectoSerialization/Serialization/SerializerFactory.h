@@ -11,7 +11,7 @@ namespace Reflecto
 		class SerializerFactory
 		{
 		public:
-			using SerializationStrategy = typename Serializer::serialization_strategy_t;
+			using serialization_strategy_t = typename Serializer::serialization_strategy_t;
 
 			SerializerFactory(const Type::TypeLibrary& library)
 				: _typeLibrary(library)
@@ -19,23 +19,28 @@ namespace Reflecto
 
 			}
 
-			SerializerFactory& LearnType(const Type::TypeDescriptor& typeDescriptor, SerializationStrategy strategy)
+			SerializerFactory& LearnType(const Type::TypeDescriptorType& type, serialization_strategy_t strategy)
 			{
-				const TypeInformation information = { typeDescriptor, strategy };
-				_typeInformations.insert({ typeDescriptor.Type(), information });
+				_strategies.insert({ type, strategy });
 				return *this;
+			}
+
+			template<class value_t>
+			SerializerFactory& LearnType(serialization_strategy_t strategy)
+			{
+				const Type::TypeDescriptorType* type = _typeLibrary.Get<value_t>();
+				assert(type);
+				return LearnType(*type, strategy);
 			}
 
 			Serializer Build()
 			{
-				return Serializer(_typeLibrary, _typeInformations);
+				return Serializer(_typeLibrary, _strategies);
 			}
 
 		private:
-			using TypeInformation = typename Serializer::TypeInformation;
-			
 			Type::TypeLibrary _typeLibrary;
-			std::map<Type::TypeDescriptorType, TypeInformation> _typeInformations;
+			std::map<Type::TypeDescriptorType, serialization_strategy_t> _strategies;
 		};
 	}
 }

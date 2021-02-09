@@ -22,16 +22,16 @@ namespace Reflecto
 
 			}
 			
-			template<class type_t>
+			template<class value_t>
 			const TypeDescriptorType* Get() const
 			{
-				return GetByHash(TypeExt::GetTypeHash<type_t>());
+				return GetByHash(TypeExt::GetTypeHash<value_t>());
 			}
 
-			template<class type_t>
+			template<class value_t>
 			TypeDescriptorType GetChecked() const
 			{
-				const TypeDescriptorType* found = Get<type_t>();
+				const TypeDescriptorType* found = Get<value_t>();
 				assert(found);
 				return *found;
 			}

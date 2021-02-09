@@ -7,13 +7,13 @@ namespace Reflecto
 {
 	namespace Type
 	{
-		template<class type_t>
+		template<class value_t>
 		class TypeDescriptorTypeFactory
 		{
 		public:
 			TypeDescriptorTypeFactory(const std::string& name)
 				: _name(name)
-				, _hash(TypeExt::GetTypeHash<type_t>())
+				, _hash(TypeExt::GetTypeHash<value_t>())
 			{
 
 			}

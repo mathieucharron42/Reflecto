@@ -18,26 +18,24 @@ namespace Reflecto
 		class Serializer
 		{
 		public:				
+			using serialization_strategy_t = typename std::function<void(const Serializer&, const void*, ISerializationWriter& writer)>;
+			using strategy_map_t = std::map<Type::TypeDescriptorType, serialization_strategy_t>;
 
-			using serialization_strategy_t = typename std::function<void(const Serializer& serializer, const Type::TypeDescriptor& descriptor, const void*, ISerializationWriter& writer)>;
-			struct TypeInformation
-			{
-				Type::TypeDescriptor Descriptor;
-				Serializer::serialization_strategy_t SerializationStrategy;
-			};
-			using TypeInformationMap = std::map<Type::TypeDescriptorType, Serializer::TypeInformation>;
-
-			Serializer(const Type::TypeLibrary& library, const TypeInformationMap& typeInformation)
+			Serializer(const Type::TypeLibrary& library, const strategy_map_t& strategy)
 				: _typeLibrary(library)
-				, _typeInformations(typeInformation)
+				, _strategies(strategy)
 			{ }
 
 
 			template<typename serialization_writer_t>
 			void Serialize(const Type::TypeDescriptorType& type, const void* value, serialization_writer_t& writer) const
 			{
-				const TypeInformation* typeInformation = GetTypeInformation(type);
-				Serialize(typeInformation, value, writer);
+				const serialization_strategy_t* strategy = GetStrategy(type);
+				assert(strategy);
+				if (strategy)
+				{
+					Serialize(type, *strategy, value, writer);
+				}
 			}
 
 			template<typename value_t, typename serialization_writer_t>
@@ -50,32 +48,25 @@ namespace Reflecto
 
 		private:
 			template<typename serialization_writer_t>
-			void Serialize(const TypeInformation* typeInformation, const void* value, serialization_writer_t& writer) const
+			void Serialize(const Type::TypeDescriptorType& type, const serialization_strategy_t& strategy, const void* value, serialization_writer_t& writer) const
 			{
-				assert(typeInformation);
-				if (typeInformation)
-				{
-					const Type::TypeDescriptor& descriptor = typeInformation->Descriptor;
-					const serialization_strategy_t serializationStrategy = typeInformation->SerializationStrategy;
+				writer.WriteBeginObjectProperty("type");
+				writer.WriteString(type.Name());
+				writer.WriteEndObjectProperty();
 
-					writer.WriteBeginObjectProperty("type");
-					writer.WriteString(descriptor.Type().Name());
-					writer.WriteEndObjectProperty();
-
-					writer.WriteBeginObjectProperty("value");
-					serializationStrategy(*this, descriptor, value, writer);
-					writer.WriteEndObjectProperty();
-				}
+				writer.WriteBeginObjectProperty("value");
+				strategy(*this, value, writer);
+				writer.WriteEndObjectProperty();
 			}
 
-			const TypeInformation* GetTypeInformation(const Type::TypeDescriptorType& type) const
+			const serialization_strategy_t* GetStrategy(const Type::TypeDescriptorType& type) const
 			{
-				TypeInformationMap::const_iterator found = _typeInformations.find(type);
-				return found != _typeInformations.end() ? &(*found).second : nullptr;
+				strategy_map_t::const_iterator found = _strategies.find(type);
+				return found != _strategies.end() ? &(*found).second : nullptr;
 			}
 
 			Type::TypeLibrary _typeLibrary;
-			TypeInformationMap _typeInformations;
+			strategy_map_t _strategies;
 		};
 	}
 }
