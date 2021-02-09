@@ -34,8 +34,9 @@ namespace Reflecto
 
 					const Type::TypeDescriptor intDescriptor = Type::TypeDescriptorFactory<int32_t>(testTypeLibrary).Build();
 
-					Serializer<JsonSerializationWriter> serializer = SerializerFactory<JsonSerializationWriter>(testTypeLibrary).Build();
-					serializer.RegisterType(intDescriptor, JsonSerializationStrategy::SerializeInt32);
+					Serializer<JsonSerializationWriter> serializer = SerializerFactory<JsonSerializationWriter>(testTypeLibrary)
+						.LearnType(intDescriptor, SerializationStrategy::SerializeInt32)
+					.Build();
 
 					int32_t testValue = 42;
 
@@ -57,8 +58,9 @@ namespace Reflecto
 
 					const Type::TypeDescriptor strDescriptor = Type::TypeDescriptorFactory<std::string>(testTypeLibrary).Build();
 
-					Serializer<JsonSerializationWriter> serializer(testTypeLibrary);
-					serializer.RegisterType(strDescriptor, JsonSerializationStrategy::SerializeString);
+					Serializer<JsonSerializationWriter> serializer = SerializerFactory<JsonSerializationWriter>(testTypeLibrary)
+						.LearnType(strDescriptor, SerializationStrategy::SerializeString)
+					.Build();
 
 					std::string testValue = "test";
 
@@ -94,10 +96,11 @@ namespace Reflecto
 						.Register(&PersonTestObject::Age, "Age")
 					.Build();
 
-					Serializer<JsonSerializationWriter> serializer(testTypeLibrary);
-					serializer.RegisterType(int32Descriptor, JsonSerializationStrategy::SerializeInt32);
-					serializer.RegisterType(strDescriptor, JsonSerializationStrategy::SerializeString);
-					serializer.RegisterType(objDescriptor, JsonSerializationStrategy::SerializeObject<PersonTestObject>);
+					Serializer<JsonSerializationWriter> serializer = SerializerFactory<JsonSerializationWriter>(testTypeLibrary)
+						.LearnType(int32Descriptor, SerializationStrategy::SerializeInt32)
+						.LearnType(strDescriptor, SerializationStrategy::SerializeString)
+						.LearnType(objDescriptor, SerializationStrategy::SerializeObject<PersonTestObject>)
+					.Build();
 
 				
 					PersonTestObject testValue;

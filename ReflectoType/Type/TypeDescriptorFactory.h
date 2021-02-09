@@ -38,7 +38,7 @@ namespace Reflecto
 			{
 				MemberDescriptor member = MemberDescriptorFactory<object_t, member_t>(_typeLibrary, _sampleObj)
 					.SetMember(memberPointer, memberName)
-					.Build();
+				.Build();
 
 				_members.push_back(member);
 
@@ -47,9 +47,8 @@ namespace Reflecto
 
 			TypeDescriptor Build()
 			{
-				const TypeDescriptorType* type = _typeLibrary.Get<object_t>();
-				assert(type);
-				return TypeDescriptor(*type, _parent, _constructor, _members);
+				const TypeDescriptorType& type = _typeLibrary.GetChecked<object_t>();
+				return TypeDescriptor(type, _parent, _constructor, _members);
 			}
 
 		private:

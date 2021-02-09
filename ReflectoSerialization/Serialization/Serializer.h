@@ -16,11 +16,18 @@ namespace Reflecto
 		template<typename serialization_writer_t>
 		class Serializer
 		{
-		public:
+		public:				
 			using serialization_strategy_t = typename std::function<void(const Serializer<serialization_writer_t>& serializer, const Type::TypeDescriptor& descriptor, const void*, serialization_writer_t& writer)>;
+			struct TypeInformation
+			{
+				Type::TypeDescriptor Descriptor;
+				Serializer::serialization_strategy_t SerializationStrategy;
+			};
+			using TypeInformationMap = std::map<Type::TypeDescriptorType, Serializer::TypeInformation>;
 
-			Serializer(const Type::TypeLibrary& library)
+			Serializer(const Type::TypeLibrary& library, const TypeInformationMap& typeInformation)
 				: _typeLibrary(library)
+				, _typeInformations(typeInformation)
 			{
 
 			}
@@ -39,30 +46,7 @@ namespace Reflecto
 				Serialize(*type, &value, writer);
 			}
 
-			void RegisterType(const Type::TypeDescriptor& typeDescriptor, serialization_strategy_t strategy)
-			{
-				const TypeInformation information = { typeDescriptor, strategy };
-				_typeInformations.insert({ typeDescriptor.Type(), information });
-			}
-
-			template<typename value_t>
-			void RegisterType(serialization_strategy_t strategy)
-			{
-				const Type::TypeDescriptor* type = _typeLibrary.Get<value_t>();
-				assert(type);
-				RegisterType(*type, strategy);
-			}
-
-
 		private:
-			struct TypeInformation
-			{
-				Type::TypeDescriptor Descriptor;
-				serialization_strategy_t SerializationStrategy;
-			};
-
-			using TypeInformationMap = std::map<Type::TypeDescriptorType, TypeInformation>;
-
 			void Serialize(const TypeInformation* typeInformation, const void* value, serialization_writer_t& writer) const
 			{
 				if (typeInformation)
