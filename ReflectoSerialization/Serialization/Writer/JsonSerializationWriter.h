@@ -53,11 +53,6 @@ namespace Reflecto
 				GetCurrentElement().Json = value;
 			}
 
-			void WriteWriter(const std::string& propertyName, const JsonSerializationWriter& value)
-			{
-				GetCurrentElement() = value.GetCurrentElement();
-			}
-
 			virtual void WriteBeginObjectProperty(const std::string& propertyName) override
 			{
 				Element elem;
@@ -92,17 +87,11 @@ namespace Reflecto
 					return std::unique_ptr<Json::StreamWriter>(builder.newStreamWriter());
 				}();
 
-				std::stringstream ss;
-				writer->write(GetCurrentElement().Json, &ss);
-				str = ss.str();
-			}
-
-			void Transpose(std::vector<byte>& bytes)
-			{
-				std::string str;
-				Transpose(str);
-
-				TextSerialization::Serialize(str, bytes);
+				{
+					std::stringstream ss;
+					writer->write(GetCurrentElement().Json, &ss);
+					str = ss.str();
+				}
 			}
 
 		private:

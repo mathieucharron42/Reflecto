@@ -211,12 +211,6 @@ namespace Reflecto
 
 					const std::string expectedStr = R"("test")";
 					Assert::AreEqual(expectedStr, actualStr, L"Unexpected serialization");
-
-					std::vector<byte> actualBytes;
-					writer.Transpose(actualBytes);
-
-					std::vector<byte> expectedBytes = { 34, 116, 101, 115, 116, 34, 0 };
-					Assert::IsTrue(expectedBytes == actualBytes, L"Unexpected serialization");
 				}
 			};
 		}

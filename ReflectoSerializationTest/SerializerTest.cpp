@@ -115,7 +115,6 @@ namespace Reflecto
 					Assert::AreEqual(expectedStr, actualStr, L"Serialized bytes are unexpected!");
 				}
 
-
 				TEST_METHOD(SerializeVector)
 				{
 					Type::TypeLibrary testTypeLibrary = Type::TypeLibraryFactory()
