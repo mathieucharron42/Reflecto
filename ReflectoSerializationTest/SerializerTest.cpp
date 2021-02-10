@@ -86,8 +86,6 @@ namespace Reflecto
 						.Add<int32_t>("int32")
 					.Build();
 
-					const Type::TypeDescriptor strDescriptor = Type::TypeDescriptorFactory<std::string>(testTypeLibrary).Build();
-					const Type::TypeDescriptor int32Descriptor = Type::TypeDescriptorFactory<int32_t>(testTypeLibrary).Build();
 					const Type::TypeDescriptor objDescriptor = Type::TypeDescriptorFactory<PersonTestObject>(testTypeLibrary)
 						.Register(&PersonTestObject::Name, "Name")
 						.Register(&PersonTestObject::Age, "Age")
@@ -96,10 +94,9 @@ namespace Reflecto
 					Serializer serializer = SerializerFactory(testTypeLibrary)
 						.LearnType<int32_t>(SerializationStrategy::SerializeInt32)
 						.LearnType<std::string>(SerializationStrategy::SerializeString)
-						.LearnType<PersonTestObject>(std::bind(&SerializationStrategy::SerializeObject<PersonTestObject>, _1, objDescriptor, _2, _3))
+						.LearnType<PersonTestObject>(std::bind(&SerializationStrategy::SerializeObject<PersonTestObject>, objDescriptor, _1, _2, _3))
 					.Build();
-
-				
+	
 					PersonTestObject testValue;
 					const std::string testValueName = "Mr. Potato Head";
 					testValue.Name = testValueName;
@@ -112,8 +109,8 @@ namespace Reflecto
 					std::string actualStr;
 					writer.Transpose(actualStr);
 
-					std::string expectedNameStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), strDescriptor.Type().Name().c_str(), testValueName.c_str());
-					std::string expectedAgeStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), int32Descriptor.Type().Name().c_str(), testValueAge);
+					std::string expectedNameStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testValueName.c_str());
+					std::string expectedAgeStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int32", testValueAge);
 					std::string expectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Age":%s,"Name":%s}})"), objDescriptor.Type().Name().c_str(), expectedAgeStr.c_str(), expectedNameStr.c_str());
 					Assert::AreEqual(expectedStr, actualStr, L"Serialized bytes are unexpected!");
 				}

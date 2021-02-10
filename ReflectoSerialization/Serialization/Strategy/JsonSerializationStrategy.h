@@ -26,7 +26,7 @@ namespace Reflecto
 			}
 
 			template<class object_t>
-			void SerializeObject(const Serializer& serializer, const Type::TypeDescriptor& typeDesriptor, const void* value, ISerializationWriter& writer)
+			void SerializeObject(const Type::TypeDescriptor& typeDesriptor, const Serializer& serializer, const void* value, ISerializationWriter& writer)
 			{
 				const object_t& valueObject = *reinterpret_cast<const object_t*>(value);
 				Type::Resolver<object_t> resolver(typeDesriptor);
