@@ -14,6 +14,7 @@
 #include "CppUnitTest.h"
 
 #include <functional>
+#include <map>
 #include <vector>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -139,6 +140,43 @@ namespace Reflecto
 					std::string value2ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "dos");
 					std::string value3ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "tres");
 					std::string expectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":[%s,%s,%s]})"), "vector<string>", value1ExpectedStr.c_str(), value2ExpectedStr.c_str(), value3ExpectedStr.c_str());
+					Assert::AreEqual(expectedStr, actualStr, L"Serialized bytes are unexpected!");
+				}
+
+				TEST_METHOD(SerializeMap)
+				{
+					Type::TypeLibrary testTypeLibrary = Type::TypeLibraryFactory()
+						.Add<std::string>("string")
+						.Add<int32_t>("int")
+						.Add<std::map<int32_t, std::string>>("map<int,string>")
+						.Build();
+
+					Serializer serializer = SerializerFactory(testTypeLibrary)
+						.LearnType<std::string>(SerializationStrategy::SerializeString)
+						.LearnType<int32_t>(SerializationStrategy::SerializeInt32)
+						.LearnType<std::map<int32_t, std::string>>(SerializationStrategy::SerializeAssociativeCollection<std::map<int32_t, std::string>>)
+					.Build();
+
+					std::map<int32_t, std::string> testValue = { {1, "uno"}, { 2, "dos"}, { 3, "tres" } };
+
+					JsonSerializationWriter writer;
+					serializer.Serialize(testValue, writer);
+
+					std::string actualStr;
+					writer.Transpose(actualStr);
+
+					std::string key1ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int", 1);
+					std::string key2ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int", 2);
+					std::string key3ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int", 3);
+					std::string value1ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "uno");
+					std::string value2ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "dos");
+					std::string value3ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "tres");
+
+					std::string entry1ExpectedStr = Utils::StringExt::Format(std::string(R"({"key":%s,"value":%s})"), key1ExpectedStr.c_str(), value1ExpectedStr.c_str());
+					std::string entry2ExpectedStr = Utils::StringExt::Format(std::string(R"({"key":%s,"value":%s})"), key2ExpectedStr.c_str(), value2ExpectedStr.c_str());
+					std::string entry3ExpectedStr = Utils::StringExt::Format(std::string(R"({"key":%s,"value":%s})"), key3ExpectedStr.c_str(), value3ExpectedStr.c_str());
+					
+					std::string expectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":[%s,%s,%s]})"), "map<int,string>", entry1ExpectedStr.c_str(), entry2ExpectedStr.c_str(), entry3ExpectedStr.c_str());
 					Assert::AreEqual(expectedStr, actualStr, L"Serialized bytes are unexpected!");
 				}
 			};

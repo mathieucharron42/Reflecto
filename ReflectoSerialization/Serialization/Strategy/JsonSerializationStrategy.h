@@ -52,6 +52,25 @@ namespace Reflecto
 					writer.WriteEndArrayElement();
 				}
 			}
+
+			template<class object_t>
+			void SerializeAssociativeCollection(const Serializer& serializer, const void* value, ISerializationWriter& writer)
+			{
+				using element_t = typename object_t::value_type;
+
+				const object_t& valueObject = *reinterpret_cast<const object_t*>(value);
+				for (const element_t& element : valueObject)
+				{
+					writer.WriteBeginArrayElement();
+					writer.WriteBeginObjectProperty("key");
+					serializer.Serialize(element.first, writer);
+					writer.WriteEndObjectProperty();
+					writer.WriteBeginObjectProperty("value");
+					serializer.Serialize(element.second, writer);
+					writer.WriteEndObjectProperty();
+					writer.WriteEndArrayElement();
+				}
+			}
 		}
 	}
 }
