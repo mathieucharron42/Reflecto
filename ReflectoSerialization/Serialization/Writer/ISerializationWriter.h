@@ -18,9 +18,19 @@ public:
 
 	virtual void WriteBoolean(bool value) = 0;
 
+	virtual void WriteNull() = 0;
+
+	virtual void WriteBeginObject() = 0;
+
+	virtual void WriteEndObject() = 0;
+
 	virtual void WriteBeginObjectProperty(const std::string& propertyName) = 0;
 	
 	virtual void WriteEndObjectProperty() = 0;
+
+	virtual void WriteBeginArray() = 0;
+
+	virtual void WriteEndArray() = 0;
 
 	virtual void WriteBeginArrayElement() = 0;
 

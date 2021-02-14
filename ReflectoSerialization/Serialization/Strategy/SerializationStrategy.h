@@ -30,13 +30,17 @@ namespace Reflecto
 			{
 				const object_t& valueObject = *reinterpret_cast<const object_t*>(value);
 				Type::Resolver<object_t> resolver(typeDesriptor);
-				for (const Type::MemberDescriptor& member : typeDesriptor.Members())
+				writer.WriteBeginObject();
 				{
-					writer.WriteBeginObjectProperty(member.Name());
-					const void* value = resolver.ResolveMember(valueObject, member);
-					serializer.Serialize(member.Type(), value, writer);
-					writer.WriteEndObjectProperty();
+					for (const Type::MemberDescriptor& member : typeDesriptor.Members())
+					{
+						writer.WriteBeginObjectProperty(member.Name());
+						const void* value = resolver.ResolveMember(valueObject, member);
+						serializer.Serialize(member.Type(), value, writer);
+						writer.WriteEndObjectProperty();
+					}
 				}
+				writer.WriteEndObject();
 			}
 
 			template<class object_t>
@@ -45,12 +49,16 @@ namespace Reflecto
 				using element_t = typename object_t::value_type;
 
 				const object_t& valueObject = *reinterpret_cast<const object_t*>(value);
-				for (const element_t& element : valueObject)
+				writer.WriteBeginArray();
 				{
-					writer.WriteBeginArrayElement();
-					serializer.Serialize(element, writer);
-					writer.WriteEndArrayElement();
+					for (const element_t& element : valueObject)
+					{
+						writer.WriteBeginArrayElement();
+						serializer.Serialize(element, writer);
+						writer.WriteEndArrayElement();
+					}
 				}
+				writer.WriteEndArray();
 			}
 
 			template<class object_t>
@@ -59,17 +67,27 @@ namespace Reflecto
 				using element_t = typename object_t::value_type;
 
 				const object_t& valueObject = *reinterpret_cast<const object_t*>(value);
-				for (const element_t& element : valueObject)
+				writer.WriteBeginArray();
 				{
-					writer.WriteBeginArrayElement();
-					writer.WriteBeginObjectProperty("key");
-					serializer.Serialize(element.first, writer);
-					writer.WriteEndObjectProperty();
-					writer.WriteBeginObjectProperty("value");
-					serializer.Serialize(element.second, writer);
-					writer.WriteEndObjectProperty();
-					writer.WriteEndArrayElement();
+					for (const element_t& element : valueObject)
+					{
+						writer.WriteBeginArrayElement();
+						{
+							writer.WriteBeginObject();
+							{
+								writer.WriteBeginObjectProperty("key");
+								serializer.Serialize(element.first, writer);
+								writer.WriteEndObjectProperty();
+								writer.WriteBeginObjectProperty("value");
+								serializer.Serialize(element.second, writer);
+								writer.WriteEndObjectProperty();
+							}
+							writer.WriteEndObject();
+						}
+						writer.WriteEndArrayElement();
+					}
 				}
+				writer.WriteEndArray();
 			}
 		}
 	}

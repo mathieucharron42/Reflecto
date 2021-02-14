@@ -24,19 +24,10 @@
     <ClInclude Include="Serialization\TextSerialization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\Strategy\PODSerializationStrategy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Serialization\Strategy\TypeSerializationStrategy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Serialization\SerializationFormat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Serialization\Writer\JsonSerializationWriter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Serialization\Strategy\JsonSerializationStrategy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Serialization\SerializationMetaType.h">
@@ -46,6 +37,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Serialization\Writer\ISerializationWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization\Reader\ISerializationReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization\Strategy\SerializationStrategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization\Strategy\DeserializationStrategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization\Reader\JsonSerializationReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

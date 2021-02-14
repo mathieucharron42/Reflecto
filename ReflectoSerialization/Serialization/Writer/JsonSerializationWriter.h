@@ -20,63 +20,85 @@ namespace Reflecto
 		public:
 			JsonSerializationWriter()
 			{
-				PushNewElement();
+				
 			}
 			
 			virtual void WriteInteger32(int32_t value) override
 			{
-				GetCurrentElement().Json = value;
+				PushElement(JsonElement(value));
 			}
 
 			virtual void WriteInteger64(int64_t value) override
 			{
-				GetCurrentElement().Json = value;
+				PushElement(JsonElement(value));
 			}
 
 			virtual void WriteFloat(float value) override
 			{
-				GetCurrentElement().Json = value;
+				PushElement(JsonElement(value));
 			}
 
 			virtual void WriteDouble(double value) override
 			{
-				GetCurrentElement().Json = value;
+				PushElement(JsonElement(value));
 			}
 
 			virtual void WriteString(const std::string& value) override
 			{
-				GetCurrentElement().Json = value;
+				PushElement(JsonElement(value));
 			}
 
 			virtual void WriteBoolean(bool value) override
 			{
-				GetCurrentElement().Json = value;
+				PushElement(JsonElement(value));
+			}
+
+			virtual void WriteNull() override
+			{
+				PushElement(JsonElement(Json::nullValue));
+			}
+
+			virtual void WriteBeginObject() override
+			{
+				PushElement(JsonElement(Json::objectValue));
+			}
+
+			virtual void WriteEndObject() override
+			{
+
 			}
 
 			virtual void WriteBeginObjectProperty(const std::string& propertyName) override
 			{
-				Element elem;
-				elem.PropertyName = propertyName;
-				PushNewElement(elem);
+				PushPropertyName(propertyName);
 			}
 
 			virtual void WriteEndObjectProperty() override
 			{
-				Element elem = GetCurrentElement();
-				PopElement();
-				GetCurrentElement().Json[elem.PropertyName] = elem.Json;
+				const std::string propertyName = PopPropertyName();
+				const JsonElement element = PopElement();
+				GetCurrentElement()[propertyName] = element;
+			}
+
+			virtual void WriteBeginArray() override
+			{
+				PushElement(JsonElement(Json::arrayValue));
+			}
+
+			virtual void WriteEndArray() override
+			{
+				
 			}
 
 			virtual void WriteBeginArrayElement() override
 			{
-				PushNewElement();
+				
 			}
 
 			virtual void WriteEndArrayElement() override
 			{
-				Element elem = GetCurrentElement();
-				PopElement();
-				GetCurrentElement().Json.append(elem.Json);
+				const JsonElement element = PopElement();
+				GetCurrentElement().append(element);
 			}
 
 			void Transpose(std::string& str)
@@ -87,43 +109,64 @@ namespace Reflecto
 					return std::unique_ptr<Json::StreamWriter>(builder.newStreamWriter());
 				}();
 
+				if (HasCurrentElement())
 				{
 					std::stringstream ss;
-					writer->write(GetCurrentElement().Json, &ss);
+					writer->write(GetCurrentElement(), &ss);
 					str = ss.str();
 				}
 			}
 
 		private:
-			struct Element
-			{
-				std::string PropertyName;
-				Json::Value Json;
-			};
+			using JsonElement = Json::Value;
 
-			void PushNewElement(const Element& element = Element())
+			void PushElement(const JsonElement& element)
 			{
 				_stack.push(element);
 			}
 
-			void PopElement()
+			JsonElement PopElement()
 			{
-				return _stack.pop();
+				JsonElement element = GetCurrentElement();
+				_stack.pop();
+				return element;
 			}
 
-			Element& GetCurrentElement()
+			JsonElement& GetCurrentElement()
 			{
-				assert(!_stack.empty());
+				assert(HasCurrentElement());
 				return _stack.top();
 			}
 
-			const Element& GetCurrentElement() const
+			const bool HasCurrentElement() const
 			{
-				assert(!_stack.empty());
-				return _stack.top();
+				return !_stack.empty();
 			}
 
-			std::stack<Element> _stack;
+			void PushPropertyName(const std::string &propertyName)
+			{
+				_propertyNames.push(propertyName);
+			}
+
+			std::string PopPropertyName()
+			{
+				std::string propertyName = GetCurrentPropertyName();
+				_propertyNames.pop();
+				return propertyName;
+			}
+
+			std::string& GetCurrentPropertyName()
+			{
+				assert(HasCurrentPropertyName());
+				return _propertyNames.top();
+			}
+
+			const bool HasCurrentPropertyName() const
+			{
+				return !_propertyNames.empty();
+			}
+
+			std::stack<JsonElement> _stack;
 			std::stack<std::string> _propertyNames;
 		};
 	}

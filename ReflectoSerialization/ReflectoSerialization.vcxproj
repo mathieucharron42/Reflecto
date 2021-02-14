@@ -19,15 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Serialization\Reader\ISerializationReader.h" />
+    <ClInclude Include="Serialization\Reader\JsonSerializationReader.h" />
     <ClInclude Include="Serialization\SerializationMetaType.h" />
     <ClInclude Include="Serialization\SerializerFactory.h" />
-    <ClInclude Include="Serialization\Strategy\JsonSerializationStrategy.h" />
+    <ClInclude Include="Serialization\Strategy\DeserializationStrategy.h" />
+    <ClInclude Include="Serialization\Strategy\SerializationStrategy.h" />
     <ClInclude Include="Serialization\SerializationExt.h" />
     <ClInclude Include="Serialization\SerializationFormat.h" />
     <ClInclude Include="Serialization\Serializer.h" />
-    <ClInclude Include="Serialization\Strategy\PODSerializationStrategy.h" />
     <ClInclude Include="Serialization\TextSerialization.h" />
-    <ClInclude Include="Serialization\Strategy\TypeSerializationStrategy.h" />
     <ClInclude Include="Serialization\Writer\ISerializationWriter.h" />
     <ClInclude Include="Serialization\Writer\JsonSerializationWriter.h" />
   </ItemGroup>

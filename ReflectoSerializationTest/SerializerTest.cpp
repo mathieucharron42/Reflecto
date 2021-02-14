@@ -8,7 +8,8 @@
 #include "Serialization/Serializer.h"
 #include "Serialization/SerializerFactory.h"
 #include "Serialization/SerializationMetaType.h"
-#include "Serialization/Strategy/JsonSerializationStrategy.h"
+#include "Serialization/Strategy/DeserializationStrategy.h"
+#include "Serialization/Strategy/SerializationStrategy.h"
 #include "Serialization/TextSerialization.h"
 
 #include "CppUnitTest.h"
@@ -36,7 +37,7 @@ namespace Reflecto
 					.Build();
 
 					Serializer serializer = SerializerFactory(testTypeLibrary)
-						.LearnType<int32_t>(SerializationStrategy::SerializeInt32)
+						.LearnType<int32_t>(SerializationStrategy::SerializeInt32, DeserializationStrategy::DeserializeInt32)
 					.Build();
 
 					int32_t testValue = 42;
@@ -49,6 +50,14 @@ namespace Reflecto
 
 					std::string expectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%i})"), "int32", testValue);
 					Assert::AreEqual(expectedStr, actualStr, L"Serialized bytes are unexpected!");
+
+					//JsonSerializationReader reader;
+					//reader.Import(actualStr);
+
+					//int32_t actualDeserializedValue;
+					//serializer.Deserialize(actualDeserializedValue, reader);
+
+					//Assert::AreEqual(testValue, actualDeserializedValue, L"Deserialized value is unexpected");
 				}
 
 				TEST_METHOD(SerializeString)
@@ -58,7 +67,7 @@ namespace Reflecto
 					.Build();
 
 					Serializer serializer = SerializerFactory(testTypeLibrary)
-						.LearnType<std::string>(SerializationStrategy::SerializeString)
+						.LearnType<std::string>(SerializationStrategy::SerializeString, DeserializationStrategy::DeserializeString)
 					.Build();
 
 					std::string testValue = "test";
@@ -93,9 +102,9 @@ namespace Reflecto
 					.Build();
 
 					Serializer serializer = SerializerFactory(testTypeLibrary)
-						.LearnType<int32_t>(SerializationStrategy::SerializeInt32)
-						.LearnType<std::string>(SerializationStrategy::SerializeString)
-						.LearnType<PersonTestObject>(std::bind(&SerializationStrategy::SerializeObject<PersonTestObject>, objDescriptor, _1, _2, _3))
+						.LearnType<int32_t>(SerializationStrategy::SerializeInt32, DeserializationStrategy::DeserializeInt32)
+						.LearnType<std::string>(SerializationStrategy::SerializeString, DeserializationStrategy::DeserializeString)
+						.LearnType<PersonTestObject>(std::bind(&SerializationStrategy::SerializeObject<PersonTestObject>, objDescriptor, _1, _2, _3), std::bind(&DeserializationStrategy::DeserializeObject<PersonTestObject>, objDescriptor, _1, _2, _3))
 					.Build();
 	
 					PersonTestObject testValue;
@@ -124,8 +133,8 @@ namespace Reflecto
 					.Build();
 
 					Serializer serializer = SerializerFactory(testTypeLibrary)
-						.LearnType<std::string>(SerializationStrategy::SerializeString)
-						.LearnType<std::vector<std::string>>(SerializationStrategy::SerializeCollection<std::vector<std::string>>)
+						.LearnType<std::string>(SerializationStrategy::SerializeString, DeserializationStrategy::DeserializeString)
+						.LearnType<std::vector<std::string>>(SerializationStrategy::SerializeCollection<std::vector<std::string>>, DeserializationStrategy::DeserializeCollection<std::vector<std::string>>)
 					.Build();
 
 					std::vector<std::string> testValue = { "uno", "dos", "tres" };
@@ -152,9 +161,9 @@ namespace Reflecto
 						.Build();
 
 					Serializer serializer = SerializerFactory(testTypeLibrary)
-						.LearnType<std::string>(SerializationStrategy::SerializeString)
-						.LearnType<int32_t>(SerializationStrategy::SerializeInt32)
-						.LearnType<std::map<int32_t, std::string>>(SerializationStrategy::SerializeAssociativeCollection<std::map<int32_t, std::string>>)
+						.LearnType<std::string>(SerializationStrategy::SerializeString, DeserializationStrategy::DeserializeString)
+						.LearnType<int32_t>(SerializationStrategy::SerializeInt32, DeserializationStrategy::DeserializeInt32)
+						.LearnType<std::map<int32_t, std::string>>(SerializationStrategy::SerializeAssociativeCollection<std::map<int32_t, std::string>>, DeserializationStrategy::DeserializeAssociativeCollection<std::map<int32_t, std::string>>)
 					.Build();
 
 					std::map<int32_t, std::string> testValue = { {1, "uno"}, { 2, "dos"}, { 3, "tres" } };
