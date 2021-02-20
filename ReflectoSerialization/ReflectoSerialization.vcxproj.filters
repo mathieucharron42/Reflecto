@@ -42,13 +42,10 @@
     <ClInclude Include="Serialization\Reader\ISerializationReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\Strategy\SerializationStrategy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Serialization\Strategy\DeserializationStrategy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Serialization\Reader\JsonSerializationReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization\Strategy\SerializationStrategy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

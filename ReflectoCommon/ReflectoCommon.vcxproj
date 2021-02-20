@@ -155,6 +155,7 @@
   <ItemGroup>
     <ClInclude Include="Common\Definitions.h" />
     <ClInclude Include="Common\Utils\EncapsulationBreaker.h" />
+    <ClInclude Include="Common\Utils\Ensure.h" />
     <ClInclude Include="Common\Utils\IOExt.h" />
     <ClInclude Include="Common\Utils\NonCopyable.h" />
     <ClInclude Include="Common\Utils\StringExt.h" />

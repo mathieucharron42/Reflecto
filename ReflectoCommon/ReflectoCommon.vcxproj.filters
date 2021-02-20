@@ -30,6 +30,9 @@
     <ClInclude Include="Common\Utils\IOExt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Common\Utils\Ensure.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">

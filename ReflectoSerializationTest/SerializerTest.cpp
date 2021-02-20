@@ -9,9 +9,9 @@
 #include "Serialization/Serializer.h"
 #include "Serialization/SerializerFactory.h"
 #include "Serialization/SerializationMetaType.h"
-#include "Serialization/Strategy/DeserializationStrategy.h"
 #include "Serialization/Strategy/SerializationStrategy.h"
 #include "Serialization/TextSerialization.h"
+#include "Serialization/Writer/JsonSerializationWriter.h"
 
 #include "CppUnitTest.h"
 
@@ -20,8 +20,6 @@
 #include <vector>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace std::placeholders;
-
 namespace Reflecto
 {
 	namespace Serialization
@@ -38,7 +36,7 @@ namespace Reflecto
 					.Build();
 
 					Serializer serializer = SerializerFactory(testTypeLibrary)
-						.LearnType<int32_t>(SerializationStrategy::SerializeInt32, DeserializationStrategy::DeserializeInt32)
+						.LearnType<int32_t, Int32SerializationStrategy>()
 					.Build();
 
 					int32_t testValue = 42;
@@ -68,7 +66,7 @@ namespace Reflecto
 					.Build();
 
 					Serializer serializer = SerializerFactory(testTypeLibrary)
-						.LearnType<std::string>(SerializationStrategy::SerializeString, DeserializationStrategy::DeserializeString)
+						.LearnType<std::string, StringSerializationStrategy>()
 					.Build();
 
 					std::string testValue = "test";
@@ -104,21 +102,21 @@ namespace Reflecto
 						}
 					};
 
-					Type::TypeLibrary testTypeLibrary = Type::TypeLibraryFactory()
+					const Type::TypeLibrary testTypeLibrary = Type::TypeLibraryFactory()
 						.Add<TestPerson>("TestPerson")
 						.Add<std::string>("string")
 						.Add<int32_t>("int32")
 					.Build();
 
-					const Type::TypeDescriptor objDescriptor = Type::TypeDescriptorFactory<TestPerson>(testTypeLibrary)
+					const Type::TypeDescriptor testPersonDescriptor = Type::TypeDescriptorFactory<TestPerson>(testTypeLibrary)
 						.Register(&TestPerson::Name, "Name")
 						.Register(&TestPerson::Age, "Age")
 					.Build();
 
-					Serializer serializer = SerializerFactory(testTypeLibrary)
-						.LearnType<int32_t>(SerializationStrategy::SerializeInt32, DeserializationStrategy::DeserializeInt32)
-						.LearnType<std::string>(SerializationStrategy::SerializeString, DeserializationStrategy::DeserializeString)
-						.LearnType<TestPerson>(std::bind(&SerializationStrategy::SerializeObject<TestPerson>, objDescriptor, _1, _2, _3), std::bind(&DeserializationStrategy::DeserializeObject<TestPerson>, objDescriptor, _1, _2, _3))
+					const Serializer serializer = SerializerFactory(testTypeLibrary)
+						.LearnType<int32_t, Int32SerializationStrategy>()
+						.LearnType<std::string, StringSerializationStrategy>()
+						.LearnType<TestPerson, ObjectSerializationStrategy<TestPerson>>(testPersonDescriptor)
 					.Build();
 	
 					TestPerson testValue;
@@ -135,7 +133,7 @@ namespace Reflecto
 
 					std::string expectedNameStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testValueName.c_str());
 					std::string expectedAgeStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int32", testValueAge);
-					std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Age":%s,"Name":%s}})"), objDescriptor.Type().Name().c_str(), expectedAgeStr.c_str(), expectedNameStr.c_str());
+					std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Age":%s,"Name":%s}})"), testPersonDescriptor.Type().Name().c_str(), expectedAgeStr.c_str(), expectedNameStr.c_str());
 					Assert::AreEqual(expectedSerialized, actualSerialized, L"Serialized value is unexpected!");
 
 					JsonSerializationReader reader;
@@ -155,8 +153,8 @@ namespace Reflecto
 					.Build();
 
 					Serializer serializer = SerializerFactory(testTypeLibrary)
-						.LearnType<std::string>(SerializationStrategy::SerializeString, DeserializationStrategy::DeserializeString)
-						.LearnType<std::vector<std::string>>(SerializationStrategy::SerializeCollection<std::vector<std::string>>, DeserializationStrategy::DeserializeCollection<std::vector<std::string>>)
+						.LearnType<std::string, StringSerializationStrategy>()
+						.LearnType<std::vector<std::string>, VectorSerializationStrategy<std::vector<std::string>>>()
 					.Build();
 
 					std::vector<std::string> testValue = { "uno", "dos", "tres" };
@@ -191,9 +189,9 @@ namespace Reflecto
 						.Build();
 
 					Serializer serializer = SerializerFactory(testTypeLibrary)
-						.LearnType<std::string>(SerializationStrategy::SerializeString, DeserializationStrategy::DeserializeString)
-						.LearnType<int32_t>(SerializationStrategy::SerializeInt32, DeserializationStrategy::DeserializeInt32)
-						.LearnType<std::map<int32_t, std::string>>(SerializationStrategy::SerializeAssociativeCollection<std::map<int32_t, std::string>>, DeserializationStrategy::DeserializeAssociativeCollection<std::map<int32_t, std::string>>)
+						.LearnType<std::string, StringSerializationStrategy>()
+						.LearnType<int32_t, Int32SerializationStrategy>()
+						.LearnType<std::map<int32_t, std::string>, MapSerializationStrategy<std::map<int32_t, std::string>>>()
 					.Build();
 
 					std::map<int32_t, std::string> testValue = { {1, "uno"}, { 2, "dos"}, { 3, "tres" } };

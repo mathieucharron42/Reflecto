@@ -2,7 +2,10 @@
 
 #include "Serialization/Serializer.h"
 
+#include "Common/Utils/Ensure.h"
 #include "Type/TypeLibrary.h"
+
+using namespace std::placeholders;
 
 namespace Reflecto
 {
@@ -17,22 +20,31 @@ namespace Reflecto
 
 			SerializerFactory(const Type::TypeLibrary& library)
 				: _typeLibrary(library)
-			{
+			{ }
 
-			}
-
-			SerializerFactory& LearnType(const Type::TypeDescriptorType& type, serialization_strategy_t serializationStrategy, deserialization_strategy_t deserializationStrategy)
+			SerializerFactory& LearnType(const Type::TypeDescriptorType& type, const serialization_strategy_t& serializationStrategy, const deserialization_strategy_t& deserializationStrategy)
 			{
 				_strategies.insert({ type, strategies_t(serializationStrategy, deserializationStrategy) });
 				return *this;
+			}
+
+			template<typename value_t, typename strategy_t, typename ... args_t>
+			SerializerFactory& LearnType(args_t ... args)
+			{
+				serialization_strategy_t serializationStrategy = std::bind(&strategy_t::Serialize, args..., _1, _2, _3);
+				deserialization_strategy_t deserializationStrategy = std::bind(&strategy_t::Deserialize, args..., _1, _2, _3);
+				return LearnType<value_t>(serializationStrategy, deserializationStrategy);
 			}
 
 			template<class value_t>
 			SerializerFactory& LearnType(serialization_strategy_t serializationStrategy, deserialization_strategy_t deserializationStrategy)
 			{
 				const Type::TypeDescriptorType* type = _typeLibrary.Get<value_t>();
-				assert(type);
-				return LearnType(*type, serializationStrategy, deserializationStrategy);
+				if (ensure(type))
+				{
+					LearnType(*type, serializationStrategy, deserializationStrategy);
+				}
+				return *this;
 			}
 
 			Serializer Build()
