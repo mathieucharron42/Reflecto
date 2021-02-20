@@ -33,38 +33,39 @@ namespace Reflecto
 			template<typename member_t>
 			member_t* ResolveMember(object_t& object, const std::string& memberName)
 			{
-				member_t* memberAddr = reinterpret_cast<member_t*>(ResolveMember(object, memberName));
-				return memberAddr;
+				return static_cast<member_t*>(ResolveMember(object, memberName));
 			}
 
 			void* ResolveMember(object_t& object, const std::string& memberName)
 			{
-				void* memberAddr = nullptr;
 				const MemberDescriptor* memberDescriptor = _typeDescriptor.GetMemberByNameRecursive(memberName);
-				if (memberDescriptor)
-				{
-					memberAddr = ResolveMember(object, *memberDescriptor);
-				}
-				return memberAddr;
+				return memberDescriptor ? ResolveMember(object, *memberDescriptor) : nullptr;
 			}
 
 			template<typename member_t>
 			member_t* ResolveMember(object_t& object, const MemberDescriptor& memberDescriptor)
 			{
-				member_t* memberAddr = reinterpret_cast<member_t*>(ResolveMember(object, memberDescriptor));
-				return memberAddr;
+				return static_cast<member_t*>(ResolveMember(object, memberDescriptor));
 			}
 
 			void* ResolveMember(object_t& object, const MemberDescriptor& memberDescriptor)
 			{
-				byte* objRawAddr = reinterpret_cast<byte*>(&object);
-				byte* memberRawAddr = objRawAddr + memberDescriptor.Offset();
-				return memberRawAddr;
+				return ResolveMember(&object, memberDescriptor);
 			}
 
 			const void* ResolveMember(const object_t& object, const MemberDescriptor& memberDescriptor)
 			{
-				const byte* objRawAddr = reinterpret_cast<const byte*>(&object);
+				return ResolveMember(&object, memberDescriptor);
+			}
+
+			void* ResolveMember(void* object, const MemberDescriptor& memberDescriptor)
+			{
+				return const_cast<void*>(ResolveMember(const_cast<const void*>(object), memberDescriptor));
+			}
+
+			const void* ResolveMember(const void* object, const MemberDescriptor& memberDescriptor)
+			{
+				const byte* objRawAddr = reinterpret_cast<const byte*>(object);
 				const byte* memberRawAddr = objRawAddr + memberDescriptor.Offset();
 				return memberRawAddr;
 			}

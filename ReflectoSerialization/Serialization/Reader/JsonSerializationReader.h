@@ -74,18 +74,28 @@ namespace Reflecto
 
 			virtual void ReadEndArray() override
 			{
+				assert(GetCurrentElement().type() == Json::ValueType::arrayValue);
 				PopArrayIndex();
 				PopElement();
 			}
 
+			virtual bool HasArrayElementRemaining() override
+			{
+				assert(GetCurrentElement().type() == Json::ValueType::arrayValue);
+				const uint32_t index = GetCurrentArrayIndex();
+				return index < GetCurrentElement().size();
+			}
+
 			virtual void ReadBeginArrayElement(uint32_t& index) override
 			{
+				assert(GetCurrentElement().type() == Json::ValueType::arrayValue);
 				index = GetCurrentArrayIndex();
 				PushElement(GetCurrentElement()[index]);
 			}
 
 			virtual void ReadEndArrayElement() override
 			{
+				assert(GetCurrentElement().type() == Json::ValueType::arrayValue);
 				uint32_t& index = GetCurrentArrayIndex();
 				++index;
 			}
@@ -98,12 +108,21 @@ namespace Reflecto
 
 			virtual void ReadEndObject() override
 			{
+				assert(GetCurrentElement().type() == Json::ValueType::objectValue);
 				PopObjectProperties();
 				PopElement();
 			}
 
+			virtual bool HasObjectPropertyRemaining() override
+			{
+				assert(GetCurrentElement().type() == Json::ValueType::objectValue);
+				JsonProperties& properties = GetCurrentObjectProperties();
+				return !properties.empty();
+			}
+
 			virtual void ReadBeginObjectProperty(std::string& propertyName) override
 			{
+				assert(GetCurrentElement().type() == Json::ValueType::objectValue);
 				JsonProperties& properties = GetCurrentObjectProperties();
 				propertyName = properties.front();
 				PushElement(GetCurrentElement()[propertyName]);
@@ -111,6 +130,7 @@ namespace Reflecto
 
 			virtual void ReadEndObjectProperty() override
 			{
+				assert(GetCurrentElement().type() == Json::ValueType::objectValue);
 				JsonProperties& properties = GetCurrentObjectProperties();
 				properties.erase(properties.begin());
 			}
@@ -119,7 +139,7 @@ namespace Reflecto
 			{
 				JsonElement element;
 
-				Json::CharReaderBuilder charReaderBuilder;
+				const Json::CharReaderBuilder charReaderBuilder;
 				JSONCPP_STRING error;
 				std::stringstream ss(str);
 				if (Json::parseFromStream(charReaderBuilder, ss, &element, &error))

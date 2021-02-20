@@ -58,7 +58,7 @@ namespace Reflecto
 			}
 
 			template<typename value_t>
-			void Deserialize(const value_t& value, ISerializationReader& writer) const
+			void Deserialize(value_t& value, ISerializationReader& reader) const
 			{
 				const Type::TypeDescriptorType* type = _typeLibrary.Get<value_t>();
 				assert(type);
@@ -86,13 +86,28 @@ namespace Reflecto
 
 			void Deserialize(const Type::TypeDescriptorType& type, const deserialization_strategy_t& strategy, void* value, ISerializationReader& reader) const
 			{
-				//writer.WriteBeginObjectProperty("type");
-				//writer.WriteString(type.Name());
-				//writer.WriteEndObjectProperty();
-
-				//writer.WriteBeginObjectProperty("value");
-				//strategy(*this, value, writer);
-				//writer.WriteEndObjectProperty();
+				reader.ReadBeginObject();
+				{
+					while (reader.HasObjectPropertyRemaining())
+					{
+						std::string property;
+						reader.ReadBeginObjectProperty(property);
+						{
+							if (property == "type")
+							{
+								std::string actualType;
+								reader.ReadString(actualType);
+								assert(type.Name() == actualType);
+							}
+							else if (property == "value")
+							{
+								strategy(*this, value, reader);
+							}
+						}
+						reader.ReadEndObjectProperty();
+					}
+				}
+				reader.ReadEndObject();
 			}
 
 			const serialization_strategy_t* GetSerializationStrategy(const Type::TypeDescriptorType& type) const

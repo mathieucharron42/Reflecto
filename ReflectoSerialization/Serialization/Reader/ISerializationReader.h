@@ -24,6 +24,8 @@ public:
 
 	virtual void ReadEndObject() = 0;
 
+	virtual bool HasObjectPropertyRemaining() = 0;
+
 	virtual void ReadBeginObjectProperty(std::string& propertyName) = 0;
 
 	virtual void ReadEndObjectProperty() = 0;
@@ -32,6 +34,8 @@ public:
 
 	virtual void ReadEndArray() = 0;
 
+	virtual bool HasArrayElementRemaining() = 0;
+	
 	virtual void ReadBeginArrayElement(uint32_t& index) = 0;
 
 	virtual void ReadEndArrayElement() = 0;
