@@ -18,9 +18,6 @@
     <ClCompile Include="SerializerTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TextSerialization.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="JsonSerializationWriterTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

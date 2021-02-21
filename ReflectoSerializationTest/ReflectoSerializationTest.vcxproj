@@ -22,7 +22,6 @@
     <ClCompile Include="JsonSerializationReaderTest.cpp" />
     <ClCompile Include="JsonSerializationWriterTest.cpp" />
     <ClCompile Include="SerializerTest.cpp" />
-    <ClCompile Include="TextSerialization.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JsonCpp\JsonCpp.vcxproj">

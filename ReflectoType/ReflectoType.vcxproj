@@ -170,7 +170,7 @@
     <ClInclude Include="Type\TypeLibraryFactory.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TypeLibrary.cpp" />
+    <ClCompile Include="ReflectoType.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

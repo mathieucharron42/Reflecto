@@ -21,11 +21,8 @@
   <ItemGroup>
     <ClInclude Include="Serialization\Reader\ISerializationReader.h" />
     <ClInclude Include="Serialization\Reader\JsonSerializationReader.h" />
-    <ClInclude Include="Serialization\SerializationMetaType.h" />
     <ClInclude Include="Serialization\SerializerFactory.h" />
     <ClInclude Include="Serialization\Strategy\SerializationStrategy.h" />
-    <ClInclude Include="Serialization\SerializationExt.h" />
-    <ClInclude Include="Serialization\SerializationFormat.h" />
     <ClInclude Include="Serialization\Serializer.h" />
     <ClInclude Include="Serialization\TextSerialization.h" />
     <ClInclude Include="Serialization\Writer\ISerializationWriter.h" />
@@ -41,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Serialization\Source.cpp" />
+    <ClCompile Include="ReflectoSerialization.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
