@@ -4,7 +4,7 @@
 #include "Serialization/Writer/ISerializationWriter.h"
 
 #include "Common/Definitions.h"
-#include "jsoncpp/json/json.h"
+#include "jsoncpp/json.h"
 
 #include <assert.h>
 #include <stack>

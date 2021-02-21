@@ -22,8 +22,8 @@
     <ClCompile Include="jsoncpp\jsoncpp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="jsoncpp\json\json-forwards.h" />
-    <ClInclude Include="jsoncpp\json\json.h" />
+    <ClInclude Include="jsoncpp\json-forwards.h" />
+    <ClInclude Include="jsoncpp\json.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -98,6 +98,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

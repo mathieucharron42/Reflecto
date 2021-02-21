@@ -92,6 +92,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <BrowseInformation>true</BrowseInformation>
+      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

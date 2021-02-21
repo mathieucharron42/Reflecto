@@ -20,10 +20,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="jsoncpp\json\json-forwards.h">
+    <ClInclude Include="jsoncpp\json.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="jsoncpp\json\json.h">
+    <ClInclude Include="jsoncpp\json-forwards.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,4 +1,5 @@
 #pragma once
+
 namespace Reflecto
 {
 	namespace Utils
