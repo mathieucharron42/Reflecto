@@ -4,6 +4,7 @@
 #include "Serialization/Writer/ISerializationWriter.h"
 
 #include "Common/Definitions.h"
+#include "Common/Ensure.h"
 #include "Type/TypeDescriptor.h"
 #include "Type/TypeLibrary.h"
 
@@ -32,8 +33,7 @@ namespace Reflecto
 			void Serialize(const Type::TypeDescriptorType& type, const void* value, ISerializationWriter& writer) const
 			{
 				const serialization_strategy_t* strategy = GetSerializationStrategy(type);
-				assert(strategy);
-				if (strategy)
+				if (ensure(strategy))
 				{
 					Serialize(type, *strategy, value, writer);
 				}
@@ -43,15 +43,16 @@ namespace Reflecto
 			void Serialize(const value_t& value, ISerializationWriter& writer) const
 			{
 				const Type::TypeDescriptorType* type = _typeLibrary.Get<value_t>();
-				assert(type); 
-				Serialize(*type, &value, writer);
+				if (ensure(type))
+				{
+					Serialize(*type, &value, writer);
+				}
 			}
 
 			void Deserialize(const Type::TypeDescriptorType& type, void* value, ISerializationReader& reader) const
 			{
 				const deserialization_strategy_t* strategy = GetDeserializationStrategy(type);
-				assert(strategy);
-				if (strategy)
+				if (ensure(strategy))
 				{
 					Deserialize(type, *strategy, value, reader);
 				}
@@ -61,8 +62,10 @@ namespace Reflecto
 			void Deserialize(value_t& value, ISerializationReader& reader) const
 			{
 				const Type::TypeDescriptorType* type = _typeLibrary.Get<value_t>();
-				assert(type);
-				Deserialize(*type, &value, reader);
+				if (ensure(type))
+				{
+					Deserialize(*type, &value, reader);
+				}
 			}
 
 		private:

@@ -4,9 +4,9 @@
 #include "Serialization/Writer/ISerializationWriter.h"
 
 #include "Common/Definitions.h"
+#include "Common/Ensure.h"
 #include "jsoncpp/json.h"
 
-#include <assert.h>
 #include <stack>
 #include <sstream>
 #include <vector>
@@ -18,11 +18,7 @@ namespace Reflecto
 		class JsonSerializationWriter : public ISerializationWriter
 		{
 		public:
-			JsonSerializationWriter()
-			{
-				
-			}
-			
+
 			virtual void WriteInteger32(int32_t value) override
 			{
 				PushElement(JsonElement(value));
@@ -65,11 +61,12 @@ namespace Reflecto
 
 			virtual void WriteEndObject() override
 			{
-
+				ensure(GetCurrentElement().type() == Json::objectValue);
 			}
 
 			virtual void WriteBeginObjectProperty(const std::string& propertyName) override
 			{
+				ensure(GetCurrentElement().type() == Json::objectValue);
 				PushPropertyName(propertyName);
 			}
 
@@ -77,6 +74,7 @@ namespace Reflecto
 			{
 				const std::string propertyName = PopPropertyName();
 				const JsonElement element = PopElement();
+				ensure(GetCurrentElement().type() == Json::objectValue);
 				GetCurrentElement()[propertyName] = element;
 			}
 
@@ -87,17 +85,18 @@ namespace Reflecto
 
 			virtual void WriteEndArray() override
 			{
-				
+				ensure(GetCurrentElement().type() == Json::arrayValue);
 			}
 
 			virtual void WriteBeginArrayElement() override
 			{
-				
+				ensure(GetCurrentElement().type() == Json::arrayValue);
 			}
 
 			virtual void WriteEndArrayElement() override
 			{
 				const JsonElement element = PopElement();
+				ensure(GetCurrentElement().type() == Json::arrayValue);
 				GetCurrentElement().append(element);
 			}
 
@@ -134,7 +133,7 @@ namespace Reflecto
 
 			JsonElement& GetCurrentElement()
 			{
-				assert(HasCurrentElement());
+				ensure(HasCurrentElement());
 				return _stack.top();
 			}
 
@@ -157,7 +156,7 @@ namespace Reflecto
 
 			std::string& GetCurrentPropertyName()
 			{
-				assert(HasCurrentPropertyName());
+				ensure(HasCurrentPropertyName());
 				return _propertyNames.top();
 			}
 

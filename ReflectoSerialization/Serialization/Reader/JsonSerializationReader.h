@@ -3,12 +3,14 @@
 #include "Serialization/Reader/ISerializationReader.h"
 
 #include "Common/Definitions.h"
+#include "Common/Ensure.h"
 #include "jsoncpp/json.h"
 
-#include <assert.h>
+#include <cstdint>
 #include <optional>
 #include <stack>
 #include <sstream>
+#include <string>
 #include <vector>
 
 namespace Reflecto
@@ -18,111 +20,106 @@ namespace Reflecto
 		class JsonSerializationReader : public ISerializationReader
 		{
 		public:
-			JsonSerializationReader()
-			{
-
-			}
-
 			virtual void ReadInteger32(int32_t& value) override
 			{
-				assert(GetCurrentElement().type() == Json::ValueType::intValue);
+				ensure(GetCurrentElement().type() == Json::ValueType::intValue);
 				value = PopElement().asInt();
 			}
 
 			virtual void ReadInteger64(int64_t& value) override
 			{
-				assert(GetCurrentElement().type() == Json::ValueType::intValue);
+				ensure(GetCurrentElement().type() == Json::ValueType::intValue);
 				value = PopElement().asInt64();
 			}
 
 			virtual void ReadFloat(float& value) override
 			{
-				assert(GetCurrentElement().type() == Json::ValueType::realValue);
+				ensure(GetCurrentElement().type() == Json::ValueType::realValue);
 				value = PopElement().asFloat();
 			}
 
 			virtual void ReadDouble(double& value) override
 			{
-				assert(GetCurrentElement().type() == Json::ValueType::realValue);
+				ensure(GetCurrentElement().type() == Json::ValueType::realValue);
 				value = PopElement().asDouble();
 			}
 
 			virtual void ReadString(std::string& value) override
 			{
-				assert(GetCurrentElement().type() == Json::ValueType::stringValue);
+				ensure(GetCurrentElement().type() == Json::ValueType::stringValue);
 				value = PopElement().asString();
 			}
 
 			virtual void ReadBoolean(bool& value) override
 			{
-				assert(GetCurrentElement().type() == Json::ValueType::booleanValue);
+				ensure(GetCurrentElement().type() == Json::ValueType::booleanValue);
 				value = PopElement().asBool();
 			}
 
 			virtual void ReadNull(void* value) override
 			{
-				assert(GetCurrentElement().type() == Json::ValueType::nullValue);
+				ensure(GetCurrentElement().type() == Json::ValueType::nullValue);
 				PopElement();
 				value = nullptr;
 			}
 
 			virtual void ReadBeginArray() override
 			{
-				assert(GetCurrentElement().type() == Json::ValueType::arrayValue);
+				ensure(GetCurrentElement().type() == Json::ValueType::arrayValue);
 				PushArrayIndex(0);
 			}
 
 			virtual void ReadEndArray() override
 			{
-				assert(GetCurrentElement().type() == Json::ValueType::arrayValue);
+				ensure(GetCurrentElement().type() == Json::ValueType::arrayValue);
 				PopArrayIndex();
 				PopElement();
 			}
 
 			virtual bool HasArrayElementRemaining() override
 			{
-				assert(GetCurrentElement().type() == Json::ValueType::arrayValue);
+				ensure(GetCurrentElement().type() == Json::ValueType::arrayValue);
 				const uint32_t index = GetCurrentArrayIndex();
 				return index < GetCurrentElement().size();
 			}
 
 			virtual void ReadBeginArrayElement(uint32_t& index) override
 			{
-				assert(GetCurrentElement().type() == Json::ValueType::arrayValue);
+				ensure(GetCurrentElement().type() == Json::ValueType::arrayValue);
 				index = GetCurrentArrayIndex();
 				PushElement(GetCurrentElement()[index]);
 			}
 
 			virtual void ReadEndArrayElement() override
 			{
-				assert(GetCurrentElement().type() == Json::ValueType::arrayValue);
+				ensure(GetCurrentElement().type() == Json::ValueType::arrayValue);
 				uint32_t& index = GetCurrentArrayIndex();
 				++index;
 			}
 
 			virtual void ReadBeginObject() override
 			{
-				assert(GetCurrentElement().type() == Json::ValueType::objectValue);
+				ensure(GetCurrentElement().type() == Json::ValueType::objectValue);
 				PushObjectProperties(GetCurrentElement().getMemberNames());
 			}
 
 			virtual void ReadEndObject() override
 			{
-				assert(GetCurrentElement().type() == Json::ValueType::objectValue);
+				ensure(GetCurrentElement().type() == Json::ValueType::objectValue);
 				PopObjectProperties();
 				PopElement();
 			}
 
 			virtual bool HasObjectPropertyRemaining() override
 			{
-				assert(GetCurrentElement().type() == Json::ValueType::objectValue);
+				ensure(GetCurrentElement().type() == Json::ValueType::objectValue);
 				JsonProperties& properties = GetCurrentObjectProperties();
 				return !properties.empty();
 			}
 
 			virtual void ReadBeginObjectProperty(std::string& propertyName) override
 			{
-				assert(GetCurrentElement().type() == Json::ValueType::objectValue);
+				ensure(GetCurrentElement().type() == Json::ValueType::objectValue);
 				JsonProperties& properties = GetCurrentObjectProperties();
 				propertyName = properties.front();
 				PushElement(GetCurrentElement()[propertyName]);
@@ -130,7 +127,7 @@ namespace Reflecto
 
 			virtual void ReadEndObjectProperty() override
 			{
-				assert(GetCurrentElement().type() == Json::ValueType::objectValue);
+				ensure(GetCurrentElement().type() == Json::ValueType::objectValue);
 				JsonProperties& properties = GetCurrentObjectProperties();
 				properties.erase(properties.begin());
 			}
@@ -142,13 +139,11 @@ namespace Reflecto
 				const Json::CharReaderBuilder charReaderBuilder;
 				JSONCPP_STRING error;
 				std::stringstream ss(str);
-				if (Json::parseFromStream(charReaderBuilder, ss, &element, &error))
+
+				const bool success = Json::parseFromStream(charReaderBuilder, ss, &element, &error);
+				if (ensure(success))
 				{
 					PushElement(element);
-				}
-				else
-				{
-					assert(false);
 				}
 			}
 
@@ -170,7 +165,7 @@ namespace Reflecto
 
 			JsonElement& GetCurrentElement()
 			{
-				assert(HasCurrentElement());
+				ensure(HasCurrentElement());
 				return _stack.top();
 			}
 
@@ -193,7 +188,7 @@ namespace Reflecto
 
 			uint32_t& GetCurrentArrayIndex()
 			{
-				assert(HasCurrentArrayIndex());
+				ensure(HasCurrentArrayIndex());
 				return _arrayIndexes.top();
 			}
 
@@ -216,7 +211,7 @@ namespace Reflecto
 
 			JsonProperties& GetCurrentObjectProperties()
 			{
-				assert(HasCurrentObjectProperties());
+				ensure(HasCurrentObjectProperties());
 				return _objectProperties.top();
 			}
 
@@ -224,6 +219,7 @@ namespace Reflecto
 			{
 				return !_objectProperties.empty();
 			}
+
 			std::stack<JsonElement> _stack;
 			std::stack<uint32_t> _arrayIndexes;
 			std::stack<JsonProperties> _objectProperties;

@@ -1,6 +1,15 @@
 #pragma once
 
 #include "Serialization/Serializer.h"
+#include "Serialization/Reader/ISerializationReader.h"
+#include "Serialization/Writer/ISerializationWriter.h"
+
+#include "Common/Ensure.h"
+#include "Resolver/Resolver.h"
+#include "Type/MemberDescriptor.h"
+
+#include <cstdint>
+#include <string>
 
 namespace Reflecto
 {
@@ -10,13 +19,13 @@ namespace Reflecto
 		{
 			static void Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
 			{
-				const int32_t& valInt = *reinterpret_cast<const int32_t*>(value);
+				const int32_t& valInt = *static_cast<const int32_t*>(value);
 				writer.WriteInteger32(valInt);
 			}
 
 			static void Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
 			{
-				int32_t& valInt = *reinterpret_cast<int32_t*>(value);
+				int32_t& valInt = *static_cast<int32_t*>(value);
 				reader.ReadInteger32(valInt);
 			}
 		};
@@ -25,13 +34,13 @@ namespace Reflecto
 		{
 			static void Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
 			{
-				const std::string& valueStr = *reinterpret_cast<const std::string*>(value);
+				const std::string& valueStr = *static_cast<const std::string*>(value);
 				writer.WriteString(valueStr);
 			}
 
 			static void Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
 			{
-				std::string& valueStr = *reinterpret_cast<std::string*>(value);
+				std::string& valueStr = *static_cast<std::string*>(value);
 				reader.ReadString(valueStr);
 			}
 		};
@@ -41,7 +50,7 @@ namespace Reflecto
 		{
 			static void Serialize(const Type::TypeDescriptor& typeDesriptor, const Serializer& serializer, const void* value, ISerializationWriter& writer)
 			{
-				const object_t& valueObject = *reinterpret_cast<const object_t*>(value);
+				const object_t& valueObject = *static_cast<const object_t*>(value);
 				Type::Resolver<object_t> resolver(typeDesriptor);
 				writer.WriteBeginObject();
 				{
@@ -60,9 +69,8 @@ namespace Reflecto
 
 			static void Deserialize(const Type::TypeDescriptor& typeDesriptor, const Serializer& serializer, void* value, ISerializationReader& reader)
 			{
-				object_t& valueObject = *reinterpret_cast<object_t*>(value);
+				object_t& valueObject = *static_cast<object_t*>(value);
 				Type::Resolver<object_t> resolver(typeDesriptor);
-
 				reader.ReadBeginObject();
 				{
 					while (reader.HasObjectPropertyRemaining())
@@ -71,8 +79,7 @@ namespace Reflecto
 						reader.ReadBeginObjectProperty(propertyName);
 						{
 							const Type::MemberDescriptor* memberDescriptor = typeDesriptor.GetMemberByName(propertyName);
-							assert(memberDescriptor);
-							if (memberDescriptor)
+							if (ensure(memberDescriptor))
 							{
 								void* member = resolver.ResolveMember(valueObject, *memberDescriptor);
 								serializer.Deserialize(memberDescriptor->Type(), member, reader);
@@ -92,7 +99,7 @@ namespace Reflecto
 			{
 				using element_t = typename object_t::value_type;
 
-				const object_t& valueObject = *reinterpret_cast<const object_t*>(value);
+				const object_t& valueObject = *static_cast<const object_t*>(value);
 				writer.WriteBeginArray();
 				{
 					for (const element_t& element : valueObject)
@@ -111,8 +118,7 @@ namespace Reflecto
 			{
 				using element_t = typename object_t::value_type;
 
-				object_t& collection = *reinterpret_cast<object_t*>(value);
-
+				object_t& collection = *static_cast<object_t*>(value);
 				reader.ReadBeginArray();
 				{
 					while (reader.HasArrayElementRemaining())
@@ -138,7 +144,7 @@ namespace Reflecto
 			{
 				using element_t = typename object_t::value_type;
 
-				const object_t& valueObject = *reinterpret_cast<const object_t*>(value);
+				const object_t& valueObject = *static_cast<const object_t*>(value);
 				writer.WriteBeginArray();
 				{
 					for (const element_t& element : valueObject)
@@ -172,8 +178,7 @@ namespace Reflecto
 				using key_t = typename object_t::key_type;
 				using value_t = typename object_t::mapped_type;
 
-				object_t& collection = *reinterpret_cast<object_t*>(value);
-
+				object_t& collection = *static_cast<object_t*>(value);
 				reader.ReadBeginArray();
 				{
 					while (reader.HasArrayElementRemaining())
