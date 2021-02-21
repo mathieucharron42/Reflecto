@@ -3,9 +3,8 @@
 #include "Type/TypeDescriptorFactory.h"
 #include "Type/TypeLibrary.h"
 #include "Type/TypeLibraryFactory.h"
-
-#include "Common/Utils/EncapsulationBreaker.h"
-#include "Common/Utils/StringExt.h"
+#include "Utils/EncapsulationBreaker.h"
+#include "Utils/StringExt.h"
 
 #include "CppUnitTest.h"
 #include <tuple>

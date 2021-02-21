@@ -4,7 +4,7 @@
 #include "Type/TypeDescriptorTypeFactory.h"
 
 #include "Common/Definitions.h"
-#include "Common/Utils/NonCopyable.h"
+#include "Utils/NonCopyable.h"
 
 #include <assert.h>
 #include <optional>

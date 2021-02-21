@@ -2,7 +2,7 @@
 
 #include "Serialization/Serializer.h"
 
-#include "Common/Utils/Ensure.h"
+#include "Common/Ensure.h"
 #include "Type/TypeLibrary.h"
 
 using namespace std::placeholders;

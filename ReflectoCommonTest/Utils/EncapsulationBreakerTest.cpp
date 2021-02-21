@@ -1,4 +1,4 @@
-#include "Common/Utils/EncapsulationBreaker.h"
+#include "Utils/EncapsulationBreaker.h"
 
 #include "CppUnitTest.h"
 

@@ -154,11 +154,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Common\Definitions.h" />
-    <ClInclude Include="Common\Utils\EncapsulationBreaker.h" />
-    <ClInclude Include="Common\Utils\Ensure.h" />
-    <ClInclude Include="Common\Utils\IOExt.h" />
-    <ClInclude Include="Common\Utils\NonCopyable.h" />
-    <ClInclude Include="Common\Utils\StringExt.h" />
+    <ClInclude Include="Utils\EncapsulationBreaker.h" />
+    <ClInclude Include="Common\Ensure.h" />
+    <ClInclude Include="Utils\IOExt.h" />
+    <ClInclude Include="Utils\NonCopyable.h" />
+    <ClInclude Include="Utils\StringExt.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp" />

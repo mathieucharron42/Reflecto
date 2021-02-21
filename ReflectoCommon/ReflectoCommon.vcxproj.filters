@@ -18,19 +18,19 @@
     <ClInclude Include="Common\Definitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Utils\EncapsulationBreaker.h">
+    <ClInclude Include="Common\Ensure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Utils\NonCopyable.h">
+    <ClInclude Include="Utils\EncapsulationBreaker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Utils\StringExt.h">
+    <ClInclude Include="Utils\IOExt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Utils\IOExt.h">
+    <ClInclude Include="Utils\StringExt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Utils\Ensure.h">
+    <ClInclude Include="Utils\NonCopyable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

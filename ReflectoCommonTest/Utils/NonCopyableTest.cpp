@@ -1,4 +1,4 @@
-#include "Common/Utils/NonCopyable.h"
+#include "Utils/NonCopyable.h"
 
 #include "CppUnitTest.h"
 
