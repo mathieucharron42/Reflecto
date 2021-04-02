@@ -34,7 +34,7 @@ namespace Reflecto
 			}
 
 			template <typename member_t, typename object_t>
-			TypeDescriptorFactory& Register(typename member_t typename object_t::* memberPointer, const std::string& memberName)
+			TypeDescriptorFactory& RegisterMember(typename member_t typename object_t::* memberPointer, const std::string& memberName)
 			{
 				MemberDescriptor member = MemberDescriptorFactory<object_t, member_t>(_typeLibrary, _sampleObj)
 					.SetMember(memberPointer, memberName)

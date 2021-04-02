@@ -197,8 +197,8 @@ namespace Reflecto
 					.Build();
 
 					const Type::TypeDescriptor testPersonDescriptor = Type::TypeDescriptorFactory<TestPerson>(testTypeLibrary)
-						.Register(&TestPerson::Name, "Name")
-						.Register(&TestPerson::Age, "Age")
+						.RegisterMember(&TestPerson::Name, "Name")
+						.RegisterMember(&TestPerson::Age, "Age")
 					.Build();
 
 					const Serializer serializer = SerializerFactory(testTypeLibrary)
@@ -370,23 +370,23 @@ namespace Reflecto
 					.Build();
 
 					const Type::TypeDescriptor testPotatoHeadDescriptor = Type::TypeDescriptorFactory<TestPotatoHead>(testTypeLibrary)
-						.Register(&TestPotatoHead::Name, "Name")
-						.Register(&TestPotatoHead::CurrentEyes, "Eyes")
-						.Register(&TestPotatoHead::CurrentNose, "Nose")
-						.Register(&TestPotatoHead::CurrentMouth, "Mouth")
+						.RegisterMember(&TestPotatoHead::Name, "Name")
+						.RegisterMember(&TestPotatoHead::CurrentEyes, "Eyes")
+						.RegisterMember(&TestPotatoHead::CurrentNose, "Nose")
+						.RegisterMember(&TestPotatoHead::CurrentMouth, "Mouth")
 					.Build();
 
 					const Type::TypeDescriptor testPotatoHeadEyesDescriptor = Type::TypeDescriptorFactory<TestPotatoHead::Eyes>(testTypeLibrary)
-						.Register(&TestPotatoHead::Eyes::Color, "Color")
-						.Register(&TestPotatoHead::Eyes::Size, "Size")
+						.RegisterMember(&TestPotatoHead::Eyes::Color, "Color")
+						.RegisterMember(&TestPotatoHead::Eyes::Size, "Size")
 					.Build();
 
 					const Type::TypeDescriptor testPotatoHeadNoseDescriptor = Type::TypeDescriptorFactory<TestPotatoHead::Nose>(testTypeLibrary)
-						.Register(&TestPotatoHead::Nose::Type, "Type")
+						.RegisterMember(&TestPotatoHead::Nose::Type, "Type")
 					.Build();
 					
 					const Type::TypeDescriptor testPotatoHeadMouthDescriptor = Type::TypeDescriptorFactory<TestPotatoHead::Mouth>(testTypeLibrary)
-						.Register(&TestPotatoHead::Mouth::IsSmiling, "IsSmiling")
+						.RegisterMember(&TestPotatoHead::Mouth::IsSmiling, "IsSmiling")
 					.Build();
 
 					const Serializer serializer = SerializerFactory(testTypeLibrary)

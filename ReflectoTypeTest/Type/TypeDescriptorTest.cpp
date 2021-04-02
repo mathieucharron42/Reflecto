@@ -104,7 +104,7 @@ namespace Reflecto
 					.Build();
 
 					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>(typeLibrary)
-						.Register(&Potato::Weight, "Weight")
+						.RegisterMember(&Potato::Weight, "Weight")
 						.Build();
 
 					const TypeDescriptorType& expectedType = *typeLibrary.Get<Potato>();
@@ -139,9 +139,9 @@ namespace Reflecto
 					.Build();
 
 					const TypeDescriptor descriptor = TypeDescriptorFactory<PotatoNoPadding>(typeLibrary)
-						.Register(&PotatoNoPadding::Name, "Name")
-						.Register(&PotatoNoPadding::Weight, "Weight")
-						.Register(&PotatoNoPadding::CookedTime, "CookedTime")
+						.RegisterMember(&PotatoNoPadding::Name, "Name")
+						.RegisterMember(&PotatoNoPadding::Weight, "Weight")
+						.RegisterMember(&PotatoNoPadding::CookedTime, "CookedTime")
 					.Build();
 
 					const TypeDescriptorType& expectedType = *typeLibrary.Get<PotatoNoPadding>();
@@ -184,8 +184,8 @@ namespace Reflecto
 					.Build();
 
 					const TypeDescriptor descriptor = TypeDescriptorFactory<PrivatePotato>(typeLibrary)
-						.Register(GetPrivateMemberPointer(PrivatePotatoWeightTag()), "Weight")
-						.Register(GetPrivateMemberPointer(PrivatePotatoNameTag()), "Name")
+						.RegisterMember(GetPrivateMemberPointer(PrivatePotatoWeightTag()), "Weight")
+						.RegisterMember(GetPrivateMemberPointer(PrivatePotatoNameTag()), "Name")
 					.Build();
 
 					const TypeDescriptorType& expectedType = *typeLibrary.Get<PrivatePotato>();
@@ -234,12 +234,12 @@ namespace Reflecto
 					.Build();
 
 					const TypeDescriptor baseDescriptor = TypeDescriptorFactory<VegetableNoPadding>(typeLibrary)
-						.Register(&VegetableNoPadding::Weight, "Weight")
-						.Register(&VegetableNoPadding::Condition, "Condition")
+						.RegisterMember(&VegetableNoPadding::Weight, "Weight")
+						.RegisterMember(&VegetableNoPadding::Condition, "Condition")
 					.Build();
 
 					const TypeDescriptor childDescriptor = TypeDescriptorFactory<PotatoNoPadding>(typeLibrary, &baseDescriptor)
-						.Register(&PotatoNoPadding::IsBacked, "IsBacked")
+						.RegisterMember(&PotatoNoPadding::IsBacked, "IsBacked")
 						.Build();
 
 					const TypeDescriptorType baseExpectedType = *typeLibrary.Get<VegetableNoPadding>();
@@ -312,11 +312,11 @@ namespace Reflecto
 					.Build();
 
 					const TypeDescriptor baseDescriptor = TypeDescriptorFactory<Vegetable>(typeLibrary)
-						.Register(&Vegetable::Age, "Age")
+						.RegisterMember(&Vegetable::Age, "Age")
 					.Build();
 
 					const TypeDescriptor childDescriptor = TypeDescriptorFactory<Potato>(typeLibrary, &baseDescriptor)
-						.Register(&Vegetable::Weight, "Weight")
+						.RegisterMember(&Vegetable::Weight, "Weight")
 					.Build();
 
 					using member_information_t = std::tuple<std::string, TypeDescriptorType>;

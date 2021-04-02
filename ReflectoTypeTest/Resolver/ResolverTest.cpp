@@ -33,7 +33,7 @@ namespace Reflecto
 					.Build();
 
 					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>(typeLibrary)
-						.Register(&Potato::Weight, "Weight")
+						.RegisterMember(&Potato::Weight, "Weight")
 					.Build();
 
 					Resolver<Potato> resolver{ descriptor };
@@ -65,7 +65,7 @@ namespace Reflecto
 					.Build();
 
 					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>(typeLibrary)
-						.Register(&Potato::Weight, "Weight")
+						.RegisterMember(&Potato::Weight, "Weight")
 						.Build();
 
 					Resolver<Potato> resolver{ descriptor };
@@ -103,10 +103,10 @@ namespace Reflecto
 					.Build();
 
 					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>(typeLibrary)
-						.Register(&Potato::Name, "Name")
-						.Register(&Potato::Weight, "Weight")
-						.Register(&Potato::IsBaked, "IsBaked")
-						.Register(&Potato::CookedTime, "CookedTime")
+						.RegisterMember(&Potato::Name, "Name")
+						.RegisterMember(&Potato::Weight, "Weight")
+						.RegisterMember(&Potato::IsBaked, "IsBaked")
+						.RegisterMember(&Potato::CookedTime, "CookedTime")
 					.Build();
 
 					Resolver<Potato> resolver{ descriptor };
@@ -177,13 +177,13 @@ namespace Reflecto
 					.Build();
 
 					const TypeDescriptor baseDescriptor = TypeDescriptorFactory<Vegetable>(typeLibrary)
-						.Register(&Vegetable::Weight, "Weight")
+						.RegisterMember(&Vegetable::Weight, "Weight")
 					.Build();
 
 					const TypeDescriptor childDescriptor = TypeDescriptorFactory<Potato>(typeLibrary, &baseDescriptor)
-						.Register(&Potato::Name, "Name")
-						.Register(&Potato::IsBaked, "IsBaked")
-						.Register(&Potato::CookedTime, "CookedTime")
+						.RegisterMember(&Potato::Name, "Name")
+						.RegisterMember(&Potato::IsBaked, "IsBaked")
+						.RegisterMember(&Potato::CookedTime, "CookedTime")
 					.Build();
 
 					Resolver<Potato> resolver{ childDescriptor };
@@ -254,13 +254,13 @@ namespace Reflecto
 					.Build();
 
 					const TypeDescriptor baseDescriptor = TypeDescriptorFactory<Vegetable>(typeLibrary)
-						.Register(&Vegetable::Weight, "Weight")
+						.RegisterMember(&Vegetable::Weight, "Weight")
 					.Build();
 
 					const TypeDescriptor childDescriptor = TypeDescriptorFactory<Potato>(typeLibrary, &baseDescriptor)
-						.Register(&Potato::Name, "Name")
-						.Register(&Potato::IsBaked, "IsBaked")
-						.Register(&Potato::CookedTime, "CookedTime")
+						.RegisterMember(&Potato::Name, "Name")
+						.RegisterMember(&Potato::IsBaked, "IsBaked")
+						.RegisterMember(&Potato::CookedTime, "CookedTime")
 					.Build();
 
 					Resolver<Vegetable> resolver{ baseDescriptor };
@@ -376,11 +376,11 @@ namespace Reflecto
 					.Build();
 
 					const TypeDescriptor baseDescriptor = TypeDescriptorFactory<Vegetable>(typeLibrary)
-						.Register(&Vegetable::Weight, "Weight")
+						.RegisterMember(&Vegetable::Weight, "Weight")
 					.Build();
 
 					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>(typeLibrary, &baseDescriptor)
-						.Register(&Potato::Tastiness, "Tastiness")
+						.RegisterMember(&Potato::Tastiness, "Tastiness")
 					.Build();
 
 					Resolver<Potato> resolver{ descriptor };
