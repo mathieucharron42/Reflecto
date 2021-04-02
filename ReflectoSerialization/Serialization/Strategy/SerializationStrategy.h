@@ -45,6 +45,51 @@ namespace Reflecto
 			}
 		};
 
+		struct FloatSerializationStrategy
+		{
+			static void Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
+			{
+				const float& valueStr = *static_cast<const float*>(value);
+				writer.WriteFloat(valueStr);
+			}
+
+			static void Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
+			{
+				float& valueStr = *static_cast<float*>(value);
+				reader.ReadFloat(valueStr);
+			}
+		};
+
+		struct DoubleSerializationStrategy
+		{
+			static void Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
+			{
+				const double& valueStr = *static_cast<const double*>(value);
+				writer.WriteDouble(valueStr);
+			}
+
+			static void Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
+			{
+				double& valueStr = *static_cast<double*>(value);
+				reader.ReadDouble(valueStr);
+			}
+		};
+
+		struct BooleanSerializationStrategy
+		{
+			static void Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
+			{
+				const bool& valueBoolean = *static_cast<const bool*>(value);
+				writer.WriteBoolean(valueBoolean);
+			}
+
+			static void Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
+			{
+				bool& valueBoolean = *static_cast<bool*>(value);
+				reader.ReadBoolean(valueBoolean);
+			}
+		};
+
 		template<class object_t>
 		struct ObjectSerializationStrategy
 		{
