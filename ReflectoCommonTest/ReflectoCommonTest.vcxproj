@@ -162,6 +162,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Utils\CollectionExt.cpp" />
     <ClCompile Include="Utils\EncapsulationBreakerTest.cpp" />
     <ClCompile Include="Utils\NonCopyableTest.cpp" />
     <ClCompile Include="Utils\StringExtTest.cpp" />

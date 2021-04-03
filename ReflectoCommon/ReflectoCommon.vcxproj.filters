@@ -33,6 +33,12 @@
     <ClInclude Include="Utils\NonCopyable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Utils\CollectionExt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Identity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
