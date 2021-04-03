@@ -301,14 +301,12 @@ namespace Reflecto
 
 					Resolver<Potato> resolver{ descriptor };
 
-					Potato* potato = resolver.Instantiate();
-					Assert::IsNotNull(potato, L"Unable to build new instance");
+					std::unique_ptr<Potato> potato = std::unique_ptr<Potato>(resolver.Instantiate());
+					Assert::IsNotNull(potato.get(), L"Unable to build new instance");
 
 					const int expectedWeight = 42;
 					potato->Weight = expectedWeight;
 					Assert::AreEqual(expectedWeight, potato->Weight, L"Unexpected value on member of instantiated instance");
-
-					delete potato;
 				}
 
 				TEST_METHOD(InstantiateInheritance)
@@ -338,8 +336,8 @@ namespace Reflecto
 
 					Resolver<Potato> resolver{ descriptor };
 
-					Potato* potato = resolver.Instantiate();
-					Assert::IsNotNull(potato, L"Unable to build new instance");
+					std::unique_ptr<Potato> potato = std::unique_ptr<Potato>(resolver.Instantiate());
+					Assert::IsNotNull(potato.get(), L"Unable to build new instance");
 
 					const int expectedWeight = 42;
 					const float expectedTastiness = 1.f;
@@ -347,8 +345,6 @@ namespace Reflecto
 					potato->Tastiness = expectedTastiness;
 					Assert::AreEqual(expectedWeight, potato->Weight, L"Unexpected value on member of instantiated instance");
 					Assert::AreEqual(expectedTastiness, potato->Tastiness, L"Unexpected value on member of instantiated instance");
-
-					delete potato;
 				}
 
 
@@ -402,6 +398,80 @@ namespace Reflecto
 
 					Assert::AreEqual(expectedWeight, potato->Weight, L"Unexpected value on member of instantiated instance");
 					Assert::AreEqual(expectedTastiness, potato->Tastiness, L"Unexpected value on member of instantiated instance");
+				}
+
+				TEST_METHOD(ResolveSingleMethod)
+				{
+					class TestClass
+					{
+					public:
+						void DoSomething() { WasDoSomethingCalled = true; }
+						bool WasDoSomethingCalled = false;
+					};
+
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<TestClass>("TestClass")
+					.Build();
+
+					const TypeDescriptor descriptor = TypeDescriptorFactory<TestClass>(typeLibrary)
+						.RegisterMethod(&TestClass::DoSomething, "DoSomething")
+					.Build();
+
+					Resolver<TestClass> resolver{ descriptor };
+
+					TestClass instance;
+					
+					auto methodDoSomething = resolver.ResolveMethod("DoSomething", instance);
+					methodDoSomething();
+
+					Assert::IsTrue(instance.WasDoSomethingCalled, L"Method was not called");
+				}
+
+				TEST_METHOD(ResolveMultipleMethod)
+				{
+					class TestClass
+					{
+					public:
+						void DoSomething() { WasDoSomethingCalled = true; }
+						bool WasDoSomethingCalled = false;
+
+						void DoSomethingWith1Param(int32_t p1) { DoSomethingWith1ParamCalledParam1Value = p1; }
+						int32_t DoSomethingWith1ParamCalledParam1Value = -1;
+
+						void DoSomethingWith2Param(int32_t p1, float p2) { DoSomethingWith2ParamCalledParam1Value = p1; DoSomethingWith2ParamCalledParam2Value = p2; }
+						int32_t DoSomethingWith2ParamCalledParam1Value = -1;
+						float DoSomethingWith2ParamCalledParam2Value = -1;
+					};
+
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<TestClass>("TestClass")
+					.Build();
+
+					const TypeDescriptor descriptor = TypeDescriptorFactory<TestClass>(typeLibrary)
+						.RegisterMethod(&TestClass::DoSomething, "DoSomething")
+						.RegisterMethod(&TestClass::DoSomethingWith1Param, "DoSomethingWith1Param")
+						.RegisterMethod(&TestClass::DoSomethingWith2Param, "DoSomethingWith2Param")
+					.Build();
+
+					Resolver<TestClass> resolver{ descriptor };
+
+					TestClass instance;
+
+					auto methodDoSomething = resolver.ResolveMethod("DoSomething", instance);
+					methodDoSomething();
+
+					Assert::IsTrue(instance.WasDoSomethingCalled, L"Method was not called");
+
+					const int32_t expectedValueParam1 = 55;
+					auto methodDoSomethingWith1Param = resolver.ResolveMethod<int32_t>("DoSomethingWith1Param", instance);
+					methodDoSomethingWith1Param(expectedValueParam1);
+					Assert::IsTrue(instance.DoSomethingWith1ParamCalledParam1Value == expectedValueParam1, L"Method was not called with expected value");
+
+					const float expectedValueParam2 = 3.14169;
+					auto methodDoSomethingWith2Param = resolver.ResolveMethod<int32_t, float>("DoSomethingWith2Param", instance);
+					methodDoSomethingWith2Param(expectedValueParam1, expectedValueParam2);
+					Assert::IsTrue(instance.DoSomethingWith1ParamCalledParam1Value == expectedValueParam1, L"Method was not called with expected value");
+					Assert::IsTrue(instance.DoSomethingWith2ParamCalledParam2Value == expectedValueParam2, L"Method was not called with expected value");
 				}
 			};
 		}

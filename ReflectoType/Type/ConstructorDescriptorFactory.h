@@ -14,7 +14,7 @@ namespace Reflecto
 			{
 				_constructor = []() -> void*
 				{
-					return new object_t{};
+					return new object_t();
 				};
 			}
 

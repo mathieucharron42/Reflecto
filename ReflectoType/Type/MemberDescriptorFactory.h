@@ -15,38 +15,28 @@ namespace Reflecto
 		class MemberDescriptorFactory
 		{
 		public:
-			MemberDescriptorFactory(const TypeLibrary& typeLibrary, object_t& sampleObj)
+			using member_pointer_t = typename member_t object_t::*;
+
+			MemberDescriptorFactory(const TypeLibrary& typeLibrary, object_t& sampleObj, member_pointer_t memberPointer, const std::string& memberName)
 				: _typeLibrary(typeLibrary)
 				, _sampleObj(sampleObj)
-				, _name()
-				, _offset(0)
+				, _memberPointer(memberPointer)
+				, _name(memberName)
 			{ }
-
-			MemberDescriptorFactory& SetMember(typename member_t object_t::* memberPointer, const std::string& memberName)
-			{
-				byte offset = TypeExt::ComputeOffset(_sampleObj, memberPointer);
-				return SetMember(offset, memberName);
-			}
-
-			MemberDescriptorFactory& SetMember(byte offset, const std::string& memberName)
-			{
-				_name = memberName;
-				_offset = offset;
-				return *this;
-			}
 
 			MemberDescriptor Build()
 			{
+				byte offset = TypeExt::ComputeMemberOffset(_sampleObj, _memberPointer);
 				const TypeDescriptorType* type = _typeLibrary.Get<member_t>();
-				assert(type);
-				return MemberDescriptor{ *type, _name, _offset };
+				assert(type && "Unknown type!");
+				return MemberDescriptor{ *type, _name, offset };
 			}
 
 		private:
 			TypeLibrary _typeLibrary;
 			object_t _sampleObj;
+			member_pointer_t _memberPointer;
 			std::string _name;
-			byte _offset;
 		};
 	}
 }

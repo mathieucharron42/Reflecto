@@ -353,6 +353,61 @@ namespace Reflecto
 					const ConstructorDescriptor& constructorDescriptor = descriptor.Constructor();
 					Assert::IsTrue(static_cast<bool>(constructorDescriptor.Function()), L"No constructor function set!");
 				}
+
+				TEST_METHOD(SingleMethod)
+				{
+					class TestClass
+					{
+					public:
+						void DoSomething() { }
+					};
+
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<TestClass>("TestClass")
+					.Build();
+
+					const TypeDescriptor descriptor = TypeDescriptorFactory<TestClass>(typeLibrary)
+						.RegisterMethod(&TestClass::DoSomething, "DoSomething")
+					.Build();
+
+					const TypeDescriptorType& expectedType = *typeLibrary.Get<TestClass>();
+					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
+
+					/*std::vector<MethodDescriptor> methodDescriptors = {
+						MethodDescriptor(std::function<void(void)>(), "DoSomething")
+					};*/
+
+					//Assert::IsTrue(methodDescriptors == descriptor.Methods(), L"Unexpected methods");
+				}
+
+				TEST_METHOD(MultipleMethod)
+				{
+					class TestClass
+					{
+					public:
+						void DoSomething() { }
+						void DoSomethingElse() { }
+					};
+
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<TestClass>("TestClass")
+					.Build();
+
+					const TypeDescriptor descriptor = TypeDescriptorFactory<TestClass>(typeLibrary)
+						.RegisterMethod(&TestClass::DoSomething, "DoSomething")
+						.RegisterMethod(&TestClass::DoSomethingElse, "DoSomethingElse")
+					.Build();
+					
+					const TypeDescriptorType& expectedType = *typeLibrary.Get<TestClass>();
+					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
+
+					//std::vector<MethodDescriptor> methodDescriptors = {
+					//	MethodDescriptor("DoSomething"),
+					//	MethodDescriptor("DoSomethingElse")
+					//};
+
+					//Assert::IsTrue(methodDescriptors == descriptor.Methods(), L"Unexpected methods");
+				}
 			};
 		}
 	}

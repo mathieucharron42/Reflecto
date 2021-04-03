@@ -93,6 +93,7 @@
       </PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)ReflectoCommon;$(SolutionDir)</AdditionalIncludeDirectories>
       <BrowseInformation>true</BrowseInformation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -161,6 +162,7 @@
     <ClInclude Include="Type\MemberDescriptorFactory.h" />
     <ClInclude Include="Type\MethodDescriptor.h" />
     <ClInclude Include="Resolver\Resolver.h" />
+    <ClInclude Include="Type\MethodDescriptorFactory.h" />
     <ClInclude Include="Type\TypeDescriptor.h" />
     <ClInclude Include="Type\TypeDescriptorFactory.h" />
     <ClInclude Include="Type\TypeDescriptorType.h" />
@@ -171,6 +173,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReflectoType.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ReflectoCommon\ReflectoCommon.vcxproj">
+      <Project>{3403ac28-d2dc-4a4d-9062-9f5d1f883ef7}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

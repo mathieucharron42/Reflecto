@@ -17,15 +17,16 @@ namespace Reflecto
 		class TypeDescriptor
 		{
 		public:
-			TypeDescriptor(const TypeDescriptorType& type, const ConstructorDescriptor& constructor, const std::vector<MemberDescriptor>& members)
-				: TypeDescriptor(type, nullptr, constructor, members)
+			TypeDescriptor(const TypeDescriptorType& type, const ConstructorDescriptor& constructor, const std::vector<MemberDescriptor>& members, const std::vector<MethodDescriptor>& methods)
+				: TypeDescriptor(type, nullptr, constructor, members, methods)
 			{ }
 
-			TypeDescriptor(const TypeDescriptorType& type, const TypeDescriptor* parent, const ConstructorDescriptor& constructor, const std::vector<MemberDescriptor>& members)
+			TypeDescriptor(const TypeDescriptorType& type, const TypeDescriptor* parent, const ConstructorDescriptor& constructor, const std::vector<MemberDescriptor>& members, const std::vector<MethodDescriptor>& methods)
 				: _type(type)
 				, _parent(parent)
 				, _constructor(constructor)
 				, _members(members)
+				, _methods(methods)
 			{ }
 
 			const TypeDescriptorType& Type() const
@@ -83,11 +84,44 @@ namespace Reflecto
 
 				return member;
 			}
+
+			const std::vector<MethodDescriptor>& Methods() const
+			{
+				return _methods;
+			}
+
+			const MethodDescriptor* GetMethodByName(const std::string& name) const
+			{
+				auto found = std::find_if(_methods.begin(), _methods.end(), [&](const MethodDescriptor& method) {
+					return method.Name() == name;
+				});
+
+				return found != _methods.end() ? &(*found) : nullptr;
+			}
+
+			const MethodDescriptor* GetMethodByNameRecursive(const std::string& name) const
+			{
+				const MethodDescriptor* method = nullptr;
+
+				if (_parent)
+				{
+					method = _parent->GetMethodByNameRecursive(name);
+				}
+
+				if (!method)
+				{
+					method = GetMethodByName(name);
+				}
+
+				return method;
+			}
+
 		private:
 			TypeDescriptorType _type;
 			const TypeDescriptor* _parent;
 			ConstructorDescriptor _constructor;
 			std::vector<MemberDescriptor> _members;
+			std::vector<MethodDescriptor> _methods;
 		};
 	}
 }

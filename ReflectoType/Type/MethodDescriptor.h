@@ -1,5 +1,7 @@
 #pragma once
 
+#include <any>
+#include <functional>
 #include <string>
 
 namespace Reflecto
@@ -9,21 +11,35 @@ namespace Reflecto
 		class MethodDescriptor
 		{
 		public:
-			MethodDescriptor(const std::string& name)
-				: _name(name)
-			{ }
+			template<typename object_t, typename ... args_t>
+			using method_ptr_t = std::function<void(object_t&, args_t...)>;
 
-			const std::string Name() const
+			template<typename object_t, typename ... args_t>
+			MethodDescriptor(method_ptr_t<object_t, args_t...> method, const std::string& name)
+				: _method(method)
+				, _name(name)
+			{
+
+			}
+			const std::string& Name() const
 			{
 				return _name;
 			}
 
+			template<typename object_t, typename ... args_t>
+			method_ptr_t<object_t, args_t...> Method() const
+			{
+				method_ptr_t<object_t, args_t...> method = std::any_cast<method_ptr_t<object_t, args_t...>>(_method);
+				return method;
+			}
+
 			bool operator==(const MethodDescriptor& other) const
 			{
-				return _name == other._name;
+				return /*_method == other._method &&*/ _name == other._name;
 			}
 		private:
 			std::string _name;
+			std::any _method;
 		};
 	}
 }

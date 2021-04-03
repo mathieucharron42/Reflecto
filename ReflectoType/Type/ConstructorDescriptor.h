@@ -11,7 +11,7 @@ namespace Reflecto
 		class ConstructorDescriptor
 		{
 		public:
-			using construction_func_t = std::function<void* ()>;
+			using construction_func_t = std::function<void*()>;
 
 			ConstructorDescriptor(const construction_func_t& constructor)
 				: _constructor(constructor)

@@ -17,6 +17,9 @@ namespace Reflecto
 		class Resolver : private Utils::NonCopyable
 		{
 		public:
+			template<typename ... args_t>
+			using resolved_method_t = std::function<void(args_t...)>;
+
 			Resolver(const TypeDescriptor& typeDescriptor)
 				: _typeDescriptor(typeDescriptor)
 			{
@@ -69,6 +72,44 @@ namespace Reflecto
 				const byte* memberRawAddr = objRawAddr + memberDescriptor.Offset();
 				return memberRawAddr;
 			}
+
+			template<typename ... args_t>
+			resolved_method_t<args_t...> ResolveMethod(const std::string& methodName, object_t& object)
+			{
+				const MethodDescriptor* methodDescriptor = _typeDescriptor.GetMethodByNameRecursive(methodName);
+				return methodDescriptor ? ResolveMethod<args_t...>(*methodDescriptor, object) : resolved_method_t<args_t...>();
+			}
+
+			template<typename ... args_t>
+			resolved_method_t<args_t...> ResolveMethod(const MethodDescriptor& methodDescriptor, object_t& object)
+			{
+				return ResolveMethod<args_t...>(methodDescriptor, &object);
+			}
+
+			template<typename ... args_t>
+			resolved_method_t<args_t...> ResolveMethod(const MethodDescriptor& methodDescriptor, void* object)
+			{
+				MethodDescriptor::method_ptr_t<object_t, args_t...> method = methodDescriptor.Method<object_t, args_t...>();
+				return [=] (args_t ... args) { 
+					object_t& typedObject = *reinterpret_cast<object_t*>(object);
+					return method(typedObject, args...);
+				};
+			}
+
+
+			//const std::function<void()> ResolveMethod(const void* object, const std::string methodName)
+			//{
+			//	const MethodDescriptor* methodDescriptor = _typeDescriptor.GetMethodByNameRecursive(methodName);
+			//	return methodDescriptor ? ResolveMethod(object, *methodDescriptor) : std::function<void()>();
+			//}
+
+			//const std::function<void()> ResolveMethod(const void* object, const MethodDescriptor& methodDescriptor)
+			//{
+			//	std::function<void()> methodWrapper = [voidMethodWrapper = methodDescriptor.Method()] {
+			//		return voidMethodWrapper.Method(object);
+			//	}
+			//	return methodWrapper;
+			//}
 
 		private:
 			TypeDescriptor _typeDescriptor;
