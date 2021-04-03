@@ -467,7 +467,7 @@ namespace Reflecto
 					methodDoSomethingWith1Param(expectedValueParam1);
 					Assert::IsTrue(instance.DoSomethingWith1ParamCalledParam1Value == expectedValueParam1, L"Method was not called with expected value");
 
-					const float expectedValueParam2 = 3.14169;
+					const float expectedValueParam2 = 3.14169f;
 					auto methodDoSomethingWith2Param = resolver.ResolveMethod<int32_t, float>("DoSomethingWith2Param", instance);
 					methodDoSomethingWith2Param(expectedValueParam1, expectedValueParam2);
 					Assert::IsTrue(instance.DoSomethingWith1ParamCalledParam1Value == expectedValueParam1, L"Method was not called with expected value");
