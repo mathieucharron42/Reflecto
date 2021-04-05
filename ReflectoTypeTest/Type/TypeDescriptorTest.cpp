@@ -373,7 +373,7 @@ namespace Reflecto
 					const TypeDescriptorType& expectedType = *typeLibrary.Get<TestClass>();
 					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
 
-					/*std::vector<MethodDescriptor> methodDescriptors = {
+					/*MethodDescriptor methodDescriptors = {
 						MethodDescriptor(std::function<void(void)>(), "DoSomething")
 					};*/
 

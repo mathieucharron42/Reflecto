@@ -34,39 +34,39 @@ namespace Reflecto
 			}
 
 			template<typename member_t>
-			member_t* ResolveMember(object_t& object, const std::string& memberName)
+			member_t* ResolveMember(object_t& object, const std::string& memberName) const
 			{
 				return static_cast<member_t*>(ResolveMember(object, memberName));
 			}
 
-			void* ResolveMember(object_t& object, const std::string& memberName)
+			void* ResolveMember(object_t& object, const std::string& memberName) const
 			{
 				const MemberDescriptor* memberDescriptor = _typeDescriptor.GetMemberByNameRecursive(memberName);
 				return memberDescriptor ? ResolveMember(object, *memberDescriptor) : nullptr;
 			}
 
 			template<typename member_t>
-			member_t* ResolveMember(object_t& object, const MemberDescriptor& memberDescriptor)
+			member_t* ResolveMember(object_t& object, const MemberDescriptor& memberDescriptor) const
 			{
 				return static_cast<member_t*>(ResolveMember(object, memberDescriptor));
 			}
 
-			void* ResolveMember(object_t& object, const MemberDescriptor& memberDescriptor)
+			void* ResolveMember(object_t& object, const MemberDescriptor& memberDescriptor) const
 			{
 				return ResolveMember(&object, memberDescriptor);
 			}
 
-			const void* ResolveMember(const object_t& object, const MemberDescriptor& memberDescriptor)
+			const void* ResolveMember(const object_t& object, const MemberDescriptor& memberDescriptor) const
 			{
 				return ResolveMember(&object, memberDescriptor);
 			}
 
-			void* ResolveMember(void* object, const MemberDescriptor& memberDescriptor)
+			void* ResolveMember(void* object, const MemberDescriptor& memberDescriptor) const
 			{
 				return const_cast<void*>(ResolveMember(const_cast<const void*>(object), memberDescriptor));
 			}
 
-			const void* ResolveMember(const void* object, const MemberDescriptor& memberDescriptor)
+			const void* ResolveMember(const void* object, const MemberDescriptor& memberDescriptor) const
 			{
 				const byte* objRawAddr = reinterpret_cast<const byte*>(object);
 				const byte* memberRawAddr = objRawAddr + memberDescriptor.Offset();
@@ -74,20 +74,20 @@ namespace Reflecto
 			}
 
 			template<typename ... args_t>
-			resolved_method_t<args_t...> ResolveMethod(const std::string& methodName, object_t& object)
+			resolved_method_t<args_t...> ResolveMethod(const std::string& methodName, object_t& object) const
 			{
 				const MethodDescriptor* methodDescriptor = _typeDescriptor.GetMethodByNameRecursive(methodName);
 				return methodDescriptor ? ResolveMethod<args_t...>(*methodDescriptor, object) : resolved_method_t<args_t...>();
 			}
 
 			template<typename ... args_t>
-			resolved_method_t<args_t...> ResolveMethod(const MethodDescriptor& methodDescriptor, object_t& object)
+			resolved_method_t<args_t...> ResolveMethod(const MethodDescriptor& methodDescriptor, object_t& object) const
 			{
 				return ResolveMethod<args_t...>(methodDescriptor, &object);
 			}
 
 			template<typename ... args_t>
-			resolved_method_t<args_t...> ResolveMethod(const MethodDescriptor& methodDescriptor, void* object)
+			resolved_method_t<args_t...> ResolveMethod(const MethodDescriptor& methodDescriptor, void* object) const
 			{
 				MethodDescriptor::method_ptr_t<object_t, args_t...> method = methodDescriptor.Method<object_t, args_t...>();
 				return [=] (args_t ... args) { 

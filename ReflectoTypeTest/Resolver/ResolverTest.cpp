@@ -347,7 +347,6 @@ namespace Reflecto
 					Assert::AreEqual(expectedTastiness, potato->Tastiness, L"Unexpected value on member of instantiated instance");
 				}
 
-
 				TEST_METHOD(InstantiateAndResolveMember)
 				{
 					class Vegetable
@@ -398,6 +397,61 @@ namespace Reflecto
 
 					Assert::AreEqual(expectedWeight, potato->Weight, L"Unexpected value on member of instantiated instance");
 					Assert::AreEqual(expectedTastiness, potato->Tastiness, L"Unexpected value on member of instantiated instance");
+				}
+
+				TEST_METHOD(ResolveUnknownType)
+				{
+					class TestClass
+					{
+					public:
+						int32_t Field1 = 0;
+						std::string Field2;
+					};
+
+					const TypeLibrary typeLibrary = TypeLibraryFactory()
+						.Add<TestClass>("TestClass")
+						.Add<int32_t>("int32")
+						.Add<std::string>("string")
+					.Build();
+
+					const TypeDescriptor classDescriptor = TypeDescriptorFactory<TestClass>(typeLibrary)
+						.RegisterMember(&TestClass::Field1, "Field1")
+						.RegisterMember(&TestClass::Field2, "Field2")
+					.Build();
+
+					auto assignatorFunc = [](const TypeLibrary& typeLibrary, const TypeDescriptor& classDescriptor, const MemberDescriptor& memberDescriptor, TestClass& instance, const std::string& value)
+					{
+						Resolver<TestClass> resolver{classDescriptor};
+						void* field = resolver.ResolveMember(instance, memberDescriptor);
+						if (memberDescriptor.Type() == *typeLibrary.Get<int32_t>())
+						{
+							int32_t* int32Field = reinterpret_cast<int32_t*>(field);
+							*int32Field = std::stoi(value);
+						}
+						else if (memberDescriptor.Type() == *typeLibrary.Get<std::string>())
+						{
+							std::string* stringField = reinterpret_cast<std::string*>(field);
+							*stringField = value;
+						}
+					};
+
+					TestClass testInstance;
+					
+					MemberDescriptor field1Descriptor = *classDescriptor.GetMemberByNameRecursive("Field1");
+					MemberDescriptor field2Descriptor = *classDescriptor.GetMemberByNameRecursive("Field2");
+
+					const int32_t expectedField1Value = 12345;
+					const std::string expectedField2Value = "Here is a test";
+
+					assignatorFunc(typeLibrary, classDescriptor, field1Descriptor, testInstance, std::to_string(expectedField1Value));
+					assignatorFunc(typeLibrary, classDescriptor, field2Descriptor, testInstance, expectedField2Value);
+					
+					Resolver<TestClass> resolver{ classDescriptor };
+					int32_t field1Value = *resolver.ResolveMember<int32_t>(testInstance, field1Descriptor);
+					std::string field2Value = *resolver.ResolveMember<std::string>(testInstance, field2Descriptor);
+
+					Assert::AreEqual(expectedField1Value, field1Value, L"Unexpected value in field1");
+					Assert::AreEqual(expectedField2Value, field2Value, L"Unexpected value in field2");
 				}
 
 				TEST_METHOD(ResolveSingleMethod)
