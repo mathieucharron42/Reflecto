@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Identity.h"
+#include "IdentityTransform.h"
 
 #include <array>
 #include <tuple>
@@ -45,7 +45,7 @@ namespace Reflecto
 			template<
 				typename element_t,
 				std::size_t array_size,
-				typename projection_t = Reflecto::Utils::Identity
+				typename projection_t = IdentityTransform
 			>
 				constexpr auto ArrayToTupleProjection(const std::array<element_t, array_size>& array, projection_t projection)
 			{

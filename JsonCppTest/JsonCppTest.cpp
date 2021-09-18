@@ -1,7 +1,7 @@
 
 #include "jsoncpp/json.h"
 
-#include "CppUnitTest.h"
+#include <CppUnitTest.h>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

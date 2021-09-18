@@ -6,7 +6,7 @@ namespace Reflecto
 {
 	namespace Utils
 	{
-		struct Identity
+		struct IdentityTransform
 		{
 			template< class T>
 			constexpr T&& operator()(T&& t) const noexcept

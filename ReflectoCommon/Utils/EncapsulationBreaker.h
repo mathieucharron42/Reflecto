@@ -17,18 +17,18 @@ namespace Reflecto
 				return M;
 			}
 
-			friend typename auto GetPrivateMember(typename tag_t::object_t_t& object, tag_t)
+			friend typename auto GetPrivateMember(typename tag_t::object_t& object, tag_t)
 			{
 				tag_t::member_pointer_t memberPointer = GetPrivateMemberPointer(tag_t());
 				return &(object.*memberPointer);
 			}
 		};
 
-		template <typename object_t, typename member_t>
+		template <typename object_type, typename member_t>
 		struct TypeMemberTag
 		{
-			using object_t_t = object_t;
-			using member_pointer_t = member_t object_t::*;
+			using object_t = object_type;
+			using member_pointer_t = member_t object_type::*;
 		};
 	}
 }

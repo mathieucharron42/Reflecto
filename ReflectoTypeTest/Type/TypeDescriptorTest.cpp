@@ -6,7 +6,7 @@
 #include "Utils/EncapsulationBreaker.h"
 #include "Utils/StringExt.h"
 
-#include "CppUnitTest.h"
+#include <CppUnitTest.h>
 #include <tuple>
 #include <vector>
 

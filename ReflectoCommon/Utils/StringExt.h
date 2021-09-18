@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Utils/AreTrait.h"
+#include "Utils/IdentityTransform.h"
+
 #include <cstdio>
 #include <codecvt>
 #include <iterator>
@@ -35,8 +38,8 @@ namespace Reflecto
 			template<typename string_t, typename collection_t>
 			string_t Join(const collection_t elems, const string_t& separator)
 			{
-				auto identityProj = [](const auto& elem) { return elem; };
-				return Join(elems, separator, identityProj);
+				const IdentityTransform projection;
+				return Join(elems, separator, projection);
 			}
 
 			template<typename string_t, typename ... Args>
@@ -58,11 +61,15 @@ namespace Reflecto
 			template<typename string_t, typename ... Args>
 			string_t Format(const string_t& format, Args ... args)
 			{
+				static_assert(AreTrait<std::is_pod, Args...>::value, "All arguments must be pod");
+
 				using char_t = typename string_t::value_type;
-				const std::size_t size = Snprintf<string_t>(nullptr, 0, format.c_str(), args ...) + 1;
-				std::unique_ptr<char_t[]> buf(new char_t[size]);
-				Snprintf<string_t>(buf.get(), size, format.c_str(), args ...);
-				return string_t(buf.get());
+				// Compute required length
+				const std::size_t size = Snprintf<string_t>(nullptr, 0, format.c_str(), args ...);
+				// Format string
+				string_t formatted(size, char_t{});
+				Snprintf<string_t>(formatted.data(), size+1, format.c_str(), args ...);
+				return formatted;
 			}
 
 			static std::wstring ToWstring(const std::string& str)

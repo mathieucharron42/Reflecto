@@ -4,7 +4,7 @@
 #include "Type/TypeLibrary.h"
 #include "Type/TypeLibraryFactory.h"
 
-#include "CppUnitTest.h"
+#include <CppUnitTest.h>
 
 #include <vector>
 

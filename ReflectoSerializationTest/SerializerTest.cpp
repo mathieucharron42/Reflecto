@@ -11,7 +11,7 @@
 #include "Type/TypeLibraryFactory.h"
 #include "Utils/StringExt.h"
 
-#include "CppUnitTest.h"
+#include <CppUnitTest.h>
 
 #include <functional>
 #include <map>

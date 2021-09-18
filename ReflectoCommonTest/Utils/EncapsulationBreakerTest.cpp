@@ -1,9 +1,8 @@
 #include "Utils/EncapsulationBreaker.h"
 
-#include "CppUnitTest.h"
+#include <CppUnitTest.h>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace Reflecto;
 
 namespace Reflecto
 {
@@ -59,7 +58,7 @@ namespace Reflecto
 			template struct EncapsulationBreaker<JMemberTag, &PrivateTestClass::_j>;
 			template struct EncapsulationBreaker<KMemberTag, &PrivateTestClass::_k>;
 
-			TEST_CLASS(EncapsulationBreaker)
+			TEST_CLASS(EncapsulationBreakerTest)
 			{
 			public:
 				TEST_METHOD(GetPrivateMemberPointerTest)

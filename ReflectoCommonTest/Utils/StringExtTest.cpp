@@ -1,12 +1,11 @@
 #include "Utils/StringExt.h"
 
-#include "CppUnitTest.h"
+#include <CppUnitTest.h>
 
 #include <string>
 #include <vector>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace Reflecto;
 
 namespace Reflecto
 {

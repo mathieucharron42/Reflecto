@@ -36,7 +36,10 @@
     <ClInclude Include="Utils\CollectionExt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\Identity.h">
+    <ClInclude Include="Utils\IdentityTransform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\AreTrait.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
