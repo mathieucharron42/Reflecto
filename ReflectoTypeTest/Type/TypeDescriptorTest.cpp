@@ -15,41 +15,36 @@ using namespace Reflecto::Type;
 using namespace Reflecto::Utils;
 using namespace Reflecto;
 
-namespace Microsoft
+template<> 
+inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<TypeDescriptorType>(const TypeDescriptorType& type)
 {
-	namespace VisualStudio
-	{
-		namespace CppUnitTestFramework
-		{
-			template<> inline std::wstring ToString<TypeDescriptorType>(const TypeDescriptorType& type)
-			{
-				std::string name = type.Name();
-				typehash_t hash = type.Hash();
-				return StringExt::Format<std::wstring>(L"{Name=%s,TypeHash=%i}", name.c_str(), hash);
-			}
-
-			template<> inline std::wstring ToString<std::vector<MemberDescriptor>>(const std::vector<MemberDescriptor>& members)
-			{
-				const std::wstring membersStr = StringExt::Join<std::wstring>(members, L",", [](const MemberDescriptor& members) {
-					const std::wstring name = StringExt::ToWstring(members.Name());
-					const std::string& type = members.Type().Name();
-					const byte offset = members.Offset();
-					return StringExt::Format<std::wstring>(L"Name=%s,Type=%s,Offset=%i", name.c_str(), type.c_str(), offset);
-				});
-				return StringExt::Format<std::wstring>(L"[%s]", membersStr.c_str());
-			}
-
-			template<> inline std::wstring ToString<std::vector<MethodDescriptor>>(const std::vector<MethodDescriptor>& methods)
-			{
-				const std::wstring membersStr = StringExt::Join<std::wstring>(methods, L",", [](const MethodDescriptor& method) {
-					const std::wstring name = StringExt::ToWstring(method.Name());
-					return StringExt::Format<std::wstring>(L"Name=%s", name.c_str());
-					});
-				return StringExt::Format<std::wstring>(L"[%s]", membersStr.c_str());
-			}
-		}
-	}
+	std::string name = type.Name();
+	typehash_t hash = type.Hash();
+	return StringExt::Format<std::wstring>(L"{Name=%s,TypeHash=%i}", name.c_str(), hash);
 }
+
+template<>
+inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<std::vector<MemberDescriptor>>(const std::vector<MemberDescriptor>& members)
+{
+	const std::wstring membersStr = StringExt::Join<std::wstring>(members, L",", [](const MemberDescriptor& members) {
+		const std::wstring name = StringExt::ToWstring(members.Name());
+		const std::string& type = members.Type().Name();
+		const byte offset = members.Offset();
+		return StringExt::Format<std::wstring>(L"Name=%s,Type=%s,Offset=%i", name.c_str(), type.c_str(), offset);
+	});
+	return StringExt::Format<std::wstring>(L"[%s]", membersStr.c_str());
+}
+
+template<>
+inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<std::vector<MethodDescriptor>>(const std::vector<MethodDescriptor>& methods)
+{
+	const std::wstring membersStr = StringExt::Join<std::wstring>(methods, L",", [](const MethodDescriptor& method) {
+		const std::wstring name = StringExt::ToWstring(method.Name());
+		return StringExt::Format<std::wstring>(L"Name=%s", name.c_str());
+		});
+	return StringExt::Format<std::wstring>(L"[%s]", membersStr.c_str());
+}
+
 
 namespace Reflecto
 {
@@ -105,7 +100,7 @@ namespace Reflecto
 
 					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>(typeLibrary)
 						.RegisterMember(&Potato::Weight, "Weight")
-						.Build();
+					.Build();
 
 					const TypeDescriptorType& expectedType = *typeLibrary.Get<Potato>();
 					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");

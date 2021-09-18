@@ -29,7 +29,6 @@ namespace Reflecto
 			static const bool value = true;
 		};
 
-
 		template <
 			template<typename> typename trait_t,
 			typename ... args_t

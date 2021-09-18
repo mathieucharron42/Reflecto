@@ -18,6 +18,21 @@ namespace Reflecto
 			TEST_CLASS(TypeLibraryTest)
 			{
 			public:
+				TEST_METHOD(Get)
+				{
+					TypeDescriptorType testUIntType = TypeDescriptorTypeFactory<uint32_t>("uint32").Build();
+					TypeDescriptorType testStringType = TypeDescriptorTypeFactory<std::string>("string").Build();
+					TypeDescriptorType testFloatType = TypeDescriptorTypeFactory<float>("float").Build();
+
+					TypeLibrary testLibrary = TypeLibraryFactory()
+						.Add(testUIntType)
+						.Add(testStringType)
+						.Add(testFloatType)
+						.Build();
+
+					Assert::IsTrue(*testLibrary.Get<uint32_t>() == testUIntType, L"Unexpected type");
+					Assert::IsTrue(*testLibrary.Get<float>() == testFloatType, L"Unexpected type");
+				}
 				TEST_METHOD(GetByHash)
 				{
 					TypeDescriptorType testUIntType = TypeDescriptorTypeFactory<uint32_t>("uint32").Build();
@@ -29,9 +44,6 @@ namespace Reflecto
 						.Add(testStringType)
 						.Add(testFloatType)
 					.Build();
-					
-					Assert::IsTrue(*testLibrary.Get<uint32_t>() == testUIntType, L"Unexpected type");
-					Assert::IsTrue(*testLibrary.Get<float>() == testFloatType, L"Unexpected type");
 				
 					Assert::IsTrue(*testLibrary.GetByHash(testUIntType.Hash()) == testUIntType, L"Unexpected type");
 					Assert::IsTrue(*testLibrary.GetByHash(testFloatType.Hash()) == testFloatType, L"Unexpected type");
