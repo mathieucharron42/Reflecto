@@ -21,17 +21,17 @@ namespace Reflecto
 				, _offset(offset)
 			{ }
 
-			const TypeDescriptorType& Type() const
+			const TypeDescriptorType& GetType() const
 			{
 				return _type;
 			}
 
-			const std::string& Name() const
+			const std::string& GetName() const
 			{
 				return _name;
 			}
 
-			const uint32_t Offset() const
+			const uint32_t GetOffset() const
 			{
 				return _offset;
 			}

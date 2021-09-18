@@ -21,13 +21,13 @@ namespace Reflecto
 			{
 
 			}
-			const std::string& Name() const
+			const std::string& GetName() const
 			{
 				return _name;
 			}
 
 			template<typename object_t, typename ... args_t>
-			method_ptr_t<object_t, args_t...> Method() const
+			method_ptr_t<object_t, args_t...> GetMethod() const
 			{
 				method_ptr_t<object_t, args_t...> method = std::any_cast<method_ptr_t<object_t, args_t...>>(_method);
 				return method;

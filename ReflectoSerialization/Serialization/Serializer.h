@@ -75,7 +75,7 @@ namespace Reflecto
 				{
 					writer.WriteBeginObjectProperty("type");
 					{
-						writer.WriteString(type.Name());
+						writer.WriteString(type.GetName());
 					}
 					writer.WriteEndObjectProperty();
 
@@ -100,7 +100,7 @@ namespace Reflecto
 							{
 								std::string actualType;
 								reader.ReadString(actualType);
-								assert(type.Name() == actualType);
+								assert(type.GetName() == actualType);
 							}
 							else if (property == "value")
 							{

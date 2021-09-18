@@ -15,12 +15,12 @@ namespace Reflecto
 
 			}
 
-			const std::string Name() const
+			const std::string GetName() const
 			{
 				return _name;
 			}
 
-			typehash_t Hash() const
+			typehash_t GetHash() const
 			{
 				return _hash;
 			}
@@ -32,7 +32,7 @@ namespace Reflecto
 
 			bool operator<(const  TypeDescriptorType& type) const
 			{
-				return _hash < type.Hash();
+				return _hash < type.GetHash();
 			}
 
 		private:

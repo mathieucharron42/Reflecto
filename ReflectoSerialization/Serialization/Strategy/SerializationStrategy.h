@@ -99,12 +99,12 @@ namespace Reflecto
 				Type::Resolver<object_t> resolver(typeDesriptor);
 				writer.WriteBeginObject();
 				{
-					for (const Type::MemberDescriptor& member : typeDesriptor.Members())
+					for (const Type::MemberDescriptor& member : typeDesriptor.GetMembers())
 					{
-						writer.WriteBeginObjectProperty(member.Name());
+						writer.WriteBeginObjectProperty(member.GetName());
 						{
 							const void* value = resolver.ResolveMember(valueObject, member);
-							serializer.Serialize(member.Type(), value, writer);
+							serializer.Serialize(member.GetType(), value, writer);
 						}
 						writer.WriteEndObjectProperty();
 					}
@@ -127,7 +127,7 @@ namespace Reflecto
 							if (ensure(memberDescriptor))
 							{
 								void* member = resolver.ResolveMember(valueObject, *memberDescriptor);
-								serializer.Deserialize(memberDescriptor->Type(), member, reader);
+								serializer.Deserialize(memberDescriptor->GetType(), member, reader);
 							}
 						}
 						reader.ReadEndObjectProperty();

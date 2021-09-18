@@ -18,8 +18,8 @@ using namespace Reflecto;
 template<> 
 inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<TypeDescriptorType>(const TypeDescriptorType& type)
 {
-	std::string name = type.Name();
-	typehash_t hash = type.Hash();
+	std::string name = type.GetName();
+	typehash_t hash = type.GetHash();
 	return StringExt::Format<std::wstring>(L"{Name=%s,TypeHash=%i}", name.c_str(), hash);
 }
 
@@ -27,9 +27,9 @@ template<>
 inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<std::vector<MemberDescriptor>>(const std::vector<MemberDescriptor>& members)
 {
 	const std::wstring membersStr = StringExt::Join<std::wstring>(members, L",", [](const MemberDescriptor& members) {
-		const std::wstring name = StringExt::ToWstring(members.Name());
-		const std::string& type = members.Type().Name();
-		const byte offset = members.Offset();
+		const std::wstring name = StringExt::ToWstring(members.GetName());
+		const std::string& type = members.GetType().GetName();
+		const byte offset = members.GetOffset();
 		return StringExt::Format<std::wstring>(L"Name=%s,Type=%s,Offset=%i", name.c_str(), type.c_str(), offset);
 	});
 	return StringExt::Format<std::wstring>(L"[%s]", membersStr.c_str());
@@ -39,7 +39,7 @@ template<>
 inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<std::vector<MethodDescriptor>>(const std::vector<MethodDescriptor>& methods)
 {
 	const std::wstring membersStr = StringExt::Join<std::wstring>(methods, L",", [](const MethodDescriptor& method) {
-		const std::wstring name = StringExt::ToWstring(method.Name());
+		const std::wstring name = StringExt::ToWstring(method.GetName());
 		return StringExt::Format<std::wstring>(L"Name=%s", name.c_str());
 		});
 	return StringExt::Format<std::wstring>(L"[%s]", membersStr.c_str());
@@ -79,10 +79,10 @@ namespace Reflecto
 					const TypeDescriptor descriptor = TypeDescriptorFactory<uint32_t>(typeLibrary).Build();
 
 					const TypeDescriptorType& expectedType = *typeLibrary.Get<uint32_t>();
-					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
+					Assert::AreEqual(expectedType, descriptor.GetType(), L"Type is unexpected");
 
 					std::vector<MemberDescriptor> expectedMembers;
-					Assert::AreEqual(expectedMembers, descriptor.Members(), L"Type members are unexpected");
+					Assert::AreEqual(expectedMembers, descriptor.GetMembers(), L"Type members are unexpected");
 				}
 
 				TEST_METHOD(SingleMember)
@@ -103,7 +103,7 @@ namespace Reflecto
 					.Build();
 
 					const TypeDescriptorType& expectedType = *typeLibrary.Get<Potato>();
-					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
+					Assert::AreEqual(expectedType, descriptor.GetType(), L"Type is unexpected");
 
 					const std::vector<MemberDescriptor> expectedMembers = [&] {
 						const TypeDescriptorType type = typeLibrary.GetChecked<float>();
@@ -111,7 +111,7 @@ namespace Reflecto
 						const byte offset = 0;
 						return std::vector<MemberDescriptor>{ MemberDescriptor(type, name, offset) };
 					}();
-					Assert::AreEqual(expectedMembers, descriptor.Members(), L"Type members are unexpected");
+					Assert::AreEqual(expectedMembers, descriptor.GetMembers(), L"Type members are unexpected");
 				}
 
 				TEST_METHOD(MultipleMembers)
@@ -140,7 +140,7 @@ namespace Reflecto
 					.Build();
 
 					const TypeDescriptorType& expectedType = *typeLibrary.Get<PotatoNoPadding>();
-					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
+					Assert::AreEqual(expectedType, descriptor.GetType(), L"Type is unexpected");
 
 					const std::vector<MemberDescriptor> expectedMembers = [&] {
 						using member1_t = std::string;
@@ -167,7 +167,7 @@ namespace Reflecto
 						return std::vector<MemberDescriptor>{member1, member2, member3};
 					}();
 
-					Assert::AreEqual(expectedMembers, descriptor.Members(), L"Type members are unexpected");
+					Assert::AreEqual(expectedMembers, descriptor.GetMembers(), L"Type members are unexpected");
 				}
 
 				TEST_METHOD(PrivateMember)
@@ -184,7 +184,7 @@ namespace Reflecto
 					.Build();
 
 					const TypeDescriptorType& expectedType = *typeLibrary.Get<PrivatePotato>();
-					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
+					Assert::AreEqual(expectedType, descriptor.GetType(), L"Type is unexpected");
 
 					const std::vector<MemberDescriptor> expectedMembers = [&] {
 						const MemberDescriptor member1 = [&] {
@@ -201,7 +201,7 @@ namespace Reflecto
 						}();
 						return std::vector<MemberDescriptor>{member1, member2};
 					}();
-					Assert::AreEqual(expectedMembers, descriptor.Members(), L"Type members are unexpected");
+					Assert::AreEqual(expectedMembers, descriptor.GetMembers(), L"Type members are unexpected");
 				}
 
 				TEST_METHOD(PublicInheritance)
@@ -238,10 +238,10 @@ namespace Reflecto
 						.Build();
 
 					const TypeDescriptorType baseExpectedType = *typeLibrary.Get<VegetableNoPadding>();
-					Assert::AreEqual(baseExpectedType, baseDescriptor.Type(), L"Type is unexpected");
+					Assert::AreEqual(baseExpectedType, baseDescriptor.GetType(), L"Type is unexpected");
 
 					const TypeDescriptorType childExpectedType = *typeLibrary.Get<PotatoNoPadding>();
-					Assert::AreEqual(childExpectedType, childDescriptor.Type(), L"Type is unexpected");
+					Assert::AreEqual(childExpectedType, childDescriptor.GetType(), L"Type is unexpected");
 
 					using baseMember1_t = float;
 					using baseMember2_t = float;
@@ -262,7 +262,7 @@ namespace Reflecto
 
 						return std::vector<MemberDescriptor> { member1, member2 };
 					}();
-					Assert::AreEqual(baseExpectedMembers, baseDescriptor.Members(), L"Type members are unexpected");
+					Assert::AreEqual(baseExpectedMembers, baseDescriptor.GetMembers(), L"Type members are unexpected");
 
 					using childMember1_t = bool;
 					const std::vector<MemberDescriptor> childExpectedMembers = [&] {
@@ -275,7 +275,7 @@ namespace Reflecto
 
 						return std::vector<MemberDescriptor> { member1 };
 					}();
-					Assert::AreEqual(childExpectedMembers, childDescriptor.Members(), L"Type members are unexpected");
+					Assert::AreEqual(childExpectedMembers, childDescriptor.GetMembers(), L"Type members are unexpected");
 
 					const std::vector<MemberDescriptor> childExpectedMembersRecursive = [&] {
 						std::vector<MemberDescriptor> recursive;
@@ -283,7 +283,7 @@ namespace Reflecto
 						recursive.insert(recursive.end(), childExpectedMembers.begin(), childExpectedMembers.end());
 						return recursive;
 					}();
-					Assert::AreEqual(childExpectedMembersRecursive, childDescriptor.MemberResursive(), L"Type recursive members are unexpected");
+					Assert::AreEqual(childExpectedMembersRecursive, childDescriptor.FetchMemberResursive(), L"Type recursive members are unexpected");
 				}
 
 				TEST_METHOD(PublicInheritanceRegisterOnChildClass)
@@ -322,17 +322,17 @@ namespace Reflecto
 						return std::vector<member_information_t>{member1, member2};
 					}();
 
-					std::vector<MemberDescriptor> members = childDescriptor.MemberResursive();
+					std::vector<MemberDescriptor> members = childDescriptor.FetchMemberResursive();
 					for (std::size_t i = 0; i < members.size(); ++i)
 					{
 						const MemberDescriptor& member = members[i];
 						const member_information_t& expectedMemberInfo = expectedMembers[i];
-						Assert::AreEqual(std::get<0>(expectedMemberInfo), member.Name(), L"Type member name is unexpected");
-						Assert::AreEqual(std::get<1>(expectedMemberInfo), member.Type(), L"Type member type is unexpected");
+						Assert::AreEqual(std::get<0>(expectedMemberInfo), member.GetName(), L"Type member name is unexpected");
+						Assert::AreEqual(std::get<1>(expectedMemberInfo), member.GetType(), L"Type member type is unexpected");
 						if (i > 0)
 						{
 							const MemberDescriptor& previousMember = members[i - 1];
-							Assert::IsTrue(member.Offset() > previousMember.Offset(), L"Type member offset are out of order!");
+							Assert::IsTrue(member.GetOffset() > previousMember.GetOffset(), L"Type member offset are out of order!");
 						}
 					}
 				}
@@ -345,7 +345,7 @@ namespace Reflecto
 
 					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>(typeLibrary).Build();
 
-					const ConstructorDescriptor& constructorDescriptor = descriptor.Constructor();
+					const ConstructorDescriptor& constructorDescriptor = descriptor.GetConstructor();
 					Assert::IsTrue(static_cast<bool>(constructorDescriptor.Function()), L"No constructor function set!");
 				}
 
@@ -366,7 +366,7 @@ namespace Reflecto
 					.Build();
 
 					const TypeDescriptorType& expectedType = *typeLibrary.Get<TestClass>();
-					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
+					Assert::AreEqual(expectedType, descriptor.GetType(), L"Type is unexpected");
 
 					/*MethodDescriptor methodDescriptors = {
 						MethodDescriptor(std::function<void(void)>(), "DoSomething")
@@ -394,7 +394,7 @@ namespace Reflecto
 					.Build();
 					
 					const TypeDescriptorType& expectedType = *typeLibrary.Get<TestClass>();
-					Assert::AreEqual(expectedType, descriptor.Type(), L"Type is unexpected");
+					Assert::AreEqual(expectedType, descriptor.GetType(), L"Type is unexpected");
 
 					//std::vector<MethodDescriptor> methodDescriptors = {
 					//	MethodDescriptor("DoSomething"),

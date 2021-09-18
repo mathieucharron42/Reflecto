@@ -23,12 +23,12 @@ namespace Reflecto
 			Resolver(const TypeDescriptor& typeDescriptor)
 				: _typeDescriptor(typeDescriptor)
 			{
-				assert(TypeExt::GetTypeHash<object_t>() == typeDescriptor.Type().Hash());
+				assert(TypeExt::GetTypeHash<object_t>() == typeDescriptor.GetType().GetHash());
 			}
 
 			object_t* Instantiate()
 			{
-				const ConstructorDescriptor& constructorDescriptor = _typeDescriptor.Constructor();
+				const ConstructorDescriptor& constructorDescriptor = _typeDescriptor.GetConstructor();
 				void* instance = (constructorDescriptor.Function())();
 				return static_cast<object_t*>(instance);
 			}
@@ -69,7 +69,7 @@ namespace Reflecto
 			const void* ResolveMember(const void* object, const MemberDescriptor& memberDescriptor) const
 			{
 				const byte* objRawAddr = reinterpret_cast<const byte*>(object);
-				const byte* memberRawAddr = objRawAddr + memberDescriptor.Offset();
+				const byte* memberRawAddr = objRawAddr + memberDescriptor.GetOffset();
 				return memberRawAddr;
 			}
 
@@ -89,7 +89,7 @@ namespace Reflecto
 			template<typename ... args_t>
 			resolved_method_t<args_t...> ResolveMethod(const MethodDescriptor& methodDescriptor, void* object) const
 			{
-				MethodDescriptor::method_ptr_t<object_t, args_t...> method = methodDescriptor.Method<object_t, args_t...>();
+				MethodDescriptor::method_ptr_t<object_t, args_t...> method = methodDescriptor.GetMethod<object_t, args_t...>();
 				return [=] (args_t ... args) { 
 					object_t& typedObject = *reinterpret_cast<object_t*>(object);
 					return method(typedObject, args...);

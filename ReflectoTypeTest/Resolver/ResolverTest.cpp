@@ -43,7 +43,7 @@ namespace Reflecto
 					Potato potato;
 					potato.Weight = expectedWeight;
 
-					const float* actualWeight = resolver.ResolveMember<float>(potato, descriptor.MemberResursive()[0]);
+					const float* actualWeight = resolver.ResolveMember<float>(potato, descriptor.FetchMemberResursive()[0]);
 					Assert::IsNotNull(actualWeight, L"Unable to resolve member");
 					if (actualWeight)
 					{
@@ -423,12 +423,12 @@ namespace Reflecto
 					{
 						Resolver<TestClass> resolver{classDescriptor};
 						void* field = resolver.ResolveMember(instance, memberDescriptor);
-						if (memberDescriptor.Type() == *typeLibrary.Get<int32_t>())
+						if (memberDescriptor.GetType() == *typeLibrary.Get<int32_t>())
 						{
 							int32_t* int32Field = reinterpret_cast<int32_t*>(field);
 							*int32Field = std::stoi(value);
 						}
-						else if (memberDescriptor.Type() == *typeLibrary.Get<std::string>())
+						else if (memberDescriptor.GetType() == *typeLibrary.Get<std::string>())
 						{
 							std::string* stringField = reinterpret_cast<std::string*>(field);
 							*stringField = value;

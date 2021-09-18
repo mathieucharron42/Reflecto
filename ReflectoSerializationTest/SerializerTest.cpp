@@ -221,7 +221,7 @@ namespace Reflecto
 
 					std::string expectedNameStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testValueName.c_str());
 					std::string expectedAgeStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int32", testValueAge);
-					std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Age":%s,"Name":%s}})"), testPersonDescriptor.Type().Name().c_str(), expectedAgeStr.c_str(), expectedNameStr.c_str());
+					std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Age":%s,"Name":%s}})"), testPersonDescriptor.GetType().GetName().c_str(), expectedAgeStr.c_str(), expectedNameStr.c_str());
 					Assert::AreEqual(expectedSerialized, actualSerialized, L"Serialized value is unexpected!");
 
 					JsonSerializationReader reader;
@@ -430,15 +430,15 @@ namespace Reflecto
 					
 					const std::string expectedEyesColorStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testEyesColor.c_str());
 					const std::string expectedEyesSizeStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int32", testEyesSize);
-					const std::string expectedEyesStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Color":%s,"Size":%s}})"), testPotatoHeadEyesDescriptor.Type().Name().c_str(), expectedEyesColorStr.c_str(), expectedEyesSizeStr.c_str());
+					const std::string expectedEyesStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Color":%s,"Size":%s}})"), testPotatoHeadEyesDescriptor.GetType().GetName().c_str(), expectedEyesColorStr.c_str(), expectedEyesSizeStr.c_str());
 					
 					const std::string expectedNoseTypeStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testNoseType.c_str()); 
-					const std::string expectedNoseStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Type":%s}})"), testPotatoHeadNoseDescriptor.Type().Name().c_str(), expectedNoseTypeStr.c_str());
+					const std::string expectedNoseStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Type":%s}})"), testPotatoHeadNoseDescriptor.GetType().GetName().c_str(), expectedNoseTypeStr.c_str());
 
 					const std::string expectedMouthIsSmilingStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%s})"), "boolean", testMouthIsSmiling ? "true" : "false");
-					const std::string expectedMouthStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"IsSmiling":%s}})"), testPotatoHeadMouthDescriptor.Type().Name().c_str(), expectedMouthIsSmilingStr.c_str());
+					const std::string expectedMouthStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"IsSmiling":%s}})"), testPotatoHeadMouthDescriptor.GetType().GetName().c_str(), expectedMouthIsSmilingStr.c_str());
 
-					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Eyes":%s,"Mouth":%s,"Name":%s,"Nose":%s}})"), testPotatoHeadDescriptor.Type().Name().c_str(), expectedEyesStr.c_str(), expectedMouthStr.c_str(), expectedNameStr.c_str(), expectedNoseStr.c_str());
+					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Eyes":%s,"Mouth":%s,"Name":%s,"Nose":%s}})"), testPotatoHeadDescriptor.GetType().GetName().c_str(), expectedEyesStr.c_str(), expectedMouthStr.c_str(), expectedNameStr.c_str(), expectedNoseStr.c_str());
 					Assert::AreEqual(expectedSerialized, actualSerialized, L"Serialized value is unexpected!");
 
 					JsonSerializationReader reader;

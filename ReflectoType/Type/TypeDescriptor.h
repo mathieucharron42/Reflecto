@@ -29,28 +29,28 @@ namespace Reflecto
 				, _methods(methods)
 			{ }
 
-			const TypeDescriptorType& Type() const
+			const TypeDescriptorType& GetType() const
 			{
 				return _type;
 			}
 
-			const ConstructorDescriptor Constructor() const
+			const ConstructorDescriptor GetConstructor() const
 			{
 				return _constructor;
 			}
 
-			const std::vector<MemberDescriptor>& Members() const
+			const std::vector<MemberDescriptor>& GetMembers() const
 			{
 				return _members;
 			}
 
-			std::vector<MemberDescriptor> MemberResursive() const
+			std::vector<MemberDescriptor> FetchMemberResursive() const
 			{
 				std::vector<MemberDescriptor> memberRecursive;
 
 				if (_parent)
 				{
-					std::vector<MemberDescriptor> parentMembers = _parent->MemberResursive();
+					std::vector<MemberDescriptor> parentMembers = _parent->FetchMemberResursive();
 					memberRecursive.insert(memberRecursive.end(), parentMembers.begin(), parentMembers.end());
 				}
 
@@ -62,7 +62,7 @@ namespace Reflecto
 			const MemberDescriptor* GetMemberByName(const std::string& name) const
 			{
 				auto found = std::find_if(_members.begin(), _members.end(), [&](const MemberDescriptor& member) {
-					return member.Name() == name;
+					return member.GetName() == name;
 					});
 
 				return found != _members.end() ? &(*found) : nullptr;
@@ -85,7 +85,7 @@ namespace Reflecto
 				return member;
 			}
 
-			const std::vector<MethodDescriptor>& Methods() const
+			const std::vector<MethodDescriptor>& GetMethods() const
 			{
 				return _methods;
 			}
@@ -93,7 +93,7 @@ namespace Reflecto
 			const MethodDescriptor* GetMethodByName(const std::string& name) const
 			{
 				auto found = std::find_if(_methods.begin(), _methods.end(), [&](const MethodDescriptor& method) {
-					return method.Name() == name;
+					return method.GetName() == name;
 				});
 
 				return found != _methods.end() ? &(*found) : nullptr;

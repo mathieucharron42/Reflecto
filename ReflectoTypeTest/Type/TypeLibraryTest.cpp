@@ -45,8 +45,8 @@ namespace Reflecto
 						.Add(testFloatType)
 					.Build();
 				
-					Assert::IsTrue(*testLibrary.GetByHash(testUIntType.Hash()) == testUIntType, L"Unexpected type");
-					Assert::IsTrue(*testLibrary.GetByHash(testFloatType.Hash()) == testFloatType, L"Unexpected type");
+					Assert::IsTrue(*testLibrary.GetByHash(testUIntType.GetHash()) == testUIntType, L"Unexpected type");
+					Assert::IsTrue(*testLibrary.GetByHash(testFloatType.GetHash()) == testFloatType, L"Unexpected type");
 				}
 
 				TEST_METHOD(GetByName)

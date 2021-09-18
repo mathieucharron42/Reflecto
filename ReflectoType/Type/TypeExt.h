@@ -16,7 +16,7 @@ namespace Reflecto
 			template <typename type>
 			std::string GetClassName()
 			{
-				std::string fullName = typeid(type).name();
+				std::string fullName = typeid(type).GetName();
 				std::string clean = fullName.substr(fullName.find(" ") + 1);
 				return clean;
 			}

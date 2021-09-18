@@ -25,8 +25,8 @@ namespace Reflecto
 
 			TypeLibraryFactory& Add(const TypeDescriptorType& type)
 			{
-				assert(std::none_of(_types.begin(), _types.end(), [&](const auto& t) { return t.Name() == type.Name(); }));
-				assert(std::none_of(_types.begin(), _types.end(), [&](const auto& t) { return t.Hash() == type.Hash(); }));
+				assert(std::none_of(_types.begin(), _types.end(), [&](const auto& t) { return t.GetName() == type.GetName(); }));
+				assert(std::none_of(_types.begin(), _types.end(), [&](const auto& t) { return t.GetHash() == type.GetHash(); }));
 				_types.push_back(type);
 				return *this;
 			}
