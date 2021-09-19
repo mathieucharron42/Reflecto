@@ -93,13 +93,13 @@ namespace Reflecto
 		template<class object_t>
 		struct ObjectSerializationStrategy
 		{
-			static void Serialize(const Type::TypeDescriptor& typeDesriptor, const Serializer& serializer, const void* value, ISerializationWriter& writer)
+			static void Serialize(const Reflection::TypeDescriptor& typeDesriptor, const Serializer& serializer, const void* value, ISerializationWriter& writer)
 			{
 				const object_t& valueObject = *static_cast<const object_t*>(value);
-				Type::Resolver<object_t> resolver(typeDesriptor);
+				Reflection::Resolver<object_t> resolver(typeDesriptor);
 				writer.WriteBeginObject();
 				{
-					for (const Type::MemberDescriptor& member : typeDesriptor.GetMembers())
+					for (const Reflection::MemberDescriptor& member : typeDesriptor.GetMembers())
 					{
 						writer.WriteBeginObjectProperty(member.GetName());
 						{
@@ -112,10 +112,10 @@ namespace Reflecto
 				writer.WriteEndObject();
 			}
 
-			static void Deserialize(const Type::TypeDescriptor& typeDesriptor, const Serializer& serializer, void* value, ISerializationReader& reader)
+			static void Deserialize(const Reflection::TypeDescriptor& typeDesriptor, const Serializer& serializer, void* value, ISerializationReader& reader)
 			{
 				object_t& valueObject = *static_cast<object_t*>(value);
-				Type::Resolver<object_t> resolver(typeDesriptor);
+				Reflection::Resolver<object_t> resolver(typeDesriptor);
 				reader.ReadBeginObject();
 				{
 					while (reader.HasObjectPropertyRemaining())
@@ -123,7 +123,7 @@ namespace Reflecto
 						std::string propertyName;
 						reader.ReadBeginObjectProperty(propertyName);
 						{
-							const Type::MemberDescriptor* memberDescriptor = typeDesriptor.GetMemberByName(propertyName);
+							const Reflection::MemberDescriptor* memberDescriptor = typeDesriptor.GetMemberByName(propertyName);
 							if (ensure(memberDescriptor))
 							{
 								void* member = resolver.ResolveMember(valueObject, *memberDescriptor);

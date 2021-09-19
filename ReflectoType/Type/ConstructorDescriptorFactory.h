@@ -4,7 +4,7 @@
 
 namespace Reflecto
 {
-	namespace Type
+	namespace Reflection
 	{
 		template <typename object_t>
 		class ConstructorDescriptorFactory

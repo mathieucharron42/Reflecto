@@ -12,16 +12,16 @@
 
 namespace Reflecto
 {
-	namespace Type
+	namespace Reflection
 	{
 		class TypeDescriptor
 		{
 		public:
-			TypeDescriptor(const TypeDescriptorType& type, const ConstructorDescriptor& constructor, const std::vector<MemberDescriptor>& members, const std::vector<MethodDescriptor>& methods)
+			TypeDescriptor(const Type& type, const ConstructorDescriptor& constructor, const std::vector<MemberDescriptor>& members, const std::vector<MethodDescriptor>& methods)
 				: TypeDescriptor(type, nullptr, constructor, members, methods)
 			{ }
 
-			TypeDescriptor(const TypeDescriptorType& type, const TypeDescriptor* parent, const ConstructorDescriptor& constructor, const std::vector<MemberDescriptor>& members, const std::vector<MethodDescriptor>& methods)
+			TypeDescriptor(const Type& type, const TypeDescriptor* parent, const ConstructorDescriptor& constructor, const std::vector<MemberDescriptor>& members, const std::vector<MethodDescriptor>& methods)
 				: _type(type)
 				, _parent(parent)
 				, _constructor(constructor)
@@ -29,7 +29,7 @@ namespace Reflecto
 				, _methods(methods)
 			{ }
 
-			const TypeDescriptorType& GetType() const
+			const Type& GetType() const
 			{
 				return _type;
 			}
@@ -117,7 +117,7 @@ namespace Reflecto
 			}
 
 		private:
-			TypeDescriptorType _type;
+			Type _type;
 			const TypeDescriptor* _parent;
 			ConstructorDescriptor _constructor;
 			std::vector<MemberDescriptor> _members;

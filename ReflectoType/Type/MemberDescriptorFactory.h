@@ -9,7 +9,7 @@
 
 namespace Reflecto
 {
-	namespace Type
+	namespace Reflection
 	{
 		template <typename object_t, typename member_t>
 		class MemberDescriptorFactory
@@ -27,7 +27,7 @@ namespace Reflecto
 			MemberDescriptor Build()
 			{
 				byte offset = TypeExt::ComputeMemberOffset(_sampleObj, _memberPointer);
-				const TypeDescriptorType* type = _typeLibrary.Get<member_t>();
+				const Type* type = _typeLibrary.Get<member_t>();
 				assert(type && "Unknown type!");
 				return MemberDescriptor{ *type, _name, offset };
 			}

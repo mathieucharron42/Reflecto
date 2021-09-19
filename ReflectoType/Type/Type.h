@@ -3,12 +3,12 @@
 #include "TypeExt.h"
 namespace Reflecto
 {
-	namespace Type
+	namespace Reflection
 	{
-		class TypeDescriptorType
+		class Type
 		{
 		public:
-			TypeDescriptorType(const std::string& name, typehash_t hash)
+			Type(const std::string& name, typehash_t hash)
 				: _name(name)
 				, _hash(hash)
 			{
@@ -25,12 +25,12 @@ namespace Reflecto
 				return _hash;
 			}
 
-			bool operator==(const TypeDescriptorType& type) const
+			bool operator==(const Type& type) const
 			{
 				return _name == type._name && _hash == type._hash;
 			}
 
-			bool operator<(const  TypeDescriptorType& type) const
+			bool operator<(const  Type& type) const
 			{
 				return _hash < type.GetHash();
 			}

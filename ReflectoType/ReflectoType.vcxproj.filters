@@ -42,10 +42,10 @@
     <ClInclude Include="Type\TypeDescriptorFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Type\TypeDescriptorType.h">
+    <ClInclude Include="Type\Type.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Type\TypeDescriptorTypeFactory.h">
+    <ClInclude Include="Type\TypeFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Resolver\Resolver.h">

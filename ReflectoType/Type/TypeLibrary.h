@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Type/TypeDescriptorTypeFactory.h"
-#include "Type/TypeDescriptorType.h"
+#include "Type/TypeFactory.h"
+#include "Type/Type.h"
 #include "Type/TypeExt.h"
 
 
@@ -11,46 +11,46 @@
 
 namespace Reflecto
 {
-	namespace Type
+	namespace Reflection
 	{
 		class TypeLibrary
 		{
 		public:
-			TypeLibrary(const std::vector<TypeDescriptorType>& types)
+			TypeLibrary(const std::vector<Type>& types)
 				: _types(types)
 			{
 
 			}
 			
 			template<class value_t>
-			const TypeDescriptorType* Get() const
+			const Type* Get() const
 			{
 				return GetByHash(TypeExt::GetTypeHash<value_t>());
 			}
 
 			template<class value_t>
-			TypeDescriptorType GetChecked() const
+			Type GetChecked() const
 			{
-				const TypeDescriptorType* found = Get<value_t>();
+				const Type* found = Get<value_t>();
 				assert(found);
 				return *found;
 			}
 
-			const TypeDescriptorType* GetByHash(const typehash_t& hash) const
+			const Type* GetByHash(const typehash_t& hash) const
 			{
-				std::vector<TypeDescriptorType>::const_iterator found = std::find_if(begin(_types), end(_types), [&](const auto& type) { return type.GetHash() == hash; });
+				std::vector<Type>::const_iterator found = std::find_if(begin(_types), end(_types), [&](const auto& type) { return type.GetHash() == hash; });
 				
 				return found != _types.end() ? &(*found) : nullptr;
 			}
 
-			const TypeDescriptorType* GetByName(const std::string& name) const
+			const Type* GetByName(const std::string& name) const
 			{
-				std::vector<TypeDescriptorType>::const_iterator found = std::find_if(begin(_types), end(_types), [&](const auto& type) { return type.GetName() == name; });
+				std::vector<Type>::const_iterator found = std::find_if(begin(_types), end(_types), [&](const auto& type) { return type.GetName() == name; });
 				return found != _types.end() ? &(*found) : nullptr;
 			}
 
 		private:
-			std::vector<TypeDescriptorType> _types;
+			std::vector<Type> _types;
 		};
 	}
 }

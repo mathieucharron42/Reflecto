@@ -11,44 +11,41 @@
 #include <vector>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace Reflecto::Type;
-using namespace Reflecto::Utils;
-using namespace Reflecto;
 
 template<> 
-inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<TypeDescriptorType>(const TypeDescriptorType& type)
+inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<Reflecto::Reflection::Type>(const Reflecto::Reflection::Type& type)
 {
 	std::string name = type.GetName();
-	typehash_t hash = type.GetHash();
-	return StringExt::Format<std::wstring>(L"{Name=%s,TypeHash=%i}", name.c_str(), hash);
+	Reflecto::Reflection::typehash_t hash = type.GetHash();
+	return Reflecto::Utils::StringExt::Format<std::wstring>(L"{Name=%s,TypeHash=%i}", name.c_str(), hash);
 }
 
 template<>
-inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<std::vector<MemberDescriptor>>(const std::vector<MemberDescriptor>& members)
+inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<std::vector<Reflecto::Reflection::MemberDescriptor>>(const std::vector<Reflecto::Reflection::MemberDescriptor>& members)
 {
-	const std::wstring membersStr = StringExt::Join<std::wstring>(members, L",", [](const MemberDescriptor& members) {
-		const std::wstring name = StringExt::ToWstring(members.GetName());
+	const std::wstring membersStr = Reflecto::Utils::StringExt::Join<std::wstring>(members, L",", [](const Reflecto::Reflection::MemberDescriptor& members) {
+		const std::wstring name = Reflecto::Utils::StringExt::ToWstring(members.GetName());
 		const std::string& type = members.GetType().GetName();
-		const byte offset = members.GetOffset();
-		return StringExt::Format<std::wstring>(L"Name=%s,Type=%s,Offset=%i", name.c_str(), type.c_str(), offset);
+		const Reflecto::byte offset = members.GetOffset();
+		return Reflecto::Utils::StringExt::Format<std::wstring>(L"Name=%s,Type=%s,Offset=%i", name.c_str(), type.c_str(), offset);
 	});
-	return StringExt::Format<std::wstring>(L"[%s]", membersStr.c_str());
+	return Reflecto::Utils::StringExt::Format<std::wstring>(L"[%s]", membersStr.c_str());
 }
 
 template<>
-inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<std::vector<MethodDescriptor>>(const std::vector<MethodDescriptor>& methods)
+inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<std::vector<Reflecto::Reflection::MethodDescriptor>>(const std::vector<Reflecto::Reflection::MethodDescriptor>& methods)
 {
-	const std::wstring membersStr = StringExt::Join<std::wstring>(methods, L",", [](const MethodDescriptor& method) {
-		const std::wstring name = StringExt::ToWstring(method.GetName());
-		return StringExt::Format<std::wstring>(L"Name=%s", name.c_str());
+	const std::wstring membersStr = Reflecto::Utils::StringExt::Join<std::wstring>(methods, L",", [](const Reflecto::Reflection::MethodDescriptor& method) {
+		const std::wstring name = Reflecto::Utils::StringExt::ToWstring(method.GetName());
+		return Reflecto::Utils::StringExt::Format<std::wstring>(L"Name=%s", name.c_str());
 		});
-	return StringExt::Format<std::wstring>(L"[%s]", membersStr.c_str());
+	return Reflecto::Utils::StringExt::Format<std::wstring>(L"[%s]", membersStr.c_str());
 }
 
 
 namespace Reflecto
 {
-	namespace Type
+	namespace Reflection
 	{
 		namespace Test
 		{
@@ -61,11 +58,11 @@ namespace Reflecto
 			};
 #pragma pack(pop)
 
-			struct PrivatePotatoWeightTag : public TypeMemberTag<PrivatePotato, float> { };
-			struct PrivatePotatoNameTag : public TypeMemberTag<PrivatePotato, std::string> { };
+			struct PrivatePotatoWeightTag : public Reflecto::Utils::TypeMemberTag<PrivatePotato, float> { };
+			struct PrivatePotatoNameTag : public Reflecto::Utils::TypeMemberTag<PrivatePotato, std::string> { };
 
-			template struct EncapsulationBreaker<PrivatePotatoWeightTag, &PrivatePotato::_weight>;
-			template struct EncapsulationBreaker<PrivatePotatoNameTag, &PrivatePotato::_name>;
+			template struct Reflecto::Utils::EncapsulationBreaker<PrivatePotatoWeightTag, &PrivatePotato::_weight>;
+			template struct Reflecto::Utils::EncapsulationBreaker<PrivatePotatoNameTag, &PrivatePotato::_name>;
 
 			TEST_CLASS(TypeDescriptorTest)
 			{
@@ -78,7 +75,7 @@ namespace Reflecto
 
 					const TypeDescriptor descriptor = TypeDescriptorFactory<uint32_t>(typeLibrary).Build();
 
-					const TypeDescriptorType& expectedType = *typeLibrary.Get<uint32_t>();
+					const Type& expectedType = *typeLibrary.Get<uint32_t>();
 					Assert::AreEqual(expectedType, descriptor.GetType(), L"Type is unexpected");
 
 					std::vector<MemberDescriptor> expectedMembers;
@@ -102,11 +99,11 @@ namespace Reflecto
 						.RegisterMember(&Potato::Weight, "Weight")
 					.Build();
 
-					const TypeDescriptorType& expectedType = *typeLibrary.Get<Potato>();
+					const Type& expectedType = *typeLibrary.Get<Potato>();
 					Assert::AreEqual(expectedType, descriptor.GetType(), L"Type is unexpected");
 
 					const std::vector<MemberDescriptor> expectedMembers = [&] {
-						const TypeDescriptorType type = typeLibrary.GetChecked<float>();
+						const Type type = typeLibrary.GetChecked<float>();
 						const std::string name = "Weight";
 						const byte offset = 0;
 						return std::vector<MemberDescriptor>{ MemberDescriptor(type, name, offset) };
@@ -139,27 +136,27 @@ namespace Reflecto
 						.RegisterMember(&PotatoNoPadding::CookedTime, "CookedTime")
 					.Build();
 
-					const TypeDescriptorType& expectedType = *typeLibrary.Get<PotatoNoPadding>();
+					const Type& expectedType = *typeLibrary.Get<PotatoNoPadding>();
 					Assert::AreEqual(expectedType, descriptor.GetType(), L"Type is unexpected");
 
 					const std::vector<MemberDescriptor> expectedMembers = [&] {
 						using member1_t = std::string;
 						const MemberDescriptor member1 = [&] {
-							const TypeDescriptorType type = typeLibrary.GetChecked<member1_t>();
+							const Type type = typeLibrary.GetChecked<member1_t>();
 							const std::string name = "Name";
 							const byte offset = 0;
 							return MemberDescriptor(type, name, offset);
 						}();
 						using member2_t = float;
 						const MemberDescriptor member2 = [&] {
-							const TypeDescriptorType type = typeLibrary.GetChecked<member2_t>();
+							const Type type = typeLibrary.GetChecked<member2_t>();
 							const std::string name = "Weight";
 							const byte offset = sizeof(member1_t);
 							return MemberDescriptor(type, name, offset);
 						}();
 						using member3_t = int64_t;
 						const MemberDescriptor member3 = [&] {
-							const TypeDescriptorType type = typeLibrary.GetChecked<member3_t>();
+							const Type type = typeLibrary.GetChecked<member3_t>();
 							const std::string name = "CookedTime";
 							const byte offset = sizeof(member1_t) + sizeof(member2_t);
 							return MemberDescriptor(type, name, offset);
@@ -183,18 +180,18 @@ namespace Reflecto
 						.RegisterMember(GetPrivateMemberPointer(PrivatePotatoNameTag()), "Name")
 					.Build();
 
-					const TypeDescriptorType& expectedType = *typeLibrary.Get<PrivatePotato>();
+					const Type& expectedType = *typeLibrary.Get<PrivatePotato>();
 					Assert::AreEqual(expectedType, descriptor.GetType(), L"Type is unexpected");
 
 					const std::vector<MemberDescriptor> expectedMembers = [&] {
 						const MemberDescriptor member1 = [&] {
-							const TypeDescriptorType type = typeLibrary.GetChecked<float>();
+							const Type type = typeLibrary.GetChecked<float>();
 							const std::string name = "Weight";
 							const byte offset = 0;
 							return MemberDescriptor(type, name, offset);
 						}();
 						const MemberDescriptor member2 = [&] {
-							const TypeDescriptorType type = typeLibrary.GetChecked<std::string>();
+							const Type type = typeLibrary.GetChecked<std::string>();
 							const std::string name = "Name";
 							const byte offset = sizeof(float);
 							return MemberDescriptor(type, name, offset);
@@ -237,24 +234,24 @@ namespace Reflecto
 						.RegisterMember(&PotatoNoPadding::IsBacked, "IsBacked")
 						.Build();
 
-					const TypeDescriptorType baseExpectedType = *typeLibrary.Get<VegetableNoPadding>();
+					const Type baseExpectedType = *typeLibrary.Get<VegetableNoPadding>();
 					Assert::AreEqual(baseExpectedType, baseDescriptor.GetType(), L"Type is unexpected");
 
-					const TypeDescriptorType childExpectedType = *typeLibrary.Get<PotatoNoPadding>();
+					const Type childExpectedType = *typeLibrary.Get<PotatoNoPadding>();
 					Assert::AreEqual(childExpectedType, childDescriptor.GetType(), L"Type is unexpected");
 
 					using baseMember1_t = float;
 					using baseMember2_t = float;
 					const std::vector<MemberDescriptor> baseExpectedMembers = [&] {
 						const MemberDescriptor member1 = [&] {
-							const TypeDescriptorType type = *typeLibrary.Get<baseMember1_t>();
+							const Type type = *typeLibrary.Get<baseMember1_t>();
 							const std::string name = "Weight";
 							const byte offset = 0;
 							return MemberDescriptor{ type, name, offset };
 						}();
 
 						const MemberDescriptor member2 = [&] {
-							const TypeDescriptorType type = *typeLibrary.Get<baseMember2_t>();
+							const Type type = *typeLibrary.Get<baseMember2_t>();
 							const std::string name = "Condition";
 							const byte offset = sizeof(baseMember1_t);
 							return MemberDescriptor{ type, name, offset };
@@ -267,7 +264,7 @@ namespace Reflecto
 					using childMember1_t = bool;
 					const std::vector<MemberDescriptor> childExpectedMembers = [&] {
 						const MemberDescriptor member1 = [&] {
-							const TypeDescriptorType type = *typeLibrary.Get<childMember1_t>();
+							const Type type = *typeLibrary.Get<childMember1_t>();
 							const std::string name = "IsBacked";
 							const byte offset = sizeof(baseMember1_t) + sizeof(baseMember2_t);
 							return MemberDescriptor{ type, name, offset };
@@ -314,9 +311,9 @@ namespace Reflecto
 						.RegisterMember(&Vegetable::Weight, "Weight")
 					.Build();
 
-					using member_information_t = std::tuple<std::string, TypeDescriptorType>;
+					using member_information_t = std::tuple<std::string, Type>;
 					std::vector<member_information_t> expectedMembers = [&] {
-						auto builderFunc = std::make_tuple<std::string, TypeDescriptorType>;
+						auto builderFunc = std::make_tuple<std::string, Type>;
 						member_information_t member1 = builderFunc("Age", typeLibrary.GetChecked<int>());
 						member_information_t member2 = builderFunc("Weight", typeLibrary.GetChecked<float>());
 						return std::vector<member_information_t>{member1, member2};
@@ -365,7 +362,7 @@ namespace Reflecto
 						.RegisterMethod(&TestClass::DoSomething, "DoSomething")
 					.Build();
 
-					const TypeDescriptorType& expectedType = *typeLibrary.Get<TestClass>();
+					const Type& expectedType = *typeLibrary.Get<TestClass>();
 					Assert::AreEqual(expectedType, descriptor.GetType(), L"Type is unexpected");
 
 					/*MethodDescriptor methodDescriptors = {
@@ -393,7 +390,7 @@ namespace Reflecto
 						.RegisterMethod(&TestClass::DoSomethingElse, "DoSomethingElse")
 					.Build();
 					
-					const TypeDescriptorType& expectedType = *typeLibrary.Get<TestClass>();
+					const Type& expectedType = *typeLibrary.Get<TestClass>();
 					Assert::AreEqual(expectedType, descriptor.GetType(), L"Type is unexpected");
 
 					//std::vector<MethodDescriptor> methodDescriptors = {

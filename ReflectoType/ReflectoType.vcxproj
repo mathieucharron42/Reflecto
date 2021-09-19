@@ -165,8 +165,8 @@
     <ClInclude Include="Type\MethodDescriptorFactory.h" />
     <ClInclude Include="Type\TypeDescriptor.h" />
     <ClInclude Include="Type\TypeDescriptorFactory.h" />
-    <ClInclude Include="Type\TypeDescriptorType.h" />
-    <ClInclude Include="Type\TypeDescriptorTypeFactory.h" />
+    <ClInclude Include="Type\Type.h" />
+    <ClInclude Include="Type\TypeFactory.h" />
     <ClInclude Include="Type\TypeExt.h" />
     <ClInclude Include="Type\TypeLibrary.h" />
     <ClInclude Include="Type\TypeLibraryFactory.h" />

@@ -6,7 +6,7 @@
 #include "Serialization/TextSerialization.h"
 #include "Serialization/Writer/JsonSerializationWriter.h"
 #include "Type/TypeDescriptorFactory.h"
-#include "Type/TypeDescriptorTypeFactory.h"
+#include "Type/TypeFactory.h"
 #include "Type/TypeLibrary.h"
 #include "Type/TypeLibraryFactory.h"
 #include "Utils/StringExt.h"
@@ -29,7 +29,7 @@ namespace Reflecto
 			public:
 				TEST_METHOD(SerializeInt)
 				{
-					Type::TypeLibrary testTypeLibrary = Type::TypeLibraryFactory()
+					Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
 						.Add<int32_t>("int32")
 					.Build();
 
@@ -59,7 +59,7 @@ namespace Reflecto
 
 				TEST_METHOD(SerializeString)
 				{
-					Type::TypeLibrary testTypeLibrary = Type::TypeLibraryFactory()
+					Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
 						.Add<std::string>("string")
 					.Build();
 
@@ -89,7 +89,7 @@ namespace Reflecto
 
 				TEST_METHOD(SerializeFloat)
 				{
-					Type::TypeLibrary testTypeLibrary = Type::TypeLibraryFactory()
+					Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
 						.Add<float>("float")
 					.Build();
 
@@ -119,7 +119,7 @@ namespace Reflecto
 
 				TEST_METHOD(SerializeDouble)
 				{
-					Type::TypeLibrary testTypeLibrary = Type::TypeLibraryFactory()
+					Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
 						.Add<double>("double")
 						.Build();
 
@@ -149,7 +149,7 @@ namespace Reflecto
 
 				TEST_METHOD(SerializeBoolean)
 				{
-					Type::TypeLibrary testTypeLibrary = Type::TypeLibraryFactory()
+					Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
 						.Add<bool>("boolean")
 					.Build();
 
@@ -190,13 +190,13 @@ namespace Reflecto
 						}
 					};
 
-					const Type::TypeLibrary testTypeLibrary = Type::TypeLibraryFactory()
+					const Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
 						.Add<TestPerson>("TestPerson")
 						.Add<std::string>("string")
 						.Add<int32_t>("int32")
 					.Build();
 
-					const Type::TypeDescriptor testPersonDescriptor = Type::TypeDescriptorFactory<TestPerson>(testTypeLibrary)
+					const Reflection::TypeDescriptor testPersonDescriptor = Reflection::TypeDescriptorFactory<TestPerson>(testTypeLibrary)
 						.RegisterMember(&TestPerson::Name, "Name")
 						.RegisterMember(&TestPerson::Age, "Age")
 					.Build();
@@ -235,7 +235,7 @@ namespace Reflecto
 
 				TEST_METHOD(SerializeVector)
 				{
-					Type::TypeLibrary testTypeLibrary = Type::TypeLibraryFactory()
+					Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
 						.Add<std::string>("string")
 						.Add<std::vector<std::string>>("vector<string>")
 					.Build();
@@ -270,7 +270,7 @@ namespace Reflecto
 
 				TEST_METHOD(SerializeMap)
 				{
-					Type::TypeLibrary testTypeLibrary = Type::TypeLibraryFactory()
+					Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
 						.Add<std::string>("string")
 						.Add<int32_t>("int")
 						.Add<std::map<int32_t, std::string>>("map<int,string>")
@@ -359,7 +359,7 @@ namespace Reflecto
 						}
 					};
 
-					const Type::TypeLibrary testTypeLibrary = Type::TypeLibraryFactory()
+					const Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
 						.Add<TestPotatoHead>("TestPotatoHead")
 						.Add<TestPotatoHead::Eyes>("TestPotatoHead::Eyes")
 						.Add<TestPotatoHead::Nose>("TestPotatoHead::Nose")
@@ -369,23 +369,23 @@ namespace Reflecto
 						.Add<bool>("boolean")
 					.Build();
 
-					const Type::TypeDescriptor testPotatoHeadDescriptor = Type::TypeDescriptorFactory<TestPotatoHead>(testTypeLibrary)
+					const Reflection::TypeDescriptor testPotatoHeadDescriptor = Reflection::TypeDescriptorFactory<TestPotatoHead>(testTypeLibrary)
 						.RegisterMember(&TestPotatoHead::Name, "Name")
 						.RegisterMember(&TestPotatoHead::CurrentEyes, "Eyes")
 						.RegisterMember(&TestPotatoHead::CurrentNose, "Nose")
 						.RegisterMember(&TestPotatoHead::CurrentMouth, "Mouth")
 					.Build();
 
-					const Type::TypeDescriptor testPotatoHeadEyesDescriptor = Type::TypeDescriptorFactory<TestPotatoHead::Eyes>(testTypeLibrary)
+					const Reflection::TypeDescriptor testPotatoHeadEyesDescriptor = Reflection::TypeDescriptorFactory<TestPotatoHead::Eyes>(testTypeLibrary)
 						.RegisterMember(&TestPotatoHead::Eyes::Color, "Color")
 						.RegisterMember(&TestPotatoHead::Eyes::Size, "Size")
 					.Build();
 
-					const Type::TypeDescriptor testPotatoHeadNoseDescriptor = Type::TypeDescriptorFactory<TestPotatoHead::Nose>(testTypeLibrary)
+					const Reflection::TypeDescriptor testPotatoHeadNoseDescriptor = Reflection::TypeDescriptorFactory<TestPotatoHead::Nose>(testTypeLibrary)
 						.RegisterMember(&TestPotatoHead::Nose::Type, "Type")
 					.Build();
 					
-					const Type::TypeDescriptor testPotatoHeadMouthDescriptor = Type::TypeDescriptorFactory<TestPotatoHead::Mouth>(testTypeLibrary)
+					const Reflection::TypeDescriptor testPotatoHeadMouthDescriptor = Reflection::TypeDescriptorFactory<TestPotatoHead::Mouth>(testTypeLibrary)
 						.RegisterMember(&TestPotatoHead::Mouth::IsSmiling, "IsSmiling")
 					.Build();
 

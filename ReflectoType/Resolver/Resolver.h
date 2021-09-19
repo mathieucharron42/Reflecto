@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Type/TypeDescriptor.h"
-#include "Type/TypeDescriptorTypeFactory.h"
+#include "Type/TypeFactory.h"
+#include "Type/TypeExt.h"
 
 #include "Common/Definitions.h"
 #include "Utils/NonCopyable.h"
@@ -11,7 +12,7 @@
 
 namespace Reflecto
 {
-	namespace Type
+	namespace Reflection
 	{
 		template<class object_t>
 		class Resolver : private Utils::NonCopyable

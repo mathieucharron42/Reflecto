@@ -1,26 +1,26 @@
 #pragma once
 
-#include "TypeDescriptorType.h"
+#include "Type.h"
 #include "TypeExt.h"
 
 namespace Reflecto
 {
-	namespace Type
+	namespace Reflection
 	{
 		template<class value_t>
-		class TypeDescriptorTypeFactory
+		class TypeFactory
 		{
 		public:
-			TypeDescriptorTypeFactory(const std::string& name)
+			TypeFactory(const std::string& name)
 				: _name(name)
 				, _hash(TypeExt::GetTypeHash<value_t>())
 			{
 
 			}
 
-			TypeDescriptorType Build()
+			Type Build()
 			{
-				return TypeDescriptorType{ _name, _hash };
+				return Type{ _name, _hash };
 			}
 
 		private:

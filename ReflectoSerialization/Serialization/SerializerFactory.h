@@ -18,11 +18,11 @@ namespace Reflecto
 			using deserialization_strategy_t = typename Serializer::deserialization_strategy_t;
 			using strategies_t = typename Serializer::strategies_t;
 
-			SerializerFactory(const Type::TypeLibrary& library)
+			SerializerFactory(const Reflection::TypeLibrary& library)
 				: _typeLibrary(library)
 			{ }
 
-			SerializerFactory& LearnType(const Type::TypeDescriptorType& type, const serialization_strategy_t& serializationStrategy, const deserialization_strategy_t& deserializationStrategy)
+			SerializerFactory& LearnType(const Reflection::Type& type, const serialization_strategy_t& serializationStrategy, const deserialization_strategy_t& deserializationStrategy)
 			{
 				_strategies.insert({ type, strategies_t(serializationStrategy, deserializationStrategy) });
 				return *this;
@@ -39,7 +39,7 @@ namespace Reflecto
 			template<class value_t>
 			SerializerFactory& LearnType(serialization_strategy_t serializationStrategy, deserialization_strategy_t deserializationStrategy)
 			{
-				const Type::TypeDescriptorType* type = _typeLibrary.Get<value_t>();
+				const Reflection::Type* type = _typeLibrary.Get<value_t>();
 				if (ensure(type))
 				{
 					LearnType(*type, serializationStrategy, deserializationStrategy);
@@ -53,7 +53,7 @@ namespace Reflecto
 			}
 
 		private:
-			Type::TypeLibrary _typeLibrary;
+			Reflection::TypeLibrary _typeLibrary;
 			Serializer::strategy_map_t _strategies;
 		};
 	}

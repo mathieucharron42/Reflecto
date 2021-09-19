@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TypeDescriptorType.h"
+#include "Type.h"
 #include "TypeLibrary.h"
 
 #include <algorithm>
@@ -10,7 +10,7 @@
 
 namespace Reflecto
 {
-	namespace Type
+	namespace Reflection
 	{
 		class TypeLibraryFactory
 		{
@@ -18,12 +18,12 @@ namespace Reflecto
 			template<class value_t>
 			TypeLibraryFactory& Add(const std::string& typeName)
 			{
-				const TypeDescriptorType type = TypeDescriptorTypeFactory<value_t>(typeName).Build();
+				const Type type = TypeFactory<value_t>(typeName).Build();
 				Add(type);
 				return *this;
 			}
 
-			TypeLibraryFactory& Add(const TypeDescriptorType& type)
+			TypeLibraryFactory& Add(const Type& type)
 			{
 				assert(std::none_of(_types.begin(), _types.end(), [&](const auto& t) { return t.GetName() == type.GetName(); }));
 				assert(std::none_of(_types.begin(), _types.end(), [&](const auto& t) { return t.GetHash() == type.GetHash(); }));
@@ -37,7 +37,7 @@ namespace Reflecto
 			}
 
 		private:
-			std::vector<TypeDescriptorType> _types;
+			std::vector<Type> _types;
 		};
 	}
 }

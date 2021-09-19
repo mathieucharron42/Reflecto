@@ -23,14 +23,14 @@ namespace Reflecto
 			using serialization_strategy_t = typename std::function<void(const Serializer&, const void*, ISerializationWriter& writer)>;
 			using deserialization_strategy_t = typename std::function<void(const Serializer&, void*, ISerializationReader& reader)>;
 			using strategies_t = std::tuple<serialization_strategy_t, deserialization_strategy_t>;
-			using strategy_map_t = std::map<Type::TypeDescriptorType, strategies_t>;
+			using strategy_map_t = std::map<Reflection::Type, strategies_t>;
 
-			Serializer(const Type::TypeLibrary& library, const strategy_map_t& strategy)
+			Serializer(const Reflection::TypeLibrary& library, const strategy_map_t& strategy)
 				: _typeLibrary(library)
 				, _strategies(strategy)
 			{ }
 
-			void Serialize(const Type::TypeDescriptorType& type, const void* value, ISerializationWriter& writer) const
+			void Serialize(const Reflection::Type& type, const void* value, ISerializationWriter& writer) const
 			{
 				const serialization_strategy_t* strategy = GetSerializationStrategy(type);
 				if (ensure(strategy))
@@ -42,14 +42,14 @@ namespace Reflecto
 			template<typename value_t>
 			void Serialize(const value_t& value, ISerializationWriter& writer) const
 			{
-				const Type::TypeDescriptorType* type = _typeLibrary.Get<value_t>();
+				const Reflection::Type* type = _typeLibrary.Get<value_t>();
 				if (ensure(type))
 				{
 					Serialize(*type, &value, writer);
 				}
 			}
 
-			void Deserialize(const Type::TypeDescriptorType& type, void* value, ISerializationReader& reader) const
+			void Deserialize(const Reflection::Type& type, void* value, ISerializationReader& reader) const
 			{
 				const deserialization_strategy_t* strategy = GetDeserializationStrategy(type);
 				if (ensure(strategy))
@@ -61,7 +61,7 @@ namespace Reflecto
 			template<typename value_t>
 			void Deserialize(value_t& value, ISerializationReader& reader) const
 			{
-				const Type::TypeDescriptorType* type = _typeLibrary.Get<value_t>();
+				const Reflection::Type* type = _typeLibrary.Get<value_t>();
 				if (ensure(type))
 				{
 					Deserialize(*type, &value, reader);
@@ -69,7 +69,7 @@ namespace Reflecto
 			}
 
 		private:
-			void Serialize(const Type::TypeDescriptorType& type, const serialization_strategy_t& strategy, const void* value, ISerializationWriter& writer) const
+			void Serialize(const Reflection::Type& type, const serialization_strategy_t& strategy, const void* value, ISerializationWriter& writer) const
 			{
 				writer.WriteBeginObject();
 				{
@@ -87,7 +87,7 @@ namespace Reflecto
 				}
 			}
 
-			void Deserialize(const Type::TypeDescriptorType& type, const deserialization_strategy_t& strategy, void* value, ISerializationReader& reader) const
+			void Deserialize(const Reflection::Type& type, const deserialization_strategy_t& strategy, void* value, ISerializationReader& reader) const
 			{
 				reader.ReadBeginObject();
 				{
@@ -113,19 +113,19 @@ namespace Reflecto
 				reader.ReadEndObject();
 			}
 
-			const serialization_strategy_t* GetSerializationStrategy(const Type::TypeDescriptorType& type) const
+			const serialization_strategy_t* GetSerializationStrategy(const Reflection::Type& type) const
 			{
 				strategy_map_t::const_iterator found = _strategies.find(type);
 				return found != _strategies.end() ? &std::get<serialization_strategy_t>((*found).second) : nullptr;
 			}
 
-			const deserialization_strategy_t* GetDeserializationStrategy(const Type::TypeDescriptorType& type) const
+			const deserialization_strategy_t* GetDeserializationStrategy(const Reflection::Type& type) const
 			{
 				strategy_map_t::const_iterator found = _strategies.find(type);
 				return found != _strategies.end() ? &std::get<deserialization_strategy_t>((*found).second) : nullptr;
 			}
 
-			Type::TypeLibrary _typeLibrary;
+			Reflection::TypeLibrary _typeLibrary;
 			strategy_map_t _strategies;
 		};
 	}

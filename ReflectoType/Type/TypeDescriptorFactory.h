@@ -8,7 +8,7 @@
 #include "MethodDescriptorFactory.h"
 #include "Resolver/Resolver.h"
 #include "TypeDescriptor.h"
-#include "TypeDescriptorType.h"
+#include "Type.h"
 
 #include "Type/TypeLibrary.h"
 
@@ -16,19 +16,19 @@
 
 namespace Reflecto
 {
-	namespace Type
+	namespace Reflection
 	{
 		template <typename object_t>
 		class TypeDescriptorFactory
 		{
 		public:
-			TypeDescriptorFactory(const Type::TypeLibrary& typeLibrary)
+			TypeDescriptorFactory(const TypeLibrary& typeLibrary)
 				: TypeDescriptorFactory(typeLibrary, nullptr)
 			{
 
 			}
 
-			TypeDescriptorFactory(const Type::TypeLibrary& typeLibrary, const TypeDescriptor* parentTypeDescriptor)
+			TypeDescriptorFactory(const TypeLibrary& typeLibrary, const TypeDescriptor* parentTypeDescriptor)
 				: _typeLibrary(typeLibrary)
 				, _sampleObj()
 				, _parent(parentTypeDescriptor)
@@ -59,12 +59,12 @@ namespace Reflecto
 
 			TypeDescriptor Build()
 			{
-				const TypeDescriptorType& type = _typeLibrary.GetChecked<object_t>();
+				const Type& type = _typeLibrary.GetChecked<object_t>();
 				return TypeDescriptor{type, _parent, _constructor, _members, _methods};
 			}
 
 		private:
-			Type::TypeLibrary _typeLibrary;
+			TypeLibrary _typeLibrary;
 			object_t _sampleObj;
 			const TypeDescriptor* _parent;
 			ConstructorDescriptor _constructor;

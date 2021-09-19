@@ -9,7 +9,7 @@
 
 namespace Reflecto
 {
-	namespace Type
+	namespace Reflection
 	{
 		template <typename object_t, typename ... args_t>
 		class MethodDescriptorFactory

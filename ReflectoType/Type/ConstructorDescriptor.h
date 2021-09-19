@@ -6,7 +6,7 @@
 
 namespace Reflecto
 {
-	namespace Type
+	namespace Reflection
 	{
 		class ConstructorDescriptor
 		{

@@ -1,5 +1,5 @@
-#include "Type/TypeDescriptorType.h"
-#include "Type/TypeDescriptorTypeFactory.h"
+#include "Type/Type.h"
+#include "Type/TypeFactory.h"
 #include "Type/TypeLibrary.h"
 #include "Type/TypeLibraryFactory.h"
 
@@ -11,7 +11,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Reflecto
 {
-	namespace Type
+	namespace Reflection
 	{
 		namespace Test
 		{
@@ -20,9 +20,9 @@ namespace Reflecto
 			public:
 				TEST_METHOD(Get)
 				{
-					TypeDescriptorType testUIntType = TypeDescriptorTypeFactory<uint32_t>("uint32").Build();
-					TypeDescriptorType testStringType = TypeDescriptorTypeFactory<std::string>("string").Build();
-					TypeDescriptorType testFloatType = TypeDescriptorTypeFactory<float>("float").Build();
+					Type testUIntType = TypeFactory<uint32_t>("uint32").Build();
+					Type testStringType = TypeFactory<std::string>("string").Build();
+					Type testFloatType = TypeFactory<float>("float").Build();
 
 					TypeLibrary testLibrary = TypeLibraryFactory()
 						.Add(testUIntType)
@@ -35,9 +35,9 @@ namespace Reflecto
 				}
 				TEST_METHOD(GetByHash)
 				{
-					TypeDescriptorType testUIntType = TypeDescriptorTypeFactory<uint32_t>("uint32").Build();
-					TypeDescriptorType testStringType = TypeDescriptorTypeFactory<std::string>("string").Build();
-					TypeDescriptorType testFloatType = TypeDescriptorTypeFactory<float>("float").Build();
+					Type testUIntType = TypeFactory<uint32_t>("uint32").Build();
+					Type testStringType = TypeFactory<std::string>("string").Build();
+					Type testFloatType = TypeFactory<float>("float").Build();
 
 					TypeLibrary testLibrary = TypeLibraryFactory()
 						.Add(testUIntType)
@@ -51,9 +51,9 @@ namespace Reflecto
 
 				TEST_METHOD(GetByName)
 				{
-					TypeDescriptorType testUIntType = TypeDescriptorTypeFactory<uint32_t>("uint32").Build();
-					TypeDescriptorType testStringType = TypeDescriptorTypeFactory<std::string>("string").Build();
-					TypeDescriptorType testFloatType = TypeDescriptorTypeFactory<float>("float").Build();
+					Type testUIntType = TypeFactory<uint32_t>("uint32").Build();
+					Type testStringType = TypeFactory<std::string>("string").Build();
+					Type testFloatType = TypeFactory<float>("float").Build();
 
 					TypeLibrary testLibrary = TypeLibraryFactory()
 						.Add(testUIntType)

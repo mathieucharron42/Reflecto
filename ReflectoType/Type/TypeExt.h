@@ -7,7 +7,7 @@
 
 namespace Reflecto
 {
-	namespace Type
+	namespace Reflection
 	{
 		using typehash_t = uint64_t;
 

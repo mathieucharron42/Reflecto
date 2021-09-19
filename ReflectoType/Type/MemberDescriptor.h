@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TypeDescriptorType.h"
+#include "Type.h"
 #include "TypeExt.h"
 
 #include "Common/Definitions.h"
@@ -10,18 +10,18 @@
 
 namespace Reflecto
 {
-	namespace Type
+	namespace Reflection
 	{
 		class MemberDescriptor
 		{
 		public:
-			MemberDescriptor(const TypeDescriptorType& type, const std::string& name, byte offset)
+			MemberDescriptor(const Type& type, const std::string& name, byte offset)
 				: _type(type)
 				, _name(name)
 				, _offset(offset)
 			{ }
 
-			const TypeDescriptorType& GetType() const
+			const Type& GetType() const
 			{
 				return _type;
 			}
@@ -44,7 +44,7 @@ namespace Reflecto
 			}
 
 		private:
-			TypeDescriptorType _type;
+			Type _type;
 			std::string _name;
 			uint32_t _offset;
 		};
