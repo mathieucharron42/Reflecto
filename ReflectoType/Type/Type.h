@@ -1,6 +1,9 @@
 #pragma once
 
 #include "TypeExt.h"
+
+#include "Utils/StringExt.h"
+
 namespace Reflecto
 {
 	namespace Reflection
@@ -33,6 +36,11 @@ namespace Reflecto
 			bool operator<(const  Type& type) const
 			{
 				return _hash < type.GetHash();
+			}
+
+			std::string ToString() const
+			{
+				return Utils::StringExt::Format<std::string>("Type{Name=%s,Hash=%llu}", _name.c_str(), _hash);
 			}
 
 		private:

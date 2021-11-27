@@ -9,6 +9,12 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
+template<> 
+inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<Reflecto::Reflection::Type>(const Reflecto::Reflection::Type& type)
+{
+	return Reflecto::Utils::StringExt::ToWstring(type.ToString());
+}
+
 namespace Reflecto
 {
 	namespace Reflection
@@ -20,51 +26,96 @@ namespace Reflecto
 			public:
 				TEST_METHOD(Get)
 				{
-					Type testUIntType = TypeFactory<uint32_t>("uint32").Build();
-					Type testStringType = TypeFactory<std::string>("string").Build();
-					Type testFloatType = TypeFactory<float>("float").Build();
+					/////////////
+					// Arrange
+					Type kExpectedUIntType = TypeFactory<uint32_t>("uint32").Build();
+					Type kExpectedStringType = TypeFactory<std::string>("string").Build();
+					Type kExpectedFloatType = TypeFactory<float>("float").Build();
 
 					TypeLibrary testLibrary = TypeLibraryFactory()
-						.Add(testUIntType)
-						.Add(testStringType)
-						.Add(testFloatType)
-						.Build();
+						.Add(kExpectedUIntType)
+						.Add(kExpectedStringType)
+						.Add(kExpectedFloatType)
+					.Build();
 
-					Assert::IsTrue(*testLibrary.Get<uint32_t>() == testUIntType, L"Unexpected type");
-					Assert::IsTrue(*testLibrary.Get<float>() == testFloatType, L"Unexpected type");
+					/////////////
+					// Act
+					const Type* actualUIntType = testLibrary.Get<uint32_t>();
+					const Type* actualFloatType = testLibrary.Get<float>();
+					const Type* actualStringType = testLibrary.Get<std::string>();
+					const Type* actualMissingType = testLibrary.Get<bool>();
+
+					/////////////
+					// Assert
+					Assert::IsNotNull(actualUIntType, L"Type is unexpectedly missing");
+					Assert::AreEqual(kExpectedUIntType, *actualUIntType, L"Type is unexpectedly different");
+				
+					Assert::IsNotNull(actualStringType, L"Type is unexpectedly missing");
+					Assert::AreEqual(kExpectedStringType, *actualStringType, L"Type is unexpectedly different");
+
+					Assert::IsNotNull(actualFloatType, L"Type is unexpectedly missing");
+					Assert::AreEqual(kExpectedFloatType, *actualFloatType, L"Type is unexpectedly different");
+				
+					Assert::IsNull(actualMissingType, L"Missing type is unexpectedly available");
 				}
+
 				TEST_METHOD(GetByHash)
 				{
-					Type testUIntType = TypeFactory<uint32_t>("uint32").Build();
-					Type testStringType = TypeFactory<std::string>("string").Build();
-					Type testFloatType = TypeFactory<float>("float").Build();
-
+					/////////////
+					// Arrange
+					Type kExpectedUIntType = TypeFactory<uint32_t>("uint32").Build();
+					Type kExpectedStringType = TypeFactory<std::string>("string").Build();
+					
 					TypeLibrary testLibrary = TypeLibraryFactory()
-						.Add(testUIntType)
-						.Add(testStringType)
-						.Add(testFloatType)
+						.Add(kExpectedUIntType)
+						.Add(kExpectedStringType)
 					.Build();
-				
-					Assert::IsTrue(*testLibrary.GetByHash(testUIntType.GetHash()) == testUIntType, L"Unexpected type");
-					Assert::IsTrue(*testLibrary.GetByHash(testFloatType.GetHash()) == testFloatType, L"Unexpected type");
+
+					/////////////
+					// Act
+					const Type* actualUIntType = testLibrary.GetByHash(TypeExt::GetTypeHash<uint32_t>());
+					const Type* actualStringType = testLibrary.GetByHash(TypeExt::GetTypeHash<std::string>());
+					const Type* actualMissingType = testLibrary.GetByHash(TypeExt::GetTypeHash<bool>());
+
+					/////////////
+					// Assert
+					Assert::IsNotNull(actualUIntType, L"Type is unexpectedly missing");
+					Assert::AreEqual(kExpectedUIntType, *actualUIntType, L"Type is unexpectedly different");
+
+					Assert::IsNotNull(actualStringType, L"Type is unexpectedly missing");
+					Assert::AreEqual(kExpectedStringType, *actualStringType, L"Type is unexpectedly different");
+
+					Assert::IsNull(actualMissingType, L"Missing type is unexpectedly available");
 				}
 
 				TEST_METHOD(GetByName)
 				{
-					Type testUIntType = TypeFactory<uint32_t>("uint32").Build();
-					Type testStringType = TypeFactory<std::string>("string").Build();
-					Type testFloatType = TypeFactory<float>("float").Build();
+					/////////////
+					// Arrange
+					Type kExpectedUIntType = TypeFactory<uint32_t>("uint32").Build();
+					Type kExpectedStringType = TypeFactory<std::string>("string").Build();
 
 					TypeLibrary testLibrary = TypeLibraryFactory()
-						.Add(testUIntType)
-						.Add(testStringType)
-						.Add(testFloatType)
+						.Add(kExpectedUIntType)
+						.Add(kExpectedStringType)
 					.Build();
 
-					Assert::IsTrue(*testLibrary.GetByName("uint32") == testUIntType, L"Unexpected type");
-					Assert::IsTrue(*testLibrary.GetByName("string") == testStringType, L"Unexpected type");
-				}
+					/////////////
+					// Act
+					const Type* actualUIntType = testLibrary.GetByName("uint32");
+					const Type* actualStringType = testLibrary.GetByName("string");
+					const Type* actualMissingType = testLibrary.GetByName("boolean");
 
+					/////////////
+					// Assert
+					Assert::IsNotNull(actualUIntType, L"Type is unexpectedly missing");
+					Assert::AreEqual(kExpectedUIntType, *actualUIntType, L"Type is unexpectedly different");
+
+					Assert::IsNotNull(actualStringType, L"Type is unexpectedly missing");
+					Assert::AreEqual(kExpectedStringType, *actualStringType, L"Type is unexpectedly different");
+
+					Assert::IsNull(actualMissingType, L"Missing type is unexpectedly available");
+				}
 			};
 		}
 	}

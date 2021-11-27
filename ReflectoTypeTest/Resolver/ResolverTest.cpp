@@ -343,7 +343,9 @@ namespace Reflecto
 						.Add<int32_t>("int32")
 					.Build();
 
-					const TypeDescriptor descriptor = TypeDescriptorFactory<SampleObject>(typeLibrary).Build();
+					const TypeDescriptor descriptor = TypeDescriptorFactory<SampleObject>(typeLibrary)
+						.RegisterMember(&SampleObject::Field, "Field")
+					.Build();
 
 					Resolver<SampleObject> resolver(descriptor);
 

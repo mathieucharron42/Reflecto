@@ -18,126 +18,99 @@ namespace Reflecto
 			public:
 				TEST_METHOD(Join)
 				{
-					const std::string actual = [] {
-						const std::string separator = ",";
-						const std::vector<std::string> elems = { "A", "B", "C", "D", "E" };
-						return StringExt::Join(elems, separator);
-					}();
+					/////////////
+					// Arrange
+					static const std::string kSeparator = ",";
+					
+					static const std::vector<std::string> kElems0 = { };
+					static const std::string kExpected0 = "";
+					
+					static const std::vector<std::string> kElems1 = { "Test" };
+					static const std::string kExpected1 = "Test";
 
-					const std::string expected = "A,B,C,D,E";
-					Assert::AreEqual(expected, actual, L"Unexpected result");
-				}
+					static const std::vector<std::string> kElems4 = { "A", "B", "C", "D", "E" };
+					static const std::string kExpected4 = "A,B,C,D,E";
 
-				TEST_METHOD(JoinProj)
-				{
-					const std::string actual = [] {
-						const std::string separator = ",";
-						const std::vector<int> elems = { 0, 1, 2, 3, 4 };
-						auto proj = [](int i) { return std::to_string(i + 1); };
-						return StringExt::Join(elems, separator, proj);
-					}();
+					static const std::wstring kSeparatorWStr = L"|";
+					static const std::wstring kExpectedWStr = L"Éléphant|Noël|Château";
+					static const std::vector<std::wstring> kElemsWStr = { L"Éléphant", L"Noël", L"Château" };
 
-					const std::string expected = "1,2,3,4,5";
-					Assert::AreEqual(expected, actual, L"Unexpected result");
-				}
+					static const std::vector<int> kElemsProj = { 0, 1, 2, 3, 4 };
+					static const auto kProj = [](int i) { return std::to_string(i * i); };
+					const std::string kExpectedProj = "0,1,4,9,16";
 
-				TEST_METHOD(JoinEmpty)
-				{
-					const std::string actual = [] {
-						const std::string separator = ",";
-						const std::vector<std::string> elems;
-						return StringExt::Join(elems, separator);
-					}();
+					/////////////
+					// Act
+					const std::string actual0 = StringExt::Join(kElems0, kSeparator);
+					const std::string actual1 = StringExt::Join(kElems1, kSeparator);
+					const std::string actual4 = StringExt::Join(kElems4, kSeparator);
+					const std::wstring actualWStr = StringExt::Join(kElemsWStr, kSeparatorWStr);
+					const std::string actualProj = StringExt::Join(kElemsProj, kSeparator, kProj);
 
-					const std::string expected = "";
-					Assert::AreEqual(expected, actual, L"Unexpected result");
-				}
-
-				TEST_METHOD(Join1)
-				{
-					const std::string actual = [] {
-						const std::string separator = ",";
-						const std::vector<std::string> elems = { "Test" };
-						return StringExt::Join(elems, separator);
-					}();
-
-					const std::string expected = "Test";
-					Assert::AreEqual(expected, actual, L"Unexpected result");
-				}
-
-				TEST_METHOD(JoinWString)
-				{
-					const std::wstring actual = [] {
-						const std::wstring separator = L"|";
-						const std::vector<std::wstring> elems = { L"Éléphant", L"Âne", L"Château" };
-						return StringExt::Join(elems, separator);
-					}();
-
-					const std::wstring expected = L"Éléphant|Âne|Château";
-					Assert::AreEqual(expected, actual, L"Unexpected result");
+					/////////////
+					// Assert
+					Assert::AreEqual(kExpected0, actual0, L"Unexpected joined string");
+					Assert::AreEqual(kExpected1, actual1, L"Unexpected joined string");
+					Assert::AreEqual(kExpected4, actual4, L"Unexpected joined string");
+					Assert::AreEqual(kExpectedWStr, actualWStr, L"Unexpected joined wstring");
+					Assert::AreEqual(kExpectedProj, actualProj, L"Unexpected joined projected string");
 				}
 
 				TEST_METHOD(FormatString)
 				{
-					const std::string actual = [] {
-						const std::string format = "This is a %s";
-						const std::string arg1 = "POTATO";
-						return StringExt::Format(format, arg1.c_str());
-					}();
+					/////////////
+					// Arrange
+					const std::string kFormatStr = "\"%s\" is the best string";
+					const std::string kParamStr = "potato";
+					const std::string kExpectedStr = "\"potato\" is the best string";
 
-					const std::string expected = "This is a POTATO";
-					Assert::AreEqual(expected, actual, L"Unexpected result");
+					const std::string kFormatInteger = "%d is the best integer";
+					const int32_t kParamInteger = 42;
+					const std::string kExpectedInteger = "42 is the best integer";
+
+					const std::string kFormatFloat = "%.0f is the best float";
+					const float kParamFloat = 99.99999f;
+					const std::string kExpectedFloat = "100 is the best float";
+
+					const std::string kFormatMultiple = "%i is a nice integer, %.5f is a good float and \"%s\" is the best string";
+					const std::string kExpectedMultiple = "42 is a nice integer, 99.99999 is a good float and \"potato\" is the best string";
+
+					const std::wstring kFormatWString = L"Voici %i %ss %ss";
+					const std::wstring kParamWString1 = L"éléphant";
+					const std::wstring kParamWString2 = L"opiniâtre";
+					const std::wstring kExpectedWString = L"Voici 42 éléphants opiniâtres";
+
+					/////////////
+					// Act
+					const std::string actualStr = StringExt::Format(kFormatStr, kParamStr.c_str());
+					const std::string actualInteger = StringExt::Format(kFormatInteger, kParamInteger);
+					const std::string actualFloat = StringExt::Format(kFormatFloat, kParamFloat);
+					const std::string actualMultiple = StringExt::Format(kFormatMultiple, kParamInteger, kParamFloat, kParamStr.c_str());
+					const std::wstring actualWString = StringExt::Format(kFormatWString, kParamInteger, kParamWString1.c_str(), kParamWString2.c_str());
+
+					/////////////
+					// Assert
+					Assert::AreEqual(kExpectedStr, actualStr, L"Unexpected formatted string");
+					Assert::AreEqual(kExpectedInteger, actualInteger, L"Unexpected formatted string");
+					Assert::AreEqual(kExpectedFloat, actualFloat, L"Unexpected formatted string");
+					Assert::AreEqual(kExpectedMultiple, actualMultiple, L"Unexpected formatted string");
+					Assert::AreEqual(kExpectedWString, actualWString, L"Unexpected formatted wstring");
 				}
 
-				TEST_METHOD(FormatInteger)
+				TEST_METHOD(ToWstring)
 				{
-					const std::string actual = [] {
-						const std::string format = "%i is the best integer";
-						const int arg1 = 42;
-						return StringExt::Format(format, arg1);
-					}();
-
-					const std::string expected = "42 is the best integer";
-					Assert::AreEqual(expected, actual, L"Unexpected result");
-				}
-
-				TEST_METHOD(FormatFloat)
-				{
-					const std::string actual = [] {
-						const std::string format = "%.2f is the best float";
-						const float arg1 = 99.99f;
-						return StringExt::Format(format, arg1);
-					}();
-
-					const std::string expected = "99.99 is the best float";
-					Assert::AreEqual(expected, actual, L"Unexpected result");
-				}
-
-				TEST_METHOD(FormatMultiple)
-				{
-					const std::string actual = [] {
-						const std::string format = "%i is a nice integer, %.5f is a good float and \"%s\" is the best string";
-						const int arg1 = 42;
-						const float arg2 = 3.14159f;
-						const std::string arg3 = "potato";
-						return StringExt::Format(format, arg1, arg2, arg3.c_str());
-					}();
-
-					const std::string expected = "42 is a nice integer, 3.14159 is a good float and \"potato\" is the best string";
-					Assert::AreEqual(expected, actual, L"Unexpected result");
-				}
-
-				TEST_METHOD(FormatWString)
-				{
-					const std::wstring actual = [] {
-						const std::wstring format = L"Here is %i éléphant %s";
-						const int arg1 = 1;
-						const std::wstring arg2 = L"âpre";
-						return StringExt::Format(format, arg1, arg2.c_str());
-					}();
-
-					const std::wstring expected = L"Here is 1 éléphant âpre";
-					Assert::AreEqual(expected, actual, L"Unexpected result");
+					/////////////
+					// Arrange
+					const std::wstring expectedWstr = L"Hello";
+					const std::string inputStr = "Hello";
+					
+					/////////////
+					// Act
+					const std::wstring actualWStr = StringExt::ToWstring(inputStr);
+					
+					/////////////
+					// Assert
+					Assert::AreEqual(expectedWstr, actualWStr, L"Unexpected wstring");
 				}
 			};
 		}
