@@ -2,6 +2,8 @@
 
 #include "ConstructorDescriptor.h"
 
+#include <memory>
+
 namespace Reflecto
 {
 	namespace Reflection
@@ -12,19 +14,19 @@ namespace Reflecto
 		public:
 			ConstructorDescriptorFactory()
 			{
-				_constructor = []() -> void*
+				_constructor = []() -> std::unique_ptr<object_t>
 				{
-					return new object_t();
+					return std::make_unique<object_t>();
 				};
 			}
 
 			ConstructorDescriptor Build()
 			{
-				return ConstructorDescriptor{ _constructor };
+				return ConstructorDescriptor(_constructor);
 			}
 
 		private:
-			ConstructorDescriptor::construction_func_t _constructor;
+			ConstructorDescriptor::construction_func_t<object_t> _constructor;
 		};
 	}
 }

@@ -18,9 +18,7 @@ namespace Reflecto
 		public:
 			TypeLibrary(const std::vector<Type>& types)
 				: _types(types)
-			{
-
-			}
+			{ }
 			
 			template<class value_t>
 			const Type* Get() const

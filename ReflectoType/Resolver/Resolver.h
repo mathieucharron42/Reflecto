@@ -8,6 +8,7 @@
 #include "Utils/NonCopyable.h"
 
 #include <assert.h>
+#include <memory>
 #include <optional>
 
 namespace Reflecto
@@ -27,17 +28,24 @@ namespace Reflecto
 				assert(TypeExt::GetTypeHash<object_t>() == typeDescriptor.GetType().GetHash());
 			}
 
-			object_t* Instantiate()
+			std::unique_ptr<object_t> Instantiate()
 			{
 				const ConstructorDescriptor& constructorDescriptor = _typeDescriptor.GetConstructor();
-				void* instance = (constructorDescriptor.Function())();
-				return static_cast<object_t*>(instance);
+				auto& constructor = constructorDescriptor.GetConstructor<object_t>();
+				std::unique_ptr<object_t> instance = constructor();
+				return instance;
 			}
 
 			template<typename member_t>
 			member_t* ResolveMember(object_t& object, const std::string& memberName) const
 			{
-				return static_cast<member_t*>(ResolveMember(object, memberName));
+				member_t* memberPtr = nullptr;
+				const MemberDescriptor* memberDescriptor = _typeDescriptor.GetMemberByNameRecursive(memberName);	
+				if (memberDescriptor)
+				{
+					memberPtr = ResolveMember<member_t>(object, *memberDescriptor);
+				}
+				return memberPtr;
 			}
 
 			void* ResolveMember(object_t& object, const std::string& memberName) const
@@ -49,7 +57,12 @@ namespace Reflecto
 			template<typename member_t>
 			member_t* ResolveMember(object_t& object, const MemberDescriptor& memberDescriptor) const
 			{
-				return static_cast<member_t*>(ResolveMember(object, memberDescriptor));
+				member_t* memberPtr = nullptr;
+				if (memberDescriptor.GetType().GetHash() == TypeExt::GetTypeHash<member_t>())
+				{
+					memberPtr = static_cast<member_t*>(ResolveMember(object, memberDescriptor));
+				}
+				return memberPtr;
 			}
 
 			void* ResolveMember(object_t& object, const MemberDescriptor& memberDescriptor) const
@@ -90,27 +103,17 @@ namespace Reflecto
 			template<typename ... args_t>
 			resolved_method_t<args_t...> ResolveMethod(const MethodDescriptor& methodDescriptor, void* object) const
 			{
-				MethodDescriptor::method_ptr_t<object_t, args_t...> method = methodDescriptor.GetMethod<object_t, args_t...>();
-				return [=] (args_t ... args) { 
-					object_t& typedObject = *reinterpret_cast<object_t*>(object);
-					return method(typedObject, args...);
-				};
+				resolved_method_t<args_t...> resolvedMethod;
+				MethodDescriptor::method_ptr_t<object_t, args_t...> rawMethod = methodDescriptor.GetMethod<object_t, args_t...>();
+				if (rawMethod)
+				{
+					resolvedMethod = [=](args_t ... args) {
+						object_t& typedObject = *reinterpret_cast<object_t*>(object);
+						return rawMethod(typedObject, args...);
+					};
+				}
+				return resolvedMethod; 
 			}
-
-
-			//const std::function<void()> ResolveMethod(const void* object, const std::string methodName)
-			//{
-			//	const MethodDescriptor* methodDescriptor = _typeDescriptor.GetMethodByNameRecursive(methodName);
-			//	return methodDescriptor ? ResolveMethod(object, *methodDescriptor) : std::function<void()>();
-			//}
-
-			//const std::function<void()> ResolveMethod(const void* object, const MethodDescriptor& methodDescriptor)
-			//{
-			//	std::function<void()> methodWrapper = [voidMethodWrapper = methodDescriptor.Method()] {
-			//		return voidMethodWrapper.Method(object);
-			//	}
-			//	return methodWrapper;
-			//}
 
 		private:
 			TypeDescriptor _typeDescriptor;

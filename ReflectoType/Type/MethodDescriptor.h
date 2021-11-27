@@ -18,9 +18,8 @@ namespace Reflecto
 			MethodDescriptor(method_ptr_t<object_t, args_t...> method, const std::string& name)
 				: _method(method)
 				, _name(name)
-			{
+			{ }
 
-			}
 			const std::string& GetName() const
 			{
 				return _name;
@@ -29,8 +28,8 @@ namespace Reflecto
 			template<typename object_t, typename ... args_t>
 			method_ptr_t<object_t, args_t...> GetMethod() const
 			{
-				method_ptr_t<object_t, args_t...> method = std::any_cast<method_ptr_t<object_t, args_t...>>(_method);
-				return method;
+				const method_ptr_t<object_t, args_t...>* typedMethod = std::any_cast<method_ptr_t<object_t, args_t...>>(&_method);
+				return typedMethod ? *typedMethod : method_ptr_t<object_t, args_t...>();
 			}
 
 			bool operator==(const MethodDescriptor& other) const

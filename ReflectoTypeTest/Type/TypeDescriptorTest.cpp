@@ -343,7 +343,7 @@ namespace Reflecto
 					const TypeDescriptor descriptor = TypeDescriptorFactory<Potato>(typeLibrary).Build();
 
 					const ConstructorDescriptor& constructorDescriptor = descriptor.GetConstructor();
-					Assert::IsTrue(static_cast<bool>(constructorDescriptor.Function()), L"No constructor function set!");
+					Assert::IsTrue(static_cast<bool>(constructorDescriptor.GetConstructor<Potato>()), L"No constructor function set!");
 				}
 
 				TEST_METHOD(SingleMethod)

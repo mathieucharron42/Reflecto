@@ -2,7 +2,9 @@
 
 #include "Common/Definitions.h"
 
+#include <any>
 #include <functional>
+#include <memory>
 
 namespace Reflecto
 {
@@ -11,21 +13,23 @@ namespace Reflecto
 		class ConstructorDescriptor
 		{
 		public:
-			using construction_func_t = std::function<void*()>;
+			template<typename object_t>
+			using construction_func_t = std::function<std::unique_ptr<object_t>()>;
 
-			ConstructorDescriptor(const construction_func_t& constructor)
+			template<typename object_t>
+			ConstructorDescriptor(const construction_func_t<object_t>& constructor)
 				: _constructor(constructor)
-			{
+			{  }
 
-			}
-
-			const construction_func_t& Function() const
+			template<typename object_t>
+			const construction_func_t<object_t> GetConstructor() const
 			{
-				return _constructor;
+				construction_func_t<object_t> typedConstructor = std::any_cast<construction_func_t<object_t>>(_constructor);
+				return typedConstructor;
 			}
 
 		private:
-			construction_func_t _constructor;
+			std::any _constructor;
 		};
 	}
 }

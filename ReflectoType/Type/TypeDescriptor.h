@@ -63,7 +63,7 @@ namespace Reflecto
 			{
 				auto found = std::find_if(_members.begin(), _members.end(), [&](const MemberDescriptor& member) {
 					return member.GetName() == name;
-					});
+				});
 
 				return found != _members.end() ? &(*found) : nullptr;
 			}
