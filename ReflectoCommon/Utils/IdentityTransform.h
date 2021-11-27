@@ -8,10 +8,10 @@ namespace Reflecto
 	{
 		struct IdentityTransform
 		{
-			template< class T>
-			constexpr T&& operator()(T&& t) const noexcept
+			template< class type>
+			constexpr type&& operator()(type&& t) const noexcept
 			{
-				return std::forward<T>(t);
+				return std::forward<type>(t);
 			}
 		};
 	}

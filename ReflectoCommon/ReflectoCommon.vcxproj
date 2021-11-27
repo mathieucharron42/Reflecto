@@ -162,6 +162,7 @@
     <ClInclude Include="Utils\IdentityTransform.h" />
     <ClInclude Include="Utils\IOExt.h" />
     <ClInclude Include="Utils\NonCopyable.h" />
+    <ClInclude Include="Utils\RelationalOperators.h" />
     <ClInclude Include="Utils\StringExt.h" />
   </ItemGroup>
   <ItemGroup>
