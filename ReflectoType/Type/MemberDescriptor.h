@@ -4,6 +4,7 @@
 #include "TypeExt.h"
 
 #include "Common/Definitions.h"
+#include "Utils/RelationalOperators.h"
 
 #include <stdint.h>
 #include <string>
@@ -12,7 +13,7 @@ namespace Reflecto
 {
 	namespace Reflection
 	{
-		class MemberDescriptor
+		class MemberDescriptor : public RelationalOperators<MemberDescriptor>
 		{
 		public:
 			MemberDescriptor(const Type& type, const std::string& name, byte offset)
@@ -36,11 +37,15 @@ namespace Reflecto
 				return _offset;
 			}
 
-			bool operator==(const MemberDescriptor& other) const
+			bool operator<(const MemberDescriptor& other) const
 			{
-				return _type == other._type
-					&& _name == other._name
-					&& _offset == other._offset;
+				return _name < other._name
+					&& _type < other._type;
+			}
+
+			std::string ToString() const
+			{
+				return Utils::StringExt::Format<std::string>("{Type=%s,Name=%s,Offset=%u", _type.ToString().c_str(), _name.c_str(), _offset);
 			}
 
 		private:

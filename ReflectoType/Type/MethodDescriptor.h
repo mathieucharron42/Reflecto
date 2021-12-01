@@ -8,7 +8,7 @@ namespace Reflecto
 {
 	namespace Reflection
 	{
-		class MethodDescriptor
+		class MethodDescriptor : RelationalOperators<MethodDescriptor>
 		{
 		public:
 			template<typename object_t, typename ... args_t>
@@ -32,10 +32,16 @@ namespace Reflecto
 				return typedMethod ? *typedMethod : method_ptr_t<object_t, args_t...>();
 			}
 
-			bool operator==(const MethodDescriptor& other) const
+			bool operator<(const MethodDescriptor& other) const
 			{
-				return /*_method == other._method &&*/ _name == other._name;
+				return _name < other._name;
 			}
+
+			std::string ToString() const
+			{
+				return Utils::StringExt::Format<std::string>("{Name=%s}", _name.c_str());
+			}
+
 		private:
 			std::string _name;
 			std::any _method;

@@ -22,7 +22,7 @@ namespace Reflecto
 			{  }
 
 			template<typename object_t>
-			const construction_func_t<object_t> GetConstructor() const
+			const construction_func_t<object_t> GetConstructorMethod() const
 			{
 				construction_func_t<object_t> typedConstructor = std::any_cast<construction_func_t<object_t>>(_constructor);
 				return typedConstructor;

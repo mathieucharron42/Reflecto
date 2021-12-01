@@ -42,6 +42,31 @@ namespace Reflecto
 				return Join(elems, separator, projection);
 			}
 
+			template<typename string_t, typename collection_t, typename projection_t>
+			std::enable_if_t<
+				std::is_same_v<string_t, std::wstring>,
+				std::wstring> StringifyCollection(const collection_t collection, projection_t proj)
+			{
+				string_t elements = Join<string_t>(collection, L",", proj);
+				return Format<string_t>(L"{%s}", elements.c_str());
+			}
+
+			template<typename string_t, typename collection_t, typename projection_t>
+			std::enable_if_t<
+				std::is_same_v<string_t, std::string>,
+				std::string> StringifyCollection(const collection_t collection, projection_t proj)
+			{
+				string_t elements = Join<string_t>(collection, ",", proj);
+				return Format<string_t>("{%s}", elements.c_str());
+			}
+
+			template<typename string_t, typename collection_t, typename projection_t>
+			string_t StringifyCollection(const collection_t collection)
+			{
+				const IdentityTransform projection;
+				return StringifyCollection(collection, projection);
+			}
+
 			template<typename string_t, typename ... Args>
 			std::enable_if_t<
 				std::is_same_v<string_t, std::string>,

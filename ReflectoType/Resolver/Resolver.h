@@ -31,7 +31,7 @@ namespace Reflecto
 			std::unique_ptr<object_t> Instantiate()
 			{
 				const ConstructorDescriptor& constructorDescriptor = _typeDescriptor.GetConstructor();
-				auto& constructor = constructorDescriptor.GetConstructor<object_t>();
+				auto& constructor = constructorDescriptor.GetConstructorMethod<object_t>();
 				std::unique_ptr<object_t> instance = constructor();
 				return instance;
 			}

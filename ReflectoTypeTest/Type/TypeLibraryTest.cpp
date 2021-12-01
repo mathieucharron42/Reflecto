@@ -1,3 +1,5 @@
+#include "TestCommon.h"
+
 #include "Type/Type.h"
 #include "Type/TypeFactory.h"
 #include "Type/TypeLibrary.h"
@@ -8,12 +10,6 @@
 #include <vector>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-
-template<> 
-inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<Reflecto::Reflection::Type>(const Reflecto::Reflection::Type& type)
-{
-	return Reflecto::Utils::StringExt::ToWstring(type.ToString());
-}
 
 namespace Reflecto
 {
