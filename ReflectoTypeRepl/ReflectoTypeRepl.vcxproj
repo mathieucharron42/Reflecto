@@ -143,6 +143,23 @@
   <ItemGroup>
     <ClCompile Include="ReplMain.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Potato.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JsonCpp\JsonCpp.vcxproj">
+      <Project>{bdfe2d9f-5a3d-44b7-88b2-4ff7035af21c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ReflectoCommon\ReflectoCommon.vcxproj">
+      <Project>{3403ac28-d2dc-4a4d-9062-9f5d1f883ef7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ReflectoSerialization\ReflectoSerialization.vcxproj">
+      <Project>{3f966c5e-af4a-4375-9954-234f5bcf304e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ReflectoType\ReflectoType.vcxproj">
+      <Project>{d30205ba-bca6-4d46-b07e-fc2bbbb45ee3}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

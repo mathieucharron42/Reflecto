@@ -1,3 +1,10 @@
+#include "Potato.h"
+
+#include "Serialization/Reader/JsonSerializationReader.h"
+#include "Serialization/Serializer.h"
+#include "Serialization/SerializerFactory.h"
+#include "Serialization/Strategy/SerializationStrategy.h"
+#include "Serialization/Writer/JsonSerializationWriter.h"
 #include "Type/TypeDescriptor.h"
 #include "Type/TypeDescriptorFactory.h"
 #include "Type/TypeLibrary.h"
@@ -11,26 +18,6 @@
 
 using namespace Reflecto;
 
-class Potato
-{
-public:
-	void Bake()
-	{
-		IsBaked = true;
-	}
-
-	void AddToppings()
-	{
-		Calory += 100;
-		Weight += 5;
-	}
-
-	std::string Type;
-	float Weight;
-	int32_t Calory;
-	bool IsBaked;
-};
-
 enum class InstructionResult
 {
 	Ok,
@@ -40,50 +27,27 @@ enum class InstructionResult
 	Leave
 };
 
-InstructionResult AssignValue(Reflection::TypeLibrary typeLibrary, const Reflection::Type& type, void* value, const std::string& memberValue)
+InstructionResult AssignValue(const Serialization::Serializer& serializer, const Reflection::Type& type, void* value, const std::string& memberValue)
 {
-	InstructionResult result;
-	if (type == typeLibrary.GetChecked<int32_t>())
-	{
-		int32_t* int32Value = reinterpret_cast<int32_t*>(value);
-		*int32Value = std::stoi(memberValue);
-		result = InstructionResult::Ok;
-	}
-	else if (type == typeLibrary.GetChecked<float>())
-	{
-		float* floatValue = reinterpret_cast<float*>(value);
-		*floatValue = std::stof(memberValue);
-		result = InstructionResult::Ok;
-	}
-	else if (type == typeLibrary.GetChecked<bool>())
-	{
-		bool* boolValue = reinterpret_cast<bool*>(value);
-		*boolValue = memberValue == "true" ? true : false;
-		result = InstructionResult::Ok;
-	}
-	else if (type == typeLibrary.GetChecked<std::string>())
-	{
-		std::string* stringValue = reinterpret_cast<std::string*>(value);
-		*stringValue = memberValue;
-		result = InstructionResult::Ok;
-	}
-	else
-	{
-		result = InstructionResult::UnsupportedType;
-	}
+	Serialization::JsonSerializationReader reader;
+	reader.Import(memberValue);
+
+	InstructionResult result = InstructionResult::Ok;
+	serializer.RawDeserialize(type, value, reader);
+
 	return result;
 }
 
-InstructionResult ProcessMemberInstruction(Reflection::TypeLibrary typeLibrary, Reflection::TypeDescriptor typeDescriptor, Potato& instance, const std::string& memberName, const std::string& memberValue)
+InstructionResult ProcessMemberInstruction(const Serialization::Serializer& serializer, Reflection::TypeDescriptor typeDescriptor, Potato& instance, const std::string& memberName, const std::string& memberValue)
 {
 	InstructionResult result;
 
-	Reflection::Resolver<Potato> resolver{ typeDescriptor };
+	Reflection::Resolver<Potato> resolver(typeDescriptor);
 	const Reflection::MemberDescriptor* memberDescriptor = typeDescriptor.GetMemberByName(memberName);
 	if (memberDescriptor)
 	{
 		void* member = resolver.ResolveMember(instance, memberName);
-		result = AssignValue(typeLibrary, memberDescriptor->GetType(), member, memberValue);
+		result = AssignValue(serializer, memberDescriptor->GetType(), member, memberValue);
 	}
 	else
 	{
@@ -94,7 +58,7 @@ InstructionResult ProcessMemberInstruction(Reflection::TypeLibrary typeLibrary, 
 }
 
 template<typename method_t>
-InstructionResult ExecuteMethod(Reflection::TypeLibrary typeLibrary, method_t method)
+InstructionResult ExecuteMethod(const Serialization::Serializer& serializer, method_t method)
 {
 	InstructionResult result;
 	// to do: gérer les paramètres et fonction avec type de retour
@@ -103,7 +67,7 @@ InstructionResult ExecuteMethod(Reflection::TypeLibrary typeLibrary, method_t me
 	return result;
 }
 
-InstructionResult ProcessMethodInstruction(Reflection::TypeLibrary typeLibrary, Reflection::TypeDescriptor typeDescriptor, Potato& instance, const std::string& methodName)
+InstructionResult ProcessMethodInstruction(const Serialization::Serializer& serializer, Reflection::TypeDescriptor typeDescriptor, Potato& instance, const std::string& methodName)
 {
 	InstructionResult result;
 
@@ -112,7 +76,7 @@ InstructionResult ProcessMethodInstruction(Reflection::TypeLibrary typeLibrary, 
 	if (methodDescriptor)
 	{
 		auto method = resolver.ResolveMethod(*methodDescriptor, instance);
-		result = ExecuteMethod(typeLibrary, method);
+		result = ExecuteMethod(serializer, method);
 	}
 	else
 	{
@@ -122,7 +86,7 @@ InstructionResult ProcessMethodInstruction(Reflection::TypeLibrary typeLibrary, 
 	return result;
 }
 
-InstructionResult ProcessInstruction(Reflection::TypeLibrary typeLibrary, Potato& instance, Reflection::TypeDescriptor typeDescriptor, const std::string& instruction)
+InstructionResult ProcessInstruction(const Serialization::Serializer& serializer, Potato& instance, Reflection::TypeDescriptor typeDescriptor, const std::string& instruction)
 {
 	InstructionResult result;
 	if (instruction.empty() || instruction == "q")
@@ -142,7 +106,7 @@ InstructionResult ProcessInstruction(Reflection::TypeLibrary typeLibrary, Potato
 				const std::string memberName = tokens[0];
 				const std::string memberValue = tokens[1];
 
-				result = ProcessMemberInstruction(typeLibrary, typeDescriptor, instance, memberName, memberValue);
+				result = ProcessMemberInstruction(serializer, typeDescriptor, instance, memberName, memberValue);
 			}
 			else
 			{
@@ -152,7 +116,7 @@ InstructionResult ProcessInstruction(Reflection::TypeLibrary typeLibrary, Potato
 		else if (instruction.find(kMethodInstructionParamBeginDelimiter) != std::string::npos && instruction.find(kMethodInstructionParamEndDelimiter) != std::string::npos)
 		{
 			const std::string methodName = instruction.substr(0, instruction.find(kMethodInstructionParamBeginDelimiter));
-			result = ProcessMethodInstruction(typeLibrary, typeDescriptor, instance, methodName);
+			result = ProcessMethodInstruction(serializer, typeDescriptor, instance, methodName);
 		}
 		else
 		{
@@ -200,43 +164,31 @@ void WriteResult(InstructionResult result, stream_out_t& ouput)
 }
 
 template<typename stream_t>
-void WriteValue(Reflection::TypeLibrary typeLibrary, const Reflection::Type& type, const void* value, stream_t& ouput)
+void WriteValue(const Serialization::Serializer& serializer, const Reflection::Type& type, const void* value, stream_t& ouput)
 {
-	if (type == typeLibrary.GetChecked<int32_t>())
-	{
-		const int32_t* int32Value = reinterpret_cast<const int32_t*>(value);
-		ouput << *int32Value;
-	}
-	else if (type == typeLibrary.GetChecked<float>())
-	{
-		const float* floatValue = reinterpret_cast<const float*>(value);
-		ouput << *floatValue;
-	}
-	else if (type == typeLibrary.GetChecked<bool>())
-	{
-		const bool* boolValue = reinterpret_cast<const bool*>(value);
-		ouput << *boolValue ? "true" : "false";
-	}
-	else if (type == typeLibrary.GetChecked<std::string>())
-	{
-		const std::string* stringValue = reinterpret_cast<const std::string*>(value);
-		ouput << *stringValue;
-	}
+	Serialization::JsonSerializationWriter writer;
+	
+	serializer.RawSerialize(type, value, writer);
+
+	std::string str;
+	writer.Transpose(str);
+
+	ouput << str;
 }
 
 template<typename stream_t>
-void WriteState(const Reflection::TypeLibrary& typeLibrary, Reflection::TypeDescriptor typeDescriptor, const Potato& instance, stream_t& ouput)
+void WriteState(const Serialization::Serializer& serializer, Reflection::TypeDescriptor typeDescriptor, const Potato& instance, stream_t& ouput)
 {
 	Reflection::Resolver<Potato> resolver{ typeDescriptor };
 	ouput << "Instance[" << typeDescriptor.GetType().GetName() << "]" << std::endl;
-	ouput << "Methodes:" << std::endl;
+	ouput << "Methods:" << std::endl;
 	for (const Reflection::MethodDescriptor& methodDescriptor : typeDescriptor.GetMethods())
 	{
 		const std::string& methodName = methodDescriptor.GetName();
 		ouput << "  ";
 		ouput << "void " << methodName << "()" << std::endl;
 	}
-	ouput << "Donnees membres:" << std::endl;
+	ouput << "Members:" << std::endl;
 	for (const Reflection::MemberDescriptor& memberDescriptor : typeDescriptor.GetMembers())
 	{
 		const std::string& memberName = memberDescriptor.GetName();
@@ -245,7 +197,7 @@ void WriteState(const Reflection::TypeLibrary& typeLibrary, Reflection::TypeDesc
 		ouput << "  ";
 		ouput << memberType << " " << memberName;
 		ouput << " = ";
-		WriteValue(typeLibrary, memberDescriptor.GetType(), member, ouput);
+		WriteValue(serializer, memberDescriptor.GetType(), member, ouput);
 		ouput << std::endl;
 	}
 }
@@ -269,6 +221,13 @@ int main()
 		.RegisterMethod(&Potato::AddToppings, "AddToppings")
 	.Build();
 
+	Serialization::Serializer serializer = Serialization::SerializerFactory(typeLibrary)
+		.LearnType<int32_t, Serialization::Int32SerializationStrategy>()
+		.LearnType<std::string, Serialization::StringSerializationStrategy>()
+		.LearnType<float, Serialization::FloatSerializationStrategy>()
+		.LearnType<bool, Serialization::BooleanSerializationStrategy>()
+	.Build();
+
 	Potato instance;
 	instance.Type = "Russet";
 	instance.Weight = 89.f;
@@ -281,9 +240,9 @@ int main()
 	bool leave;
 	do
 	{
-		WriteState(typeLibrary, potatoTypeDescriptor, instance, ouput);
+		WriteState(serializer, potatoTypeDescriptor, instance, ouput);
 		std::string instruction = PromptInstruction(input, ouput);
-		InstructionResult result = ProcessInstruction(typeLibrary, instance, potatoTypeDescriptor, instruction);
+		InstructionResult result = ProcessInstruction(serializer, instance, potatoTypeDescriptor, instruction);
 		WriteResult(result, ouput);
 		leave = result == InstructionResult::Leave;
 		ouput << std::endl;
