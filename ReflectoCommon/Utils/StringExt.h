@@ -8,6 +8,7 @@
 #include <iterator>
 #include <locale>
 #include <string>
+#include <vector>
 #include <type_traits>
 
 namespace Reflecto
@@ -42,29 +43,22 @@ namespace Reflecto
 				return Join(elems, separator, projection);
 			}
 
-			template<typename string_t, typename collection_t, typename projection_t>
-			std::enable_if_t<
-				std::is_same_v<string_t, std::wstring>,
-				std::wstring> StringifyCollection(const collection_t collection, projection_t proj)
+			template<typename string_t>
+			std::vector<string_t> Tokenize(const string_t& string, const string_t& delimiter)
 			{
-				string_t elements = Join<string_t>(collection, L",", proj);
-				return Format<string_t>(L"{%s}", elements.c_str());
-			}
-
-			template<typename string_t, typename collection_t, typename projection_t>
-			std::enable_if_t<
-				std::is_same_v<string_t, std::string>,
-				std::string> StringifyCollection(const collection_t collection, projection_t proj)
-			{
-				string_t elements = Join<string_t>(collection, ",", proj);
-				return Format<string_t>("{%s}", elements.c_str());
-			}
-
-			template<typename string_t, typename collection_t, typename projection_t>
-			string_t StringifyCollection(const collection_t collection)
-			{
-				const IdentityTransform projection;
-				return StringifyCollection(collection, projection);
+				std::vector<string_t> tokens;
+				std::size_t start = 0U;
+				std::size_t end = string.find(delimiter);
+				while (end != std::string::npos)
+				{
+					const std::string token = string.substr(start, end - start);
+					tokens.push_back(token);
+					start = end + delimiter.length();
+					end = string.find(delimiter, start);
+				}
+				const std::string token = string.substr(start, end);
+				tokens.push_back(token);
+				return tokens;
 			}
 
 			template<typename string_t, typename ... Args>
@@ -100,6 +94,31 @@ namespace Reflecto
 			static std::wstring ToWstring(const std::string& str)
 			{
 				return std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(str);
+			}
+
+			template<typename string_t, typename collection_t, typename projection_t>
+			std::enable_if_t<
+				std::is_same_v<string_t, std::wstring>,
+				std::wstring> StringifyCollection(const collection_t collection, projection_t proj)
+			{
+				string_t elements = Join<string_t>(collection, L",", proj);
+				return Format<string_t>(L"{%s}", elements.c_str());
+			}
+
+			template<typename string_t, typename collection_t, typename projection_t>
+			std::enable_if_t<
+				std::is_same_v<string_t, std::string>,
+				std::string> StringifyCollection(const collection_t collection, projection_t proj)
+			{
+				string_t elements = Join<string_t>(collection, ",", proj);
+				return Format<string_t>("{%s}", elements.c_str());
+			}
+
+			template<typename string_t, typename collection_t, typename projection_t>
+			string_t StringifyCollection(const collection_t collection)
+			{
+				const IdentityTransform projection;
+				return StringifyCollection(collection, projection);
 			}
 		}
 	}

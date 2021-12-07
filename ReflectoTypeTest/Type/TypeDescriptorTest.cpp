@@ -15,8 +15,6 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-
-
 namespace Reflecto
 {
 	namespace Reflection

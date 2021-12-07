@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JsonCpp", "JsonCpp\JsonCpp.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JsonCppTest", "JsonCppTest\JsonCppTest.vcxproj", "{11E95469-9026-4ACA-80CB-8881D324520A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectoTypeRepl", "ReflectoTypeRepl\ReflectoTypeRepl.vcxproj", "{E139EA4A-7D63-4539-B19A-55751BAA123D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -91,6 +93,14 @@ Global
 		{11E95469-9026-4ACA-80CB-8881D324520A}.Release|x64.Build.0 = Release|x64
 		{11E95469-9026-4ACA-80CB-8881D324520A}.Release|x86.ActiveCfg = Release|Win32
 		{11E95469-9026-4ACA-80CB-8881D324520A}.Release|x86.Build.0 = Release|Win32
+		{E139EA4A-7D63-4539-B19A-55751BAA123D}.Debug|x64.ActiveCfg = Debug|x64
+		{E139EA4A-7D63-4539-B19A-55751BAA123D}.Debug|x64.Build.0 = Debug|x64
+		{E139EA4A-7D63-4539-B19A-55751BAA123D}.Debug|x86.ActiveCfg = Debug|Win32
+		{E139EA4A-7D63-4539-B19A-55751BAA123D}.Debug|x86.Build.0 = Debug|Win32
+		{E139EA4A-7D63-4539-B19A-55751BAA123D}.Release|x64.ActiveCfg = Release|x64
+		{E139EA4A-7D63-4539-B19A-55751BAA123D}.Release|x64.Build.0 = Release|x64
+		{E139EA4A-7D63-4539-B19A-55751BAA123D}.Release|x86.ActiveCfg = Release|Win32
+		{E139EA4A-7D63-4539-B19A-55751BAA123D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
