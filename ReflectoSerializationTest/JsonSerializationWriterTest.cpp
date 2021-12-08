@@ -15,235 +15,308 @@ namespace Reflecto
 			public:
 				TEST_METHOD(NoWrite)
 				{
+					/////////////
+					// Arrange
 					JsonSerializationWriter writer;
-					
-					std::string actual;
-					writer.Transpose(actual);
-
 					const std::string expected = R"()";
+
+					/////////////
+					// Act
+					bool success = true;
+					std::string actual;
+					success &= writer.Transpose(actual);
+
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
 					Assert::AreEqual(expected, actual, L"Unexpected written value");
 				}
 
 				TEST_METHOD(WriteString)
 				{
+					/////////////
+					// Arrange
 					JsonSerializationWriter writer;
-					writer.WriteString("test");
-
-					std::string actual;
-					writer.Transpose(actual);
-					
 					const std::string expected = R"("test")";
+
+					/////////////
+					// Act
+					bool success = true;
+					std::string actual;
+					success &= writer.WriteString("test");
+					success &= writer.Transpose(actual);
+					
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
 					Assert::AreEqual(expected, actual, L"Unexpected written value");
 				}
 
 				TEST_METHOD(WriteInt32)
 				{
+					/////////////
+					// Arrange
 					JsonSerializationWriter writer;
-					writer.WriteInteger32(1);
-
-					std::string actual;
-					writer.Transpose(actual);
-
 					const std::string expected = R"(1)";
+					
+					/////////////
+					// Act
+					bool success = true;
+					std::string actual;
+					success &= writer.WriteInteger32(1);
+					success &= writer.Transpose(actual);
+
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
 					Assert::AreEqual(expected, actual, L"Unexpected written value");
 				}
 
 				TEST_METHOD(WriteInt64)
 				{
+					/////////////
+					// Arrange
 					JsonSerializationWriter writer;
-					writer.WriteInteger64(33445566778899);
-
-					std::string actual;
-					writer.Transpose(actual);
-
 					const std::string expected = R"(33445566778899)";
+
+					/////////////
+					// Act
+					bool success = true;
+					std::string actual;
+					success &= writer.WriteInteger64(33445566778899);
+					success &= writer.Transpose(actual);
+
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
 					Assert::AreEqual(expected, actual, L"Unexpected written value");
 				}
 
 				TEST_METHOD(WriteFloat)
 				{
+					/////////////
+					// Arrange
 					JsonSerializationWriter writer;
-					writer.WriteFloat(0.5f);
-
-					std::string actual;
-					writer.Transpose(actual);
-
 					const std::string expected = R"(0.5)";
+
+					/////////////
+					// Act
+					bool success = true;
+					std::string actual;
+					success &= writer.WriteFloat(0.5f);
+					success &= writer.Transpose(actual);
+
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
 					Assert::AreEqual(expected, actual, L"Unexpected written value");
 				}
 
 				TEST_METHOD(WriteDouble)
 				{
+					/////////////
+					// Arrange
 					JsonSerializationWriter writer;
-					writer.WriteDouble(0.5);
-
-					std::string actual;
-					writer.Transpose(actual);
-
 					const std::string expected = R"(0.5)";
+
+					/////////////
+					// Act
+					bool success = true;
+					std::string actual;
+					success &= writer.WriteDouble(0.5);
+					success &= writer.Transpose(actual);
+
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
 					Assert::AreEqual(expected, actual, L"Unexpected written value");
 				}
 
 				TEST_METHOD(WriteBool)
 				{
-					{
-						JsonSerializationWriter writer;
-						writer.WriteBoolean(true);
+					/////////////
+					// Arrange
+					JsonSerializationWriter writer;
+					const std::string expected = R"(false)";
 
-						std::string actual;
-						writer.Transpose(actual);
+					/////////////
+					// Act
+					bool success = true;
+					std::string actual;
+					success &= writer.WriteBoolean(false);
+					success &= writer.Transpose(actual);
 
-						const std::string expected = R"(true)";
-						Assert::AreEqual(expected, actual, L"Unexpected written value");
-					}
-
-					{
-						JsonSerializationWriter writer;
-						writer.WriteBoolean(false);
-
-						std::string actual;
-						writer.Transpose(actual);
-
-						const std::string expected = R"(false)";
-						Assert::AreEqual(expected, actual, L"Unexpected written value");
-					}
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
+					Assert::AreEqual(expected, actual, L"Unexpected written value");
 				}
 
 				TEST_METHOD(WriteNull)
 				{
+					/////////////
+					// Arrange
 					JsonSerializationWriter writer;
-
-					writer.WriteNull();
-					
-					std::string actual;
-					writer.Transpose(actual);
-
 					const std::string expected = R"(null)";
+
+					/////////////
+					// Act
+					bool success = true;
+					std::string actual;
+					success &= writer.WriteNull();
+					success &= writer.Transpose(actual);
+
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
 					Assert::AreEqual(expected, actual, L"Unexpected written value");
 				}
 
 				TEST_METHOD(WriteArray)
 				{
+					/////////////
+					// Arrange
 					JsonSerializationWriter writer;
-
-					writer.WriteBeginArray();
-
-					writer.WriteBeginArrayElement();
-					writer.WriteInteger32(1);
-					writer.WriteEndArrayElement();
-
-					writer.WriteBeginArrayElement();
-					writer.WriteInteger32(2);
-					writer.WriteEndArrayElement();
-
-					writer.WriteBeginArrayElement();
-					writer.WriteInteger32(3);
-					writer.WriteEndArrayElement();
-
-					writer.WriteEndArray();
-
-					std::string actual;
-					writer.Transpose(actual);
-
 					const std::string expected = R"([1,2,3])";
+
+					/////////////
+					// Act
+					bool success = true;
+					std::string actual;
+
+					success &= writer.WriteBeginArray();
+
+					success &= writer.WriteBeginArrayElement();
+					success &= writer.WriteInteger32(1);
+					success &= writer.WriteEndArrayElement();
+
+					success &= writer.WriteBeginArrayElement();
+					success &= writer.WriteInteger32(2);
+					success &= writer.WriteEndArrayElement();
+
+					success &= writer.WriteBeginArrayElement();
+					success &= writer.WriteInteger32(3);
+					success &= writer.WriteEndArrayElement();
+
+					success &= writer.WriteEndArray();
+					success &= writer.Transpose(actual);
+
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
 					Assert::AreEqual(expected, actual, L"Unexpected written value");
 				}
 				
 				TEST_METHOD(WriteObject)
 				{
+					/////////////
+					// Arrange
 					JsonSerializationWriter writer;
+					const std::string expected = R"({"FieldFloat":0.5,"FieldInt32":1,"FieldString":"ABC123321CBA"})";
 
-					writer.WriteBeginObject();
-
-					writer.WriteBeginObjectProperty("Name");
-					writer.WriteString("Mr. Potato Head");
-					writer.WriteEndObjectProperty();
-
-					writer.WriteBeginObjectProperty("Age");
-					writer.WriteInteger32(1);
-					writer.WriteEndObjectProperty();
-
-					writer.WriteBeginObjectProperty("Friendliness");
-					writer.WriteFloat(0.5f);
-					writer.WriteEndObjectProperty();
-
-					writer.WriteEndObject();
-
+					/////////////
+					// Act
+					bool success = true;
 					std::string actual;
-					writer.Transpose(actual);
+					success &= writer.WriteBeginObject();
 
-					const std::string expected = R"({"Age":1,"Friendliness":0.5,"Name":"Mr. Potato Head"})";
+					success &= writer.WriteBeginObjectProperty("FieldString");
+					success &= writer.WriteString("ABC123321CBA");
+					success &= writer.WriteEndObjectProperty();
+
+					success &= writer.WriteBeginObjectProperty("FieldInt32");
+					success &= writer.WriteInteger32(1);
+					success &= writer.WriteEndObjectProperty();
+
+					success &= writer.WriteBeginObjectProperty("FieldFloat");
+					success &= writer.WriteFloat(0.5f);
+					success &= writer.WriteEndObjectProperty();
+
+					success &= writer.WriteEndObject();
+
+					success &= writer.Transpose(actual);
+
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
 					Assert::AreEqual(expected, actual, L"Unexpected written value");
 				}
 
 				TEST_METHOD(WriteComplexObject)
 				{
+					/////////////
+					// Arrange
 					JsonSerializationWriter writer;
-
-					writer.WriteBeginObject();
-					{
-						writer.WriteBeginObjectProperty("Name");
-						{
-							writer.WriteString("Mr. Potato Head");
-						}
-						writer.WriteEndObjectProperty();
-
-						writer.WriteBeginObjectProperty("Eyes");
-						{
-							writer.WriteBeginObject();
-							{
-								writer.WriteBeginObjectProperty("Size");
-								{
-									writer.WriteInteger32(5);
-								}
-								writer.WriteEndObjectProperty();
-								writer.WriteBeginObjectProperty("Color");
-								{
-									writer.WriteString("black");
-								}
-								writer.WriteEndObjectProperty();
-							}
-							writer.WriteEndObject();
-						}
-						writer.WriteEndObjectProperty();
-
-						writer.WriteBeginObjectProperty("Mouth");
-						writer.WriteNull();
-						writer.WriteEndObjectProperty();
-
-						writer.WriteBeginObjectProperty("Legs");
-						{
-							writer.WriteBeginObject();
-							{
-								writer.WriteBeginObjectProperty("PossibleColors");
-								{
-									writer.WriteBeginArray();
-									{
-										writer.WriteBeginArrayElement();
-										writer.WriteString("blue");
-										writer.WriteEndArrayElement();
-										writer.WriteBeginArrayElement();
-										writer.WriteString("orange");
-										writer.WriteEndArrayElement();
-										writer.WriteBeginArrayElement();
-										writer.WriteString("white");
-										writer.WriteEndArrayElement(); 
-									}
-									writer.WriteEndArray();
-								}
-								writer.WriteEndObjectProperty();
-							}
-							writer.WriteEndObject();
-
-						}
-						writer.WriteEndObjectProperty();
-					}
-					writer.WriteEndObject();
-					
-					std::string actual;
-					writer.Transpose(actual);
-
 					const std::string expected = R"({"Eyes":{"Color":"black","Size":5},"Legs":{"PossibleColors":["blue","orange","white"]},"Mouth":null,"Name":"Mr. Potato Head"})";
+
+					/////////////
+					// Act
+					bool success = true;
+					std::string actual;
+					success &= writer.WriteBeginObject();
+					{
+						success &= writer.WriteBeginObjectProperty("Name");
+						{
+							success &= writer.WriteString("Mr. Potato Head");
+						}
+						success &= writer.WriteEndObjectProperty();
+
+						success &= writer.WriteBeginObjectProperty("Eyes");
+						{
+							success &= writer.WriteBeginObject();
+							{
+								success &= writer.WriteBeginObjectProperty("Size");
+								{
+									success &= writer.WriteInteger32(5);
+								}
+								success &= writer.WriteEndObjectProperty();
+								success &= writer.WriteBeginObjectProperty("Color");
+								{
+									success &= writer.WriteString("black");
+								}
+								success &= writer.WriteEndObjectProperty();
+							}
+							success &= writer.WriteEndObject();
+						}
+						success &= writer.WriteEndObjectProperty();
+
+						success &= writer.WriteBeginObjectProperty("Mouth");
+						success &= writer.WriteNull();
+						success &= writer.WriteEndObjectProperty();
+
+						success &= writer.WriteBeginObjectProperty("Legs");
+						{
+							success &= writer.WriteBeginObject();
+							{
+								success &= writer.WriteBeginObjectProperty("PossibleColors");
+								{
+									success &= writer.WriteBeginArray();
+									{
+										success &= writer.WriteBeginArrayElement();
+										success &= writer.WriteString("blue");
+										success &= writer.WriteEndArrayElement();
+										success &= writer.WriteBeginArrayElement();
+										success &= writer.WriteString("orange");
+										success &= writer.WriteEndArrayElement();
+										success &= writer.WriteBeginArrayElement();
+										success &= writer.WriteString("white");
+										success &= writer.WriteEndArrayElement();
+									}
+									success &= writer.WriteEndArray();
+								}
+								success &= writer.WriteEndObjectProperty();
+							}
+							success &= writer.WriteEndObject();
+						}
+						success &= writer.WriteEndObjectProperty();
+					}
+					success &= writer.WriteEndObject();
+					success &= writer.Transpose(actual);
+
+
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
 					Assert::AreEqual(expected, actual, L"Unexpected written value");
 				}
 			};

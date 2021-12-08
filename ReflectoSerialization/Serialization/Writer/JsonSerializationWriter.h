@@ -4,7 +4,6 @@
 #include "Serialization/Writer/ISerializationWriter.h"
 
 #include "Common/Definitions.h"
-#include "Common/Ensure.h"
 #include "jsoncpp/json.h"
 
 #include <stack>
@@ -19,88 +18,133 @@ namespace Reflecto
 		{
 		public:
 
-			virtual void WriteInteger32(int32_t value) override
+			virtual bool WriteInteger32(int32_t value) override
 			{
-				PushElement(JsonElement(value));
+				return PushElement(JsonElement(value));
 			}
 
-			virtual void WriteInteger64(int64_t value) override
+			virtual bool WriteInteger64(int64_t value) override
 			{
-				PushElement(JsonElement(value));
+				return PushElement(JsonElement(value));
 			}
 
-			virtual void WriteFloat(float value) override
+			virtual bool WriteFloat(float value) override
 			{
-				PushElement(JsonElement(value));
+				return PushElement(JsonElement(value));
 			}
 
-			virtual void WriteDouble(double value) override
+			virtual bool WriteDouble(double value) override
 			{
-				PushElement(JsonElement(value));
+				return PushElement(JsonElement(value));
 			}
 
-			virtual void WriteString(const std::string& value) override
+			virtual bool WriteString(const std::string& value) override
 			{
-				PushElement(JsonElement(value));
+				return PushElement(JsonElement(value));
 			}
 
-			virtual void WriteBoolean(bool value) override
+			virtual bool WriteBoolean(bool value) override
 			{
-				PushElement(JsonElement(value));
+				return PushElement(JsonElement(value));
 			}
 
-			virtual void WriteNull() override
+			virtual bool WriteNull() override
 			{
-				PushElement(JsonElement(Json::nullValue));
+				return PushElement(JsonElement(Json::nullValue));
 			}
 
-			virtual void WriteBeginObject() override
+			virtual bool WriteBeginObject() override
 			{
-				PushElement(JsonElement(Json::objectValue));
+				return PushElement(JsonElement(Json::objectValue));
 			}
 
-			virtual void WriteEndObject() override
+			virtual bool WriteEndObject() override
 			{
-				ensure(GetCurrentElement().type() == Json::objectValue);
+				bool success = false;
+				JsonElement* element;
+				if (GetCurrentElement(element) && element->type() == Json::objectValue)
+				{
+					success = true;
+				}
+				return success;
 			}
 
-			virtual void WriteBeginObjectProperty(const std::string& propertyName) override
+			virtual bool WriteBeginObjectProperty(const std::string& propertyName) override
 			{
-				ensure(GetCurrentElement().type() == Json::objectValue);
-				PushPropertyName(propertyName);
+				bool success = false;
+				JsonElement* element;
+				if (GetCurrentElement(element) && element->type() == Json::objectValue)
+				{
+					success = PushPropertyName(propertyName);
+				}
+				return success;
 			}
 
-			virtual void WriteEndObjectProperty() override
+			virtual bool WriteEndObjectProperty() override
 			{
-				const std::string propertyName = PopPropertyName();
-				const JsonElement element = PopElement();
-				ensure(GetCurrentElement().type() == Json::objectValue);
-				GetCurrentElement()[propertyName] = element;
+				bool success = false;
+				std::string propertyName;
+				if (PopPropertyName(propertyName))
+				{
+					JsonElement element;
+					if (PopElement(element))
+					{
+						JsonElement* parent;
+						if (GetCurrentElement(parent) && parent->type() == Json::objectValue)
+						{
+							(*parent)[propertyName] = element;
+							success = true;
+						}
+					}
+				}
+				return success;
 			}
 
-			virtual void WriteBeginArray() override
+			virtual bool WriteBeginArray() override
 			{
-				PushElement(JsonElement(Json::arrayValue));
+				return PushElement(JsonElement(Json::arrayValue));
 			}
 
-			virtual void WriteEndArray() override
+			virtual bool WriteEndArray() override
 			{
-				ensure(GetCurrentElement().type() == Json::arrayValue);
+				bool success = false;
+				JsonElement* element;
+				if (GetCurrentElement(element) && element->type() == Json::arrayValue)
+				{
+					success = true;
+				}
+				return success;
 			}
 
-			virtual void WriteBeginArrayElement() override
+			virtual bool WriteBeginArrayElement() override
 			{
-				ensure(GetCurrentElement().type() == Json::arrayValue);
+				bool success = false;
+				JsonElement* element;
+				if (GetCurrentElement(element) && element->type() == Json::arrayValue)
+				{
+					success = true;
+				}
+				return success;
 			}
 
-			virtual void WriteEndArrayElement() override
+			virtual bool WriteEndArrayElement() override
 			{
-				const JsonElement element = PopElement();
-				ensure(GetCurrentElement().type() == Json::arrayValue);
-				GetCurrentElement().append(element);
+				bool success = false;
+				JsonElement element;
+				if (PopElement(element))
+				{
+					JsonElement* parent;
+					if (GetCurrentElement(parent) && parent->type() == Json::arrayValue)
+					{
+						parent->append(element);
+						success = true;
+					}
+					
+				}
+				return success;
 			}
 
-			void Transpose(std::string& str)
+			bool Transpose(std::string& str)
 			{
 				std::unique_ptr<Json::StreamWriter> writer = [&] {
 					Json::StreamWriterBuilder builder;
@@ -108,56 +152,80 @@ namespace Reflecto
 					return std::unique_ptr<Json::StreamWriter>(builder.newStreamWriter());
 				}();
 
-				if (HasCurrentElement())
+				JsonElement* element;
+				if (GetCurrentElement(element))
 				{
 					std::stringstream ss;
-					writer->write(GetCurrentElement(), &ss);
+					writer->write(*element, &ss);
 					str = ss.str();
 				}
+				return true;
 			}
 
 		private:
 			using JsonElement = Json::Value;
 
-			void PushElement(const JsonElement& element)
+			bool PushElement(const JsonElement& element)
 			{
 				_stack.push(element);
+				return true;
 			}
 
-			JsonElement PopElement()
+			bool PopElement(JsonElement& element)
 			{
-				JsonElement element = GetCurrentElement();
-				_stack.pop();
-				return element;
+				bool success = false;
+				JsonElement* ptr;
+				if (GetCurrentElement(ptr))
+				{
+					element = *ptr;
+					_stack.pop();
+					success = true;
+				}
+				return success;
 			}
 
-			JsonElement& GetCurrentElement()
+			bool GetCurrentElement(JsonElement*& element)
 			{
-				ensure(HasCurrentElement());
-				return _stack.top();
+				bool success = false;
+				if (HasCurrentElement())
+				{
+					element = &_stack.top();
+					success = true;
+				}
+				return success;
 			}
 
-			const bool HasCurrentElement() const
+			bool HasCurrentElement() const
 			{
 				return !_stack.empty();
 			}
 
-			void PushPropertyName(const std::string &propertyName)
+			bool PushPropertyName(const std::string &propertyName)
 			{
 				_propertyNames.push(propertyName);
+				return true;
 			}
 
-			std::string PopPropertyName()
+			bool PopPropertyName(std::string& propertyName)
 			{
-				std::string propertyName = GetCurrentPropertyName();
-				_propertyNames.pop();
-				return propertyName;
+				bool success = false;
+				if (GetCurrentPropertyName(propertyName))
+				{
+					_propertyNames.pop();
+					success = true;
+				}
+				return success;
 			}
 
-			std::string& GetCurrentPropertyName()
+			bool GetCurrentPropertyName(std::string& propertyName)
 			{
-				ensure(HasCurrentPropertyName());
-				return _propertyNames.top();
+				bool success = false;
+				if (HasCurrentPropertyName())
+				{
+					propertyName = _propertyNames.top();
+					success = true;
+				}
+				return success;
 			}
 
 			const bool HasCurrentPropertyName() const
