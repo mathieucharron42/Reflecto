@@ -1,8 +1,23 @@
 #include "Serialization/Reader/JsonSerializationReader.h"
 
+#include "Utils/StringExt.h"
+
 #include <CppUnitTest.h>
+#include <array>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+template<>
+inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<std::vector<uint32_t>>(const std::vector<uint32_t>& vector)
+{
+	return Reflecto::Utils::StringExt::Join<std::wstring>(vector, L",");
+}
+
+template<>
+inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<std::vector<std::string>>(const std::vector<std::string>& vector)
+{
+	return Reflecto::Utils::StringExt::ToWstring(Reflecto::Utils::StringExt::Join<std::string>(vector, ","));
+}
 
 namespace Reflecto
 {
@@ -15,201 +30,362 @@ namespace Reflecto
 			public:
 				TEST_METHOD(ReadString)
 				{
+					/////////////
+					// Arrange
+					const std::string expected = R"(test)";
 					JsonSerializationReader reader;
 					reader.Import(R"("test")");
-					
+				
+					/////////////
+					// Act
+					bool success = true;
 					std::string actual;
-					reader.ReadString(actual);
+					success &= reader.ReadString(actual);
 
-					const std::string expected = R"(test)";
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
 					Assert::AreEqual(expected, actual, L"Unexpected read value");
 				}
 
 				TEST_METHOD(ReadInt32)
 				{
+					/////////////
+					// Arrange
+					const int32_t expected = 1;
 					JsonSerializationReader reader;
 					reader.Import(R"(1)");
 					
+					/////////////
+					// Act
+					bool success = true;
 					std::int32_t actual;
-					reader.ReadInteger32(actual);
+					success &= reader.ReadInteger32(actual);
 
-					const int32_t expected = 1;
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
 					Assert::AreEqual(expected, actual, L"Unexpected read value");
 				}
 
 				TEST_METHOD(ReadInt64)
 				{
+					/////////////
+					// Arrange
+					const std::int64_t expected = 33445566778899;
 					JsonSerializationReader reader;
 					reader.Import(R"(33445566778899)");
 
+					/////////////
+					// Act
+					bool success = true;
 					std::int64_t actual;
-					reader.ReadInteger64(actual);
+					success &= reader.ReadInteger64(actual);
 
-					const std::int64_t expected = 33445566778899;
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
 					Assert::AreEqual(expected, actual, L"Unexpected read value");
 				}
 
 				TEST_METHOD(ReadFloat)
 				{
+					/////////////
+					// Arrange
+					const float expected = 0.5f;
 					JsonSerializationReader reader;
 					reader.Import(R"(0.5)");
 
+					/////////////
+					// Act
+					bool success = true;
 					float actual;
-					reader.ReadFloat(actual);
+					success &= reader.ReadFloat(actual);
 
-					const float expected = 0.5f;
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
 					Assert::AreEqual(expected, actual, L"Unexpected read value");
 				}
 
 				TEST_METHOD(ReadDouble)
 				{
+					/////////////
+					// Arrange
+					const double expected = 0.5;
 					JsonSerializationReader reader;
 					reader.Import(R"(0.5)");
 
+					/////////////
+					// Act
+					bool success = true;
 					double actual;
-					reader.ReadDouble(actual);
+					success &= reader.ReadDouble(actual);
 
-					const double expected = 0.5;
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
 					Assert::AreEqual(expected, actual, L"Unexpected read value");
 				}
 
 				TEST_METHOD(ReadBool)
 				{
-					{
-						JsonSerializationReader reader;
-						reader.Import(R"(true)");
 
-						bool actual;
-						reader.ReadBoolean(actual);
+					/////////////
+					// Arrange
+					const bool expected = true;
+					JsonSerializationReader reader;
+					reader.Import(R"(true)");
 
-						const bool expected = true;
-						Assert::AreEqual(expected, actual, L"Unexpected read value");
-					}
+					/////////////
+					// Act
+					bool success = true;
+					bool actual;
+					reader.ReadBoolean(actual);
 
-					{
-						JsonSerializationReader reader;
-						reader.Import(R"(false)");
-
-						bool actual;
-						reader.ReadBoolean(actual);
-
-						const bool expected = false;
-						Assert::AreEqual(expected, actual, L"Unexpected read value");
-					}
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
+					Assert::AreEqual(expected, actual, L"Unexpected read value");
 				}
 
 				TEST_METHOD(ReadNull)
 				{
+					/////////////
+					// Arrange
+					void* expected = nullptr;
 					JsonSerializationReader reader;
 					reader.Import(R"(null)");
 
+					/////////////
+					// Act
+					bool success = true;
 					void* actual = nullptr;
-					reader.ReadNull(actual);
+					success &= reader.ReadNull(actual);
 
-					void* expected = nullptr;
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
 					Assert::AreEqual(expected, actual, L"Unexpected read value");
 				}
 
 				TEST_METHOD(ReadArray)
 				{
+					/////////////
+					// Arrange
 					JsonSerializationReader reader;
 					reader.Import(R"([1,2,3])");
+					const uint32_t expectedFirstIndex = 0;
+					const int32_t expectedFirstValue = 1;
+					const uint32_t expectedSecondIndex = 1;
+					const int32_t expectedSecondValue = 2;
+					const uint32_t expectedThirdIndex = 2;
+					const int32_t expectedThirdValue = 3;
 
-					reader.ReadBeginArray();
+					/////////////
+					// Act
+					bool success = true;
+					int32_t actualFirstValue;
+					int32_t actualSecondValue;
+					int32_t actualThirdValue;
+
+					uint32_t actualFirstIndex;
+					uint32_t actualSecondIndex;
+					uint32_t actualThirdIndex;
+					success &= reader.ReadBeginArray();
 					{
-						uint32_t actualIndex;
-						reader.ReadBeginArrayElement(actualIndex);
+						success &= reader.ReadBeginArrayElement(actualFirstIndex);
 						{
-							const uint32_t expectedIndex = 0;
-							Assert::AreEqual(expectedIndex, actualIndex, L"Unexpected index");
-
-							int32_t actualValue;
-							reader.ReadInteger32(actualValue);
-							int32_t expectedValue = 1;
-							Assert::AreEqual(expectedValue, actualValue, L"Unexpected read value");
+							success &= reader.ReadInteger32(actualFirstValue);
 						}
-						reader.ReadEndArrayElement();
+						success &= reader.ReadEndArrayElement();
 
-						reader.ReadBeginArrayElement(actualIndex);
+						success &= reader.ReadBeginArrayElement(actualSecondIndex);
 						{
-							const uint32_t expectedIndex = 1;
-							Assert::AreEqual(expectedIndex, actualIndex, L"Unexpected index");
-
-							int32_t actualValue;
-							reader.ReadInteger32(actualValue);
-							int32_t expectedValue = 2;
-							Assert::AreEqual(expectedValue, actualValue, L"Unexpected read value");
+							success &= reader.ReadInteger32(actualSecondValue);
 						}
-						reader.ReadEndArrayElement();
+						success &= reader.ReadEndArrayElement();
 
-						reader.ReadBeginArrayElement(actualIndex);
+						success &= reader.ReadBeginArrayElement(actualThirdIndex);
 						{
-							const uint32_t expectedIndex = 2;
-							Assert::AreEqual(expectedIndex, actualIndex, L"Unexpected index");
-
-							int32_t actualValue;
-							reader.ReadInteger32(actualValue);
-							int32_t expectedValue = 3;
-							Assert::AreEqual(expectedValue, actualValue, L"Unexpected read value");
+							success &= reader.ReadInteger32(actualThirdValue);
 						}
-						reader.ReadEndArrayElement();
+						success &= reader.ReadEndArrayElement();
 					}
-					reader.ReadEndArray();
+					success &= reader.ReadEndArray();
+
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
+					Assert::AreEqual(expectedFirstIndex, actualFirstIndex, L"Unexpected first index");
+					Assert::AreEqual(expectedFirstValue, actualFirstValue, L"Unexpected first read value");
+					Assert::AreEqual(expectedSecondIndex, actualSecondIndex, L"Unexpected second index");
+					Assert::AreEqual(expectedSecondValue, actualSecondValue, L"Unexpected second read value");
+					Assert::AreEqual(expectedThirdIndex, actualThirdIndex, L"Unexpected third index");
+					Assert::AreEqual(expectedThirdValue, actualThirdValue, L"Unexpected third read value");
 				}
 
 				TEST_METHOD(ReadObject)
 				{
+					/////////////
+					// Arrange
 					JsonSerializationReader reader;
 					reader.Import(R"({"Age":1,"Friendliness":0.5,"Name":"Mr. Potato Head"})");
+					
+					const std::string expectedFirstProperty = "Age";
+					const int32_t expectedFirstValue = 1;
+					const std::string expectedSecondProperty = "Friendliness";
+					const float expectedSecondValue = 0.5f;
+					const std::string expectedThirdProperty = "Name";
+					const std::string expectedThirdValue = "Mr. Potato Head";
 
-					reader.ReadBeginObject();
+					/////////////
+					// Act
+					bool success = true;
+					std::string actualFirstProperty;
+					int32_t actualFirstValue;
+					std::string actualSecondProperty;
+					float actualSecondValue;
+					std::string actualThirdProperty;
+					std::string actualThirdValue;
+
+					success &= reader.ReadBeginObject();
 					{
+						success &= reader.ReadBeginObjectProperty(actualFirstProperty);
 						{
-							std::string actualProperty;
-							reader.ReadBeginObjectProperty(actualProperty);
-							{
-								const std::string expectedProperty = "Age";
-								Assert::AreEqual(expectedProperty, actualProperty, L"Unexpected property");
-
-								int32_t actualValue;
-								reader.ReadInteger32(actualValue);
-								const int32_t expectedValue = 1;
-								Assert::AreEqual(expectedValue, actualValue, L"Unexpected value");
-							}
-							reader.ReadEndObjectProperty();
+							success &= reader.ReadInteger32(actualFirstValue);
 						}
-
+						success &= reader.ReadEndObjectProperty();
+											
+						success &= reader.ReadBeginObjectProperty(actualSecondProperty);
 						{
-							std::string actualProperty;
-							reader.ReadBeginObjectProperty(actualProperty);
-							{
-								const std::string expectedProperty = "Friendliness";
-								Assert::AreEqual(expectedProperty, actualProperty, L"Unexpected property");
-
-								float actualValue;
-								reader.ReadFloat(actualValue);
-								const float expectedValue = 0.5f;
-								Assert::AreEqual(expectedValue, actualValue, L"Unexpected value");
-							}
-							reader.ReadEndObjectProperty();
-						}
-
+							success &= reader.ReadFloat(actualSecondValue);
+						}		
+						success &= reader.ReadEndObjectProperty();
+						
+						success &= reader.ReadBeginObjectProperty(actualThirdProperty);
 						{
-							std::string actualProperty;
-							reader.ReadBeginObjectProperty(actualProperty);
-							{
-								const std::string expectedProperty = "Name";
-								Assert::AreEqual(expectedProperty, actualProperty, L"Unexpected property");
-
-								std::string actualValue;
-								reader.ReadString(actualValue);
-								const std::string expectedValue = "Mr. Potato Head";
-								Assert::AreEqual(expectedValue, actualValue, L"Unexpected value");
-							}
-							reader.ReadEndObjectProperty();
+							success &= reader.ReadString(actualThirdValue);
 						}
+						success &= reader.ReadEndObjectProperty();
 					}
-					reader.ReadEndObject();
+					success &= reader.ReadEndObject();
+
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
+					Assert::AreEqual(expectedFirstProperty, actualFirstProperty, L"Unexpected property");
+					Assert::AreEqual(expectedFirstValue, actualFirstValue, L"Unexpected value");
+					Assert::AreEqual(expectedSecondProperty, actualSecondProperty, L"Unexpected property");
+					Assert::AreEqual(expectedSecondValue, actualSecondValue, L"Unexpected value");		
+					Assert::AreEqual(expectedThirdProperty, actualThirdProperty, L"Unexpected property");
+					Assert::AreEqual(expectedThirdValue, actualThirdValue, L"Unexpected value");
+				}
+
+				TEST_METHOD(ReadNestedArray)
+				{
+					/////////////
+					// Arrange
+					JsonSerializationReader reader;
+					reader.Import(R"([["hey","you", "wow"],["potato","test"],["hello","tomorrow","yesterday","Aluminum"]])");
+					const std::vector<std::vector<uint32_t>> expectedIndexes = { {0,1,2}, {0,1}, {0,1,2,3} };
+					const std::vector<std::vector<std::string>> expectedValues = { {"hey","you", "wow"}, {"potato","test"}, {"hello","tomorrow","yesterday","Aluminum"} };
+					
+					/////////////
+					// Act
+					bool success = true;
+					std::vector<uint32_t> actualTopLevelIndexes = { 0, 0, 0 };
+					std::vector<std::vector<uint32_t>> actualIndexes = { {0, 0, 0}, {0, 0}, {0, 0, 0, 0} };
+					std::vector<std::vector<std::string>> actualValues = { {"", "", ""}, {"", ""}, {"", "", "", ""}};
+					
+					success &= reader.ReadBeginArray();
+					{
+						success &= reader.ReadBeginArrayElement(actualTopLevelIndexes[0]);
+						{
+							success &= reader.ReadBeginArray();
+							{
+								success &= reader.ReadBeginArrayElement(actualIndexes[0][0]);
+								{
+									success &= reader.ReadString(actualValues[0][0]);
+								}
+								success &= reader.ReadEndArrayElement();
+								success &= reader.ReadBeginArrayElement(actualIndexes[0][1]);
+								{
+									success &= reader.ReadString(actualValues[0][1]);
+								}
+								success &= reader.ReadEndArrayElement();
+								success &= reader.ReadBeginArrayElement(actualIndexes[0][2]);
+								{
+									success &= reader.ReadString(actualValues[0][2]);
+								}
+								success &= reader.ReadEndArrayElement();
+							}
+							success &= reader.ReadEndArray();
+						}
+						success &= reader.ReadEndArrayElement();
+
+						success &= reader.ReadBeginArrayElement(actualTopLevelIndexes[1]);
+						{
+							success &= reader.ReadBeginArray();
+							{
+								success &= reader.ReadBeginArrayElement(actualIndexes[1][0]);
+								{
+									success &= reader.ReadString(actualValues[1][0]);
+								}
+								success &= reader.ReadEndArrayElement();
+								success &= reader.ReadBeginArrayElement(actualIndexes[1][1]);
+								{
+									success &= reader.ReadString(actualValues[1][1]);
+								}
+								success &= reader.ReadEndArrayElement();
+							}
+							success &= reader.ReadEndArray();
+						}
+						success &= reader.ReadEndArrayElement();
+						
+						success &= reader.ReadBeginArrayElement(actualTopLevelIndexes[2]);
+						{
+							success &= reader.ReadBeginArray();
+							{
+								success &= reader.ReadBeginArrayElement(actualIndexes[2][0]);
+								{
+									success &= reader.ReadString(actualValues[2][0]);
+								}
+								success &= reader.ReadEndArrayElement();
+								success &= reader.ReadBeginArrayElement(actualIndexes[2][1]);
+								{
+									success &= reader.ReadString(actualValues[2][1]);
+								}
+								success &= reader.ReadEndArrayElement();
+								success &= reader.ReadBeginArrayElement(actualIndexes[2][2]);
+								{
+									success &= reader.ReadString(actualValues[2][2]);
+								}
+								success &= reader.ReadEndArrayElement();
+								success &= reader.ReadBeginArrayElement(actualIndexes[2][3]);
+								{
+									success &= reader.ReadString(actualValues[2][3]);
+								}
+								success &= reader.ReadEndArrayElement();
+							}
+							success &= reader.ReadEndArray();
+						}
+						success &= reader.ReadEndArrayElement();
+						
+					}
+					success &= reader.ReadEndArray();
+
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
+					for (uint32_t i = 0; i < expectedIndexes.size(); ++i)
+					{
+						Assert::AreEqual(expectedIndexes[i], actualIndexes[i], L"Unexpected indexes");
+					}
+					for (uint32_t i = 0; i < expectedValues.size(); ++i)
+					{
+						Assert::AreEqual(expectedValues[i], actualValues[i], L"Unexpected values");
+					}
 				}
 
 				TEST_METHOD(ReadComplexObject)

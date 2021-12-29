@@ -7,6 +7,7 @@
 #include "jsoncpp/json.h"
 
 #include <cstdint>
+#include <functional>
 #include <optional>
 #include <stack>
 #include <sstream>
@@ -20,116 +21,111 @@ namespace Reflecto
 		class JsonSerializationReader : public ISerializationReader
 		{
 		public:
-			virtual void ReadInteger32(int32_t& value) override
+			virtual bool ReadInteger32(int32_t& value) override
 			{
-				ensure(GetCurrentElement().type() == Json::ValueType::intValue);
-				value = PopElement().asInt();
+				return ReadElementValue(Json::intValue, &Json::Value::asInt, value);
 			}
 
-			virtual void ReadInteger64(int64_t& value) override
+			virtual bool ReadInteger64(int64_t& value) override
 			{
-				ensure(GetCurrentElement().type() == Json::ValueType::intValue);
-				value = PopElement().asInt64();
+				return ReadElementValue(Json::intValue, &Json::Value::asInt64, value);
 			}
 
-			virtual void ReadFloat(float& value) override
+			virtual bool ReadFloat(float& value) override
 			{
-				ensure(GetCurrentElement().type() == Json::ValueType::realValue);
-				value = PopElement().asFloat();
+				return ReadElementValue(Json::realValue, &Json::Value::asFloat, value);
 			}
 
-			virtual void ReadDouble(double& value) override
+			virtual bool ReadDouble(double& value) override
 			{
-				ensure(GetCurrentElement().type() == Json::ValueType::realValue);
-				value = PopElement().asDouble();
+				return ReadElementValue(Json::realValue, &Json::Value::asDouble, value);
 			}
 
-			virtual void ReadString(std::string& value) override
+			virtual bool ReadString(std::string& value) override
 			{
-				ensure(GetCurrentElement().type() == Json::ValueType::stringValue);
-				value = PopElement().asString();
+				return ReadElementValue(Json::stringValue, &Json::Value::asString, value);
 			}
 
-			virtual void ReadBoolean(bool& value) override
+			virtual bool ReadBoolean(bool& value) override
 			{
-				ensure(GetCurrentElement().type() == Json::ValueType::booleanValue);
-				value = PopElement().asBool();
+				return ReadElementValue(Json::booleanValue, &Json::Value::asBool, value);
 			}
 
-			virtual void ReadNull(void* value) override
+			virtual bool ReadNull(void* value) override
 			{
-				ensure(GetCurrentElement().type() == Json::ValueType::nullValue);
-				PopElement();
-				value = nullptr;
+				return ReadElementValue(Json::nullValue, [] (const JsonElement&) { return nullptr; }, value);
 			}
 
-			virtual void ReadBeginArray() override
+			virtual bool ReadBeginArray() override
 			{
-				ensure(GetCurrentElement().type() == Json::ValueType::arrayValue);
-				PushArrayIndex(0);
+				return ReadElement(Json::arrayValue, [&](const JsonElement& elem) {
+					return PushCurrentArrayIndexes(elem.size());
+				});
 			}
 
-			virtual void ReadEndArray() override
+			virtual bool ReadEndArray() override
 			{
-				ensure(GetCurrentElement().type() == Json::ValueType::arrayValue);
-				PopArrayIndex();
-				PopElement();
+				return ReadElement(Json::arrayValue, [&](const JsonElement& elem) {
+					return PopCurrentArrayIndexes() && PopElement();
+				});
 			}
 
 			virtual bool HasArrayElementRemaining() override
 			{
-				ensure(GetCurrentElement().type() == Json::ValueType::arrayValue);
-				const uint32_t index = GetCurrentArrayIndex();
-				return index < GetCurrentElement().size();
+				return ReadElement(Json::arrayValue, [&](const JsonElement& elem) {
+					std::stack<uint32_t>* indexes;
+					return GetCurrentArrayIndexes(indexes) && !(*indexes).empty();
+				});
 			}
 
-			virtual void ReadBeginArrayElement(uint32_t& index) override
+			virtual bool ReadBeginArrayElement(uint32_t& index) override
 			{
-				ensure(GetCurrentElement().type() == Json::ValueType::arrayValue);
-				index = GetCurrentArrayIndex();
-				PushElement(GetCurrentElement()[index]);
+				return ReadElement(Json::arrayValue, [&](const JsonElement& elem) {
+					return GetCurrentArrayIndex(index) && index < elem.size() && PushElement(elem[index]);
+				});
 			}
 
-			virtual void ReadEndArrayElement() override
+			virtual bool ReadEndArrayElement() override
 			{
-				ensure(GetCurrentElement().type() == Json::ValueType::arrayValue);
-				uint32_t& index = GetCurrentArrayIndex();
-				++index;
+				return ReadElement(Json::arrayValue, [&](const JsonElement& elem) {
+					return PopCurrentArrayIndex();
+				});
 			}
 
-			virtual void ReadBeginObject() override
+			virtual bool ReadBeginObject() override
 			{
-				ensure(GetCurrentElement().type() == Json::ValueType::objectValue);
-				PushObjectProperties(GetCurrentElement().getMemberNames());
+				return ReadElement(Json::objectValue, [&](const JsonElement& elem) {
+					return PushCurrentObjectProperties(elem.getMemberNames());
+				});
 			}
 
-			virtual void ReadEndObject() override
+			virtual bool ReadEndObject() override
 			{
-				ensure(GetCurrentElement().type() == Json::ValueType::objectValue);
-				PopObjectProperties();
-				PopElement();
+				return ReadElement(Json::objectValue, [&](const JsonElement& elem) {
+					return PopCurrentObjectProperties() && PopElement();
+				});
 			}
 
 			virtual bool HasObjectPropertyRemaining() override
 			{
-				ensure(GetCurrentElement().type() == Json::ValueType::objectValue);
-				JsonProperties& properties = GetCurrentObjectProperties();
-				return !properties.empty();
+				return ReadElement(Json::objectValue, [&](const JsonElement& elem) {
+					std::stack<std::string>* properties;
+					return GetCurrentObjectProperties(properties) && !(*properties).empty();
+				});
 			}
 
-			virtual void ReadBeginObjectProperty(std::string& propertyName) override
+			virtual bool ReadBeginObjectProperty(std::string& propertyName) override
 			{
-				ensure(GetCurrentElement().type() == Json::ValueType::objectValue);
-				JsonProperties& properties = GetCurrentObjectProperties();
-				propertyName = properties.front();
-				PushElement(GetCurrentElement()[propertyName]);
+				return ReadElement(Json::objectValue, [&](const JsonElement& elem) {
+					return GetCurrentObjectProperty(propertyName) && elem.isMember(propertyName) && PushElement(elem[propertyName]);
+				});
 			}
 
-			virtual void ReadEndObjectProperty() override
+			virtual bool ReadEndObjectProperty() override
 			{
-				ensure(GetCurrentElement().type() == Json::ValueType::objectValue);
-				JsonProperties& properties = GetCurrentObjectProperties();
-				properties.erase(properties.begin());
+				return ReadElement(Json::objectValue, [&](const JsonElement& elem) {
+					return PopCurrentObjectProperty();
+				});
 			}
 
 			void Import(const std::string& str)
@@ -151,22 +147,76 @@ namespace Reflecto
 			using JsonElement = Json::Value;
 			using JsonProperties = Json::Value::Members;
 
-			void PushElement(const JsonElement& element)
+			template<typename member_function_ptr_type, typename type>
+			bool ReadElementValue(Json::ValueType valueType, member_function_ptr_type memberFunctionPtr, type& value)
+			{
+				std::function<type(const JsonElement&)> func = memberFunctionPtr;
+				return ReadElementValue(valueType, func, value);
+			}
+
+			template<typename type>
+			bool ReadElementValue(Json::ValueType valueType, const std::function<type(const JsonElement&)>& func, type& value)
+			{
+				return ReadElement(valueType, [&](const JsonElement& element)
+				{
+					bool success = false;
+					value = func(element);
+					success = PopElement();
+					return success;
+				});
+			}
+			
+			template<typename funct_t>
+			bool ReadElement(Json::ValueType valueType, const funct_t& func)
+			{
+				bool success = false;
+				JsonElement* currentElement;
+				if (GetCurrentElement(currentElement) && currentElement->type() == valueType)
+				{
+					success = func(*currentElement);
+				}
+				return success;
+			}
+
+			bool PushElement(const JsonElement& element)
 			{
 				_stack.push(element);
+				return true;
 			}
 
-			JsonElement PopElement()
+			bool PopElement()
 			{
-				JsonElement element = GetCurrentElement();
-				_stack.pop();
-				return element;
+				bool success = false;
+				JsonElement* currentElement = nullptr;
+				if (GetCurrentElement(currentElement))
+				{	
+					_stack.pop();
+					success = true;
+				}
+				return success;
 			}
 
-			JsonElement& GetCurrentElement()
+			bool GetCurrentElement(JsonElement*& element)
 			{
-				ensure(HasCurrentElement());
-				return _stack.top();
+				bool success = false;
+				if (HasCurrentElement())
+				{
+					element = &_stack.top();
+					success = true;
+				}
+				return success;
+			}
+
+			bool GetCurrentElementType(Json::ValueType& type)
+			{
+				bool success = false;
+				JsonElement* currentElement = nullptr;
+				if (GetCurrentElement(currentElement))
+				{
+					type = currentElement->type();
+					success = true;
+				}
+				return success;
 			}
 
 			bool HasCurrentElement() const
@@ -174,55 +224,125 @@ namespace Reflecto
 				return !_stack.empty();
 			}
 
-			void PushArrayIndex(uint32_t index)
+			bool PushCurrentArrayIndexes(uint32_t size)
 			{
-				_arrayIndexes.push(index);
+				std::stack<uint32_t> stack;
+				for (uint32_t i = 0; i < size; ++i)
+				{
+					// Insert in reverse order
+					stack.push(size - i - 1);
+				}
+				_arrayIndexes.push(stack);
+				return true;
 			}
 
-			uint32_t PopArrayIndex()
+			bool PopCurrentArrayIndexes()
 			{
-				uint32_t index = GetCurrentArrayIndex();
-				_arrayIndexes.pop();
-				return index;
+				bool success = false;
+				if (!_arrayIndexes.empty())
+				{
+					_arrayIndexes.pop();
+					success = true;
+				}
+				return success;
 			}
 
-			uint32_t& GetCurrentArrayIndex()
+			bool PopCurrentArrayIndex()
 			{
-				ensure(HasCurrentArrayIndex());
-				return _arrayIndexes.top();
+				bool success = false;
+				std::stack<uint32_t>* indexes;
+				if (GetCurrentArrayIndexes(indexes))
+				{
+					(*indexes).pop();
+					success = true;
+				}
+				return success;
 			}
 
-			const bool HasCurrentArrayIndex() const
+			bool GetCurrentArrayIndex(uint32_t& index)
 			{
-				return !_arrayIndexes.empty();
+				bool success = false;
+				std::stack<uint32_t>* indexes;
+				if (GetCurrentArrayIndexes(indexes))
+				{
+					index = (*indexes).top();
+					success = true;
+				}
+				return success;
 			}
 
-			void PushObjectProperties(const JsonProperties& properties)
+			bool GetCurrentArrayIndexes(std::stack<uint32_t>*& indexes)
 			{
-				_objectProperties.push(properties);
+				bool success = false;
+				if (!_arrayIndexes.empty())
+				{
+					indexes = &_arrayIndexes.top();
+					success = true;
+				}
+				return success;
 			}
 
-			JsonProperties PopObjectProperties()
+			bool PushCurrentObjectProperties(const JsonProperties& properties)
 			{
-				JsonProperties properties = GetCurrentObjectProperties();
-				_objectProperties.pop();
-				return properties;
+				std::stack<std::string> stack;
+				for (uint32_t i = 0; i < properties.size(); ++i)
+				{
+					// Insert in reverse order
+					stack.push(properties[properties.size() - i - 1]);
+				}
+				_objectProperties.push(stack);
+				return true;
 			}
 
-			JsonProperties& GetCurrentObjectProperties()
+			bool PopCurrentObjectProperties()
 			{
-				ensure(HasCurrentObjectProperties());
-				return _objectProperties.top();
+				bool success = false;
+				if (!_objectProperties.empty())
+				{
+					_objectProperties.pop();
+					success = true;
+				}
+				return success;
 			}
 
-			const bool HasCurrentObjectProperties() const
+			bool PopCurrentObjectProperty()
 			{
-				return !_objectProperties.empty();
+				bool success = false;
+				std::stack<std::string>* properties;
+				if (GetCurrentObjectProperties(properties))
+				{
+					(*properties).pop();
+					success = true;
+				}
+				return success;
+			}
+
+			bool GetCurrentObjectProperty(std::string& property)
+			{
+				bool success = false;
+				std::stack<std::string>* properties;
+				if (GetCurrentObjectProperties(properties))
+				{
+					property = (*properties).top();
+					success = true;
+				}
+				return success;
+			}
+
+			const bool GetCurrentObjectProperties(std::stack<std::string>*& properties)
+			{
+				bool success = false;
+				if (!_objectProperties.empty())
+				{
+					properties = &_objectProperties.top();
+					success = true;
+				}
+				return success;
 			}
 
 			std::stack<JsonElement> _stack;
-			std::stack<uint32_t> _arrayIndexes;
-			std::stack<JsonProperties> _objectProperties;
+			std::stack<std::stack<uint32_t>> _arrayIndexes;
+			std::stack<std::stack<std::string>> _objectProperties;
 		};
 	}
 }

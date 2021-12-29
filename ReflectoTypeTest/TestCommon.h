@@ -30,3 +30,9 @@ inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<std:
 		return Reflecto::Utils::StringExt::ToWstring(d.ToString());
 	});
 }
+
+template<>
+inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<std::array<uint32_t, 10>>(const std::array<uint32_t, 10>& a)
+{
+
+}

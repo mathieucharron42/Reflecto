@@ -10,39 +10,39 @@ namespace Reflecto
 		class ISerializationReader
 		{
 		public:
-			virtual void ReadInteger32(int32_t& value) = 0;
+			virtual bool ReadInteger32(int32_t& value) = 0;
 
-			virtual void ReadInteger64(int64_t& value) = 0;
+			virtual bool ReadInteger64(int64_t& value) = 0;
 
-			virtual void ReadFloat(float& value) = 0;
+			virtual bool ReadFloat(float& value) = 0;
 
-			virtual void ReadDouble(double& value) = 0;
+			virtual bool ReadDouble(double& value) = 0;
 
-			virtual void ReadString(std::string& value) = 0;
+			virtual bool ReadString(std::string& value) = 0;
 
-			virtual void ReadBoolean(bool& value) = 0;
+			virtual bool ReadBoolean(bool& value) = 0;
 
-			virtual void ReadNull(void* value) = 0;
+			virtual bool ReadNull(void* value) = 0;
 
-			virtual void ReadBeginObject() = 0;
+			virtual bool ReadBeginObject() = 0;
 
-			virtual void ReadEndObject() = 0;
+			virtual bool ReadEndObject() = 0;
 
 			virtual bool HasObjectPropertyRemaining() = 0;
 
-			virtual void ReadBeginObjectProperty(std::string& propertyName) = 0;
+			virtual bool ReadBeginObjectProperty(std::string& propertyName) = 0;
 
-			virtual void ReadEndObjectProperty() = 0;
+			virtual bool ReadEndObjectProperty() = 0;
 
-			virtual void ReadBeginArray() = 0;
+			virtual bool ReadBeginArray() = 0;
 
-			virtual void ReadEndArray() = 0;
+			virtual bool ReadEndArray() = 0;
 
 			virtual bool HasArrayElementRemaining() = 0;
 	
-			virtual void ReadBeginArrayElement(uint32_t& index) = 0;
+			virtual bool ReadBeginArrayElement(uint32_t& index) = 0;
 
-			virtual void ReadEndArrayElement() = 0;
+			virtual bool ReadEndArrayElement() = 0;
 		};
 	}
 }

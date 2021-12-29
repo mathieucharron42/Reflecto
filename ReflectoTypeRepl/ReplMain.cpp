@@ -27,17 +27,6 @@ enum class InstructionResult
 	Leave
 };
 
-InstructionResult AssignValue(const Serialization::Serializer& serializer, const Reflection::Type& type, void* value, const std::string& memberValue)
-{
-	Serialization::JsonSerializationReader reader;
-	reader.Import(memberValue);
-
-	InstructionResult result = InstructionResult::Ok;
-	serializer.RawDeserialize(type, value, reader);
-
-	return result;
-}
-
 InstructionResult ProcessMemberInstruction(const Serialization::Serializer& serializer, Reflection::TypeDescriptor typeDescriptor, Potato& instance, const std::string& memberName, const std::string& memberValue)
 {
 	InstructionResult result;
@@ -47,23 +36,18 @@ InstructionResult ProcessMemberInstruction(const Serialization::Serializer& seri
 	if (memberDescriptor)
 	{
 		void* member = resolver.ResolveMember(instance, memberName);
-		result = AssignValue(serializer, memberDescriptor->GetType(), member, memberValue);
+		
+		Serialization::JsonSerializationReader reader;
+		reader.Import(memberValue);
+
+		InstructionResult result = InstructionResult::Ok;
+		serializer.RawDeserialize(memberDescriptor->GetType(), member, reader);
 	}
 	else
 	{
 		result = InstructionResult::InternalError;
 	}
 
-	return result;
-}
-
-template<typename method_t>
-InstructionResult ExecuteMethod(const Serialization::Serializer& serializer, method_t method)
-{
-	InstructionResult result;
-	// to do: gérer les paramètres et fonction avec type de retour
-	method();
-	result = InstructionResult::Ok;
 	return result;
 }
 
@@ -76,7 +60,9 @@ InstructionResult ProcessMethodInstruction(const Serialization::Serializer& seri
 	if (methodDescriptor)
 	{
 		auto method = resolver.ResolveMethod(*methodDescriptor, instance);
-		result = ExecuteMethod(serializer, method);
+		// to do: gérer les paramètres et fonction avec type de retour
+		method();
+		result = InstructionResult::Ok;
 	}
 	else
 	{
