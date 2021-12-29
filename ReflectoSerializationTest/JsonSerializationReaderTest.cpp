@@ -390,133 +390,140 @@ namespace Reflecto
 
 				TEST_METHOD(ReadComplexObject)
 				{
+					/////////////
+					// Arrange
 					JsonSerializationReader reader;
 					reader.Import(R"({"Eyes":{"Color":"black","Size":5},"Legs":{"PossibleColors":["blue","orange","white"]},"Mouth":null,"Name":"Mr. Potato Head"})");
 
-					reader.ReadBeginObject();
+					/////////////
+					// Act
+					bool success = true;
+					const std::string expectedEyesProperty = "Eyes";
+					const std::string expectedEyesColorProperty = "Color";
+					const std::string expectedEyesColorValue = "black";
+					const std::string expectedEyesSizeProperty = "Size";
+					const int32_t expectedEyesSizeValue = 5;
+					const std::string expectedLegsProperty = "Legs";
+					const std::string expectedLegsPossibleColorProperty = "PossibleColors";
+					const uint32_t expectedLegsPossibleColorIndex1Value = 0;
+					const std::string expectedLegsPossibleColor1Value = "blue";
+					const uint32_t expectedLegsPossibleColorIndex2 = 1;
+					const std::string expectedLegsPossibleColor2Value = "orange";
+					const uint32_t expectedLegsPossibleColorIndex3 = 2;
+					const std::string expectedLegsPossibleColor3Value = "white";
+					const void* expectedMouthValue = nullptr;
+					const std::string expectedMouthProperty = "Mouth";
+					const std::string expectedNameProperty = "Name";
+					const std::string expectedNameValue = "Mr. Potato Head";
+
+					std::string actualEyesProperty;
+					std::string actualEyesColorProperty;
+					std::string actualEyesColorValue;
+					std::string actualEyesSizeProperty;
+					int32_t actualEyesSizeValue;
+					std::string actualLegsProperty;
+					std::string actualLegsPossibleColorProperty;
+					uint32_t actualLegsPossibleColorIndex1;
+					std::string actualLegsPossibleColor1Value;
+					uint32_t actualLegsPossibleColorIndex2;
+					std::string actualLegsPossibleColor2Value;
+					uint32_t actualLegsPossibleColorIndex3;
+					std::string actualLegsPossibleColor3Value;
+					std::string actualMouthProperty;
+					void* actualMouthValue = nullptr;
+					std::string actualNameProperty;
+					std::string actualNameValue;
+					
+					success &= reader.ReadBeginObject();
 					{
+						success &= reader.ReadBeginObjectProperty(actualEyesProperty);
 						{
-							std::string actualProperty;
-							reader.ReadBeginObjectProperty(actualProperty);
+							success &= reader.ReadBeginObject();
 							{
-								const std::string expectedProperty = "Eyes";
-								Assert::AreEqual(expectedProperty, actualProperty, L"Unexpected property");
-
-								reader.ReadBeginObject();
+								success &= reader.ReadBeginObjectProperty(actualEyesColorProperty);
 								{
-									reader.ReadBeginObjectProperty(actualProperty);
-									{
-										const std::string expectedProperty = "Color";
-										Assert::AreEqual(expectedProperty, actualProperty, L"Unexpected property");
-										
-										std::string actualValue;
-										reader.ReadString(actualValue);
-										const std::string expectedValue = "black";
-										Assert::AreEqual(expectedValue, actualValue, L"Unexpected value");
-									}
-									reader.ReadEndObjectProperty();
-
-									reader.ReadBeginObjectProperty(actualProperty);
-									{
-										const std::string expectedProperty = "Size";
-										Assert::AreEqual(expectedProperty, actualProperty, L"Unexpected property");
-
-										int32_t actualValue;
-										reader.ReadInteger32(actualValue);
-										const int32_t expectedValue = 5;
-										Assert::AreEqual(expectedValue, actualValue, L"Unexpected value");
-									}
-									reader.ReadEndObjectProperty();
+									success &= reader.ReadString(actualEyesColorValue);
 								}
-								reader.ReadEndObject();
-							}
-							reader.ReadEndObjectProperty();
+								success &= reader.ReadEndObjectProperty();
 
-							reader.ReadBeginObjectProperty(actualProperty);
-							{
-								const std::string expectedProperty = "Legs";
-								Assert::AreEqual(expectedProperty, actualProperty, L"Unexpected property");
-
-								reader.ReadBeginObject();
+								success &= reader.ReadBeginObjectProperty(actualEyesSizeProperty);
 								{
-									reader.ReadBeginObjectProperty(actualProperty);
-									{
-										const std::string expectedProperty = "PossibleColors";
-										Assert::AreEqual(expectedProperty, actualProperty, L"Unexpected property");
-
-										reader.ReadBeginArray();
-										{
-											uint32_t actualIndex;
-											reader.ReadBeginArrayElement(actualIndex);
-											{
-												const uint32_t expectedIndex = 0;
-												Assert::AreEqual(expectedProperty, actualProperty, L"Unexpected index");
-
-												std::string actualValue;
-												reader.ReadString(actualValue);
-												const std::string expectedValue = "blue";
-												Assert::AreEqual(expectedValue, actualValue, L"Unexpected value");
-											}
-											reader.ReadEndArrayElement();
-
-											reader.ReadBeginArrayElement(actualIndex);
-											{
-												const uint32_t expectedIndex = 1;
-												Assert::AreEqual(expectedProperty, actualProperty, L"Unexpected index");
-
-												std::string actualValue;
-												reader.ReadString(actualValue);
-												const std::string expectedValue = "orange";
-												Assert::AreEqual(expectedValue, actualValue, L"Unexpected value");
-											}
-											reader.ReadEndArrayElement();
-
-											reader.ReadBeginArrayElement(actualIndex);
-											{
-												const uint32_t expectedIndex = 2;
-												Assert::AreEqual(expectedProperty, actualProperty, L"Unexpected index");
-
-												std::string actualValue;
-												reader.ReadString(actualValue);
-												const std::string expectedValue = "white";
-												Assert::AreEqual(expectedValue, actualValue, L"Unexpected value");
-											}
-											reader.ReadEndArrayElement();
-										}
-										reader.ReadEndArray();
-									}
-									reader.ReadEndObjectProperty();
+									success &= reader.ReadInteger32(actualEyesSizeValue);
 								}
-								reader.ReadEndObject();
+								success &= reader.ReadEndObjectProperty();
 							}
-							reader.ReadEndObjectProperty();
-
-							reader.ReadBeginObjectProperty(actualProperty);
-							{
-								const std::string expectedProperty = "Mouth";
-								Assert::AreEqual(expectedProperty, actualProperty, L"Unexpected property");
-
-								void* actualValue = nullptr;
-								reader.ReadNull(actualValue);
-								const void* expectedValue = nullptr;
-								Assert::IsTrue(expectedValue == actualValue, L"Unexpected value");
-							}
-							reader.ReadEndObjectProperty();
-
-							reader.ReadBeginObjectProperty(actualProperty);
-							{
-								const std::string expectedProperty = "Name";
-								Assert::AreEqual(expectedProperty, actualProperty, L"Unexpected property");
-
-								std::string actualValue;
-								reader.ReadString(actualValue);
-								const std::string expectedValue = "Mr. Potato Head";
-								Assert::AreEqual(expectedValue, actualValue, L"Unexpected value");
-							}
-							reader.ReadEndObjectProperty();
+							success &= reader.ReadEndObject();
 						}
+						success &= reader.ReadEndObjectProperty();
+
+						success &= reader.ReadBeginObjectProperty(actualLegsProperty);
+						{
+							success &= reader.ReadBeginObject();
+							{
+								success &= reader.ReadBeginObjectProperty(actualLegsPossibleColorProperty);
+								{
+									success &= reader.ReadBeginArray();
+									{
+										success &= reader.ReadBeginArrayElement(actualLegsPossibleColorIndex1);
+										{
+											success &= reader.ReadString(actualLegsPossibleColor1Value);
+										}
+										success &= reader.ReadEndArrayElement();
+
+										success &= reader.ReadBeginArrayElement(actualLegsPossibleColorIndex2);
+										{
+											success &= reader.ReadString(actualLegsPossibleColor2Value);
+										}
+										success &= reader.ReadEndArrayElement();
+
+										success &= reader.ReadBeginArrayElement(actualLegsPossibleColorIndex3);
+										{
+											success &= reader.ReadString(actualLegsPossibleColor3Value);
+										}
+										success &= reader.ReadEndArrayElement();
+									}
+									success &= reader.ReadEndArray();
+								}
+								success &= reader.ReadEndObjectProperty();
+							}
+							success &= reader.ReadEndObject();
+						}
+						success &= reader.ReadEndObjectProperty();
+
+						success &= reader.ReadBeginObjectProperty(actualMouthProperty);
+						{
+							success &= reader.ReadNull(actualMouthValue);
+						}
+						success &= reader.ReadEndObjectProperty();
+
+						success &= reader.ReadBeginObjectProperty(actualNameProperty);
+						{
+							success &= reader.ReadString(actualNameValue);
+						}
+						success &= reader.ReadEndObjectProperty();
 					}
-					reader.ReadEndObject();
+					success &= reader.ReadEndObject();
+
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Unexpected operation failure");
+					Assert::AreEqual(expectedEyesProperty, actualEyesProperty, L"Unexpected property");
+					Assert::AreEqual(expectedEyesColorProperty, actualEyesColorProperty, L"Unexpected property");
+					Assert::AreEqual(expectedEyesColorValue, actualEyesColorValue, L"Unexpected value");
+					Assert::AreEqual(expectedEyesSizeProperty, actualEyesSizeProperty, L"Unexpected property");
+					Assert::AreEqual(expectedEyesSizeValue, actualEyesSizeValue, L"Unexpected value");
+					Assert::AreEqual(expectedLegsProperty, actualLegsProperty, L"Unexpected property");
+					Assert::AreEqual(expectedLegsPossibleColorProperty, actualLegsPossibleColorProperty, L"Unexpected property");
+					Assert::AreEqual(expectedLegsPossibleColorIndex1Value, actualLegsPossibleColorIndex1, L"Unexpected index");
+					Assert::AreEqual(expectedLegsPossibleColor1Value, expectedLegsPossibleColor1Value, L"Unexpected value");
+					Assert::AreEqual(expectedLegsPossibleColorIndex2, actualLegsPossibleColorIndex2, L"Unexpected index");
+					Assert::AreEqual(expectedLegsPossibleColor2Value, actualLegsPossibleColor2Value, L"Unexpected value");
+					Assert::AreEqual(expectedLegsPossibleColorIndex3, actualLegsPossibleColorIndex3, L"Unexpected index");
+					Assert::AreEqual(expectedLegsPossibleColor3Value, actualLegsPossibleColor3Value, L"Unexpected value");
+					Assert::AreEqual(expectedMouthProperty, actualMouthProperty, L"Unexpected property");
+					Assert::IsTrue(expectedMouthValue == actualMouthValue, L"Unexpected value");
+					Assert::AreEqual(expectedNameProperty, actualNameProperty, L"Unexpected property");
+					Assert::AreEqual(expectedNameValue, actualNameValue, L"Unexpected value");
 				}
 			};
 		}
