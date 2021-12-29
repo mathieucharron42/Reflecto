@@ -8,6 +8,7 @@
 #include <iterator>
 #include <locale>
 #include <string>
+#include <sstream>
 #include <vector>
 #include <type_traits>
 
@@ -17,13 +18,17 @@ namespace Reflecto
 	{
 		namespace StringExt
 		{
+			template<typename string_t>
+			using char_t = typename string_t::value_type;
+
+			template<typename string_t>
+			using StringStreamType = std::basic_stringstream<char_t<string_t>, std::char_traits<char_t<string_t>>, std::allocator<char_t<string_t>>>;
+
 			template<typename string_t, typename collection_t, typename projection_t>
 			string_t Join(const collection_t elems, const string_t& separator, projection_t proj)
 			{
-				using char_t = typename string_t::value_type;
-				using StringStreamType = std::basic_stringstream<char_t, std::char_traits<char_t>, std::allocator<char_t>>;
-
-				StringStreamType buffer;
+				
+				StringStreamType<string_t> buffer;
 				for (auto it = begin(elems); it != end(elems); ++it)
 				{
 					if (it != begin(elems))
@@ -93,7 +98,11 @@ namespace Reflecto
 
 			static std::wstring ToWstring(const std::string& str)
 			{
-				return std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(str);
+				// Avoid using std::wstring_convert as deprecated in c++17
+				// std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(str);
+				std::wstringstream s;
+				s << str.c_str(); 
+				return s.str();
 			}
 
 			template<typename string_t, typename collection_t, typename projection_t>
