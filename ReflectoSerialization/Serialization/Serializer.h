@@ -20,8 +20,8 @@ namespace Reflecto
 		class Serializer
 		{
 		public:				
-			using serialization_strategy_t = typename std::function<void(const Serializer&, const void*, ISerializationWriter& writer)>;
-			using deserialization_strategy_t = typename std::function<void(const Serializer&, void*, ISerializationReader& reader)>;
+			using serialization_strategy_t = typename std::function<bool(const Serializer&, const void*, ISerializationWriter& writer)>;
+			using deserialization_strategy_t = typename std::function<bool(const Serializer&, void*, ISerializationReader& reader)>;
 			using strategies_t = std::tuple<serialization_strategy_t, deserialization_strategy_t>;
 			using strategy_map_t = std::map<Reflection::Type, strategies_t>;
 
@@ -30,135 +30,155 @@ namespace Reflecto
 				, _strategies(strategy)
 			{ }
 
-			void Serialize(const Reflection::Type& type, const void* value, ISerializationWriter& writer) const
+			bool Serialize(const Reflection::Type& type, const void* value, ISerializationWriter& writer) const
 			{
+				bool success = false;
 				const serialization_strategy_t* strategy = GetSerializationStrategy(type);
-				if (ensure(strategy))
+				if (strategy)
 				{
-					Serialize(type, *strategy, value, writer);
+					success = Serialize(type, *strategy, value, writer);
 				}
+				return success;
 			}
 
 			template<typename value_t>
-			void Serialize(const value_t& value, ISerializationWriter& writer) const
+			bool Serialize(const value_t& value, ISerializationWriter& writer) const
 			{
+				bool success = false;
 				const Reflection::Type* type = _typeLibrary.Get<value_t>();
-				if (ensure(type))
+				if (type)
 				{
-					Serialize(*type, &value, writer);
+					success = Serialize(*type, &value, writer);
 				}
+				return success;
 			}
 
-			void RawSerialize(const Reflection::Type& type, const void* value, ISerializationWriter& writer) const
+			bool RawSerialize(const Reflection::Type& type, const void* value, ISerializationWriter& writer) const
 			{
+				bool success = false;
 				const serialization_strategy_t* strategy = GetSerializationStrategy(type);
-				if (ensure(strategy))
+				if (strategy)
 				{
-					RawSerialize(type, *strategy, value, writer);
+					success = RawSerialize(type, *strategy, value, writer);
 				}
+				return success;
 			}
 
 			template<typename value_t>
-			void RawSerialize(const value_t& value, ISerializationWriter& writer) const
+			bool RawSerialize(const value_t& value, ISerializationWriter& writer) const
 			{
+				bool success = false;
 				const Reflection::Type* type = _typeLibrary.Get<value_t>();
-				if (ensure(type))
+				if (type)
 				{
-					RawSerialize(*type, &value, writer);
+					success = RawSerialize(*type, &value, writer);
 				}
+				return success;
 			}
 
 			template<typename value_t>
-			void Deserialize(value_t& value, ISerializationReader& reader) const
+			bool Deserialize(value_t& value, ISerializationReader& reader) const
 			{
+				bool success = false;
 				const Reflection::Type* type = _typeLibrary.Get<value_t>();
-				if (ensure(type))
+				if (type)
 				{
-					Deserialize(*type, &value, reader);
+					success = Deserialize(*type, &value, reader);
 				}
+				return success;
 			}
 
-			void Deserialize(const Reflection::Type& type, void* value, ISerializationReader& reader) const
+			bool Deserialize(const Reflection::Type& type, void* value, ISerializationReader& reader) const
 			{
+				bool success = false;
+				const deserialization_strategy_t* strategy = GetDeserializationStrategy(type);
+				if (strategy)
+				{
+					success = Deserialize(type, *strategy, value, reader);
+				}
+				return success;
+			}
+
+			template<typename value_t>
+			bool RawDeserialize(value_t& value, ISerializationReader& reader) const
+			{
+				bool success = false;
+				const Reflection::Type* type = _typeLibrary.Get<value_t>();
+				if (type)
+				{
+					success = RawDeserialize(*type, &value, reader);
+				}
+				return success;
+			}
+
+			bool RawDeserialize(const Reflection::Type& type, void* value, ISerializationReader& reader) const
+			{
+				bool success = false;
 				const deserialization_strategy_t* strategy = GetDeserializationStrategy(type);
 				if (ensure(strategy))
 				{
-					Deserialize(type, *strategy, value, reader);
+					success = RawDeserialize(type, *strategy, value, reader);
 				}
-			}
-
-			template<typename value_t>
-			void RawDeserialize(value_t& value, ISerializationReader& reader) const
-			{
-				const Reflection::Type* type = _typeLibrary.Get<value_t>();
-				if (ensure(type))
-				{
-					RawDeserialize(*type, &value, reader);
-				}
-			}
-
-			void RawDeserialize(const Reflection::Type& type, void* value, ISerializationReader& reader) const
-			{
-				const deserialization_strategy_t* strategy = GetDeserializationStrategy(type);
-				if (ensure(strategy))
-				{
-					RawDeserialize(type, *strategy, value, reader);
-				}
+				return success;
 			}
 
 		private:
-			void RawSerialize(const Reflection::Type& type, const serialization_strategy_t& strategy, const void* value, ISerializationWriter& writer) const
+			bool RawSerialize(const Reflection::Type& type, const serialization_strategy_t& strategy, const void* value, ISerializationWriter& writer) const
 			{
-				strategy(*this, value, writer);
+				return strategy(*this, value, writer);
 			}
 
-			void Serialize(const Reflection::Type& type, const serialization_strategy_t& strategy, const void* value, ISerializationWriter& writer) const
+			bool Serialize(const Reflection::Type& type, const serialization_strategy_t& strategy, const void* value, ISerializationWriter& writer) const
 			{
-				writer.WriteBeginObject();
+				bool success = true;
+				success &= writer.WriteBeginObject();
 				{
-					writer.WriteBeginObjectProperty("type");
+					success &= writer.WriteBeginObjectProperty("type");
 					{
-						writer.WriteString(type.GetName());
+						success &= writer.WriteString(type.GetName());
 					}
-					writer.WriteEndObjectProperty();
+					success &= writer.WriteEndObjectProperty();
 
-					writer.WriteBeginObjectProperty("value");
+					success &= writer.WriteBeginObjectProperty("value");
 					{
-						RawSerialize(type, strategy, value, writer);
+						success &= RawSerialize(type, strategy, value, writer);
 					}
-					writer.WriteEndObjectProperty();
+					success &= writer.WriteEndObjectProperty();
 				}
+				return success;
 			}
 
-			void RawDeserialize(const Reflection::Type& type, const deserialization_strategy_t& strategy, void* value, ISerializationReader& reader) const
+			bool RawDeserialize(const Reflection::Type& type, const deserialization_strategy_t& strategy, void* value, ISerializationReader& reader) const
 			{
-				strategy(*this, value, reader);
+				return strategy(*this, value, reader);
 			}
 
-			void Deserialize(const Reflection::Type& type, const deserialization_strategy_t& strategy, void* value, ISerializationReader& reader) const
+			bool Deserialize(const Reflection::Type& type, const deserialization_strategy_t& strategy, void* value, ISerializationReader& reader) const
 			{
-				reader.ReadBeginObject();
+				bool success = true;
+				success &= reader.ReadBeginObject();
 				{
 					while (reader.HasObjectPropertyRemaining())
 					{
 						std::string property;
-						reader.ReadBeginObjectProperty(property);
+						success &= reader.ReadBeginObjectProperty(property);
 						{
 							if (property == "type")
 							{
 								std::string actualType;
-								reader.ReadString(actualType);
+								success &= reader.ReadString(actualType);
 								assert(type.GetName() == actualType);
 							}
 							else if (property == "value")
 							{
-								RawDeserialize(type, strategy, value, reader);
+								success &= RawDeserialize(type, strategy, value, reader);
 							}
 						}
-						reader.ReadEndObjectProperty();
+						success &= reader.ReadEndObjectProperty();
 					}
 				}
-				reader.ReadEndObject();
+				success &= reader.ReadEndObject();
+				return success;
 			}
 
 			const serialization_strategy_t* GetSerializationStrategy(const Reflection::Type& type) const

@@ -18,9 +18,6 @@
     <ClInclude Include="Serialization\Serializer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\TextSerialization.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Serialization\Writer\JsonSerializationWriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -41,7 +38,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Serialization\Source.cpp">
+    <ClCompile Include="Serialization\ReflectoSerialization.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ReflectoSerialization.cpp">

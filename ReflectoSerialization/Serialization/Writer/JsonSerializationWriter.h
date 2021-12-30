@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Serialization/TextSerialization.h"
 #include "Serialization/Writer/ISerializationWriter.h"
 
 #include "Common/Definitions.h"

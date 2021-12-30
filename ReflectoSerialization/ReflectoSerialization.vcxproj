@@ -24,7 +24,6 @@
     <ClInclude Include="Serialization\SerializerFactory.h" />
     <ClInclude Include="Serialization\Strategy\SerializationStrategy.h" />
     <ClInclude Include="Serialization\Serializer.h" />
-    <ClInclude Include="Serialization\TextSerialization.h" />
     <ClInclude Include="Serialization\Writer\ISerializationWriter.h" />
     <ClInclude Include="Serialization\Writer\JsonSerializationWriter.h" />
   </ItemGroup>
@@ -37,7 +36,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Serialization\Source.cpp" />
+    <ClCompile Include="Serialization\ReflectoSerialization.cpp" />
     <ClCompile Include="ReflectoSerialization.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -128,19 +128,24 @@ namespace Reflecto
 				});
 			}
 
-			void Import(const std::string& str)
+			bool Import(const std::string& str)
 			{
+				bool success = false;
 				JsonElement element;
 
 				const Json::CharReaderBuilder charReaderBuilder;
 				JSONCPP_STRING error;
 				std::stringstream ss(str);
 
-				const bool success = Json::parseFromStream(charReaderBuilder, ss, &element, &error);
-				if (ensure(success))
+				if (Json::parseFromStream(charReaderBuilder, ss, &element, &error))
 				{
-					PushElement(element);
+					if (PushElement(element))
+					{
+						success = true;
+					}
 				}
+
+				return success;
 			}
 
 		private:

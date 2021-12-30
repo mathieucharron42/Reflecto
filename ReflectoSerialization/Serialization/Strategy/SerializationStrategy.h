@@ -17,248 +17,264 @@ namespace Reflecto
 	{
 		struct Int32SerializationStrategy
 		{
-			static void Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
+			static bool Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
 			{
 				const int32_t& valInt = *static_cast<const int32_t*>(value);
-				writer.WriteInteger32(valInt);
+				return writer.WriteInteger32(valInt);
 			}
 
-			static void Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
+			static bool Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
 			{
 				int32_t& valInt = *static_cast<int32_t*>(value);
-				reader.ReadInteger32(valInt);
+				return reader.ReadInteger32(valInt);
 			}
 		};
 
 		struct StringSerializationStrategy
 		{
-			static void Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
+			static bool Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
 			{
 				const std::string& valueStr = *static_cast<const std::string*>(value);
-				writer.WriteString(valueStr);
+				return writer.WriteString(valueStr);
 			}
 
-			static void Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
+			static bool Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
 			{
 				std::string& valueStr = *static_cast<std::string*>(value);
-				reader.ReadString(valueStr);
+				return reader.ReadString(valueStr);
 			}
 		};
 
 		struct FloatSerializationStrategy
 		{
-			static void Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
+			static bool Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
 			{
 				const float& valueStr = *static_cast<const float*>(value);
-				writer.WriteFloat(valueStr);
+				return writer.WriteFloat(valueStr);
 			}
 
-			static void Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
+			static bool Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
 			{
 				float& valueStr = *static_cast<float*>(value);
-				reader.ReadFloat(valueStr);
+				return reader.ReadFloat(valueStr);
 			}
 		};
 
 		struct DoubleSerializationStrategy
 		{
-			static void Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
+			static bool Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
 			{
 				const double& valueStr = *static_cast<const double*>(value);
-				writer.WriteDouble(valueStr);
+				return writer.WriteDouble(valueStr);
 			}
 
-			static void Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
+			static bool Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
 			{
 				double& valueStr = *static_cast<double*>(value);
-				reader.ReadDouble(valueStr);
+				return reader.ReadDouble(valueStr);
 			}
 		};
 
 		struct BooleanSerializationStrategy
 		{
-			static void Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
+			static bool Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
 			{
 				const bool& valueBoolean = *static_cast<const bool*>(value);
-				writer.WriteBoolean(valueBoolean);
+				return writer.WriteBoolean(valueBoolean);
 			}
 
-			static void Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
+			static bool Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
 			{
 				bool& valueBoolean = *static_cast<bool*>(value);
-				reader.ReadBoolean(valueBoolean);
+				return reader.ReadBoolean(valueBoolean);
 			}
 		};
 
 		template<class object_t>
 		struct ObjectSerializationStrategy
 		{
-			static void Serialize(const Reflection::TypeDescriptor& typeDesriptor, const Serializer& serializer, const void* value, ISerializationWriter& writer)
+			static bool Serialize(const Reflection::TypeDescriptor& typeDesriptor, const Serializer& serializer, const void* value, ISerializationWriter& writer)
 			{
+				bool success = true;
 				const object_t& valueObject = *static_cast<const object_t*>(value);
 				Reflection::Resolver<object_t> resolver(typeDesriptor);
-				writer.WriteBeginObject();
+				success &= writer.WriteBeginObject();
 				{
 					for (const Reflection::MemberDescriptor& member : typeDesriptor.GetMembers())
 					{
-						writer.WriteBeginObjectProperty(member.GetName());
+						success &= writer.WriteBeginObjectProperty(member.GetName());
 						{
 							const void* value = resolver.ResolveMember(valueObject, member);
-							serializer.Serialize(member.GetType(), value, writer);
+							success &= serializer.Serialize(member.GetType(), value, writer);
 						}
-						writer.WriteEndObjectProperty();
+						success &= writer.WriteEndObjectProperty();
 					}
 				}
-				writer.WriteEndObject();
+				success &= writer.WriteEndObject();
+				return success;
 			}
 
-			static void Deserialize(const Reflection::TypeDescriptor& typeDesriptor, const Serializer& serializer, void* value, ISerializationReader& reader)
+			static bool Deserialize(const Reflection::TypeDescriptor& typeDesriptor, const Serializer& serializer, void* value, ISerializationReader& reader)
 			{
+				bool success = true;
 				object_t& valueObject = *static_cast<object_t*>(value);
 				Reflection::Resolver<object_t> resolver(typeDesriptor);
-				reader.ReadBeginObject();
+				success &= reader.ReadBeginObject();
 				{
 					while (reader.HasObjectPropertyRemaining())
 					{
 						std::string propertyName;
-						reader.ReadBeginObjectProperty(propertyName);
+						success &= reader.ReadBeginObjectProperty(propertyName);
 						{
 							const Reflection::MemberDescriptor* memberDescriptor = typeDesriptor.GetMemberByName(propertyName);
 							if (ensure(memberDescriptor))
 							{
 								void* member = resolver.ResolveMember(valueObject, *memberDescriptor);
-								serializer.Deserialize(memberDescriptor->GetType(), member, reader);
+								success &= serializer.Deserialize(memberDescriptor->GetType(), member, reader);
 							}
 						}
-						reader.ReadEndObjectProperty();
+						success &= reader.ReadEndObjectProperty();
 					}
 				}
-				reader.ReadEndObject();
+				success &= reader.ReadEndObject();
+				return success;
 			}
 		};
 
 		template<class object_t>
 		struct VectorSerializationStrategy
 		{
-			static void Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
+			static bool Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
 			{
 				using element_t = typename object_t::value_type;
 
+				bool success = true;
 				const object_t& valueObject = *static_cast<const object_t*>(value);
-				writer.WriteBeginArray();
+				success &= writer.WriteBeginArray();
 				{
 					for (const element_t& element : valueObject)
 					{
-						writer.WriteBeginArrayElement();
+						success &= writer.WriteBeginArrayElement();
 						{
-							serializer.Serialize(element, writer);
+							success &= serializer.Serialize(element, writer);
 						}
-						writer.WriteEndArrayElement();
+						success &= writer.WriteEndArrayElement();
 					}
 				}
-				writer.WriteEndArray();
+				success &= writer.WriteEndArray();
+				return success;
 			}
 
-			static void Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
+			static bool Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
 			{
 				using element_t = typename object_t::value_type;
 
+				bool success = true;
+
 				object_t& collection = *static_cast<object_t*>(value);
-				reader.ReadBeginArray();
+				success &= reader.ReadBeginArray();
 				{
 					while (reader.HasArrayElementRemaining())
 					{
 						uint32_t index;
-						reader.ReadBeginArrayElement(index);
+						success &= reader.ReadBeginArrayElement(index);
 						{
 							element_t element;
-							serializer.Deserialize<element_t>(element, reader);
+							success &= serializer.Deserialize<element_t>(element, reader);
 							collection.push_back(element);
 						}
-						reader.ReadEndArrayElement();
+						success &= reader.ReadEndArrayElement();
 					}
 				}
-				reader.ReadEndArray();
+				success &= reader.ReadEndArray();
+				return success;
 			}
 		};
 
 		template<class object_t>
 		struct MapSerializationStrategy
 		{
-			static void Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
+			static bool Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
 			{
 				using element_t = typename object_t::value_type;
 
+				bool success = true;
+
 				const object_t& valueObject = *static_cast<const object_t*>(value);
-				writer.WriteBeginArray();
+				success &= writer.WriteBeginArray();
 				{
 					for (const element_t& element : valueObject)
 					{
-						writer.WriteBeginArrayElement();
+						success &= writer.WriteBeginArrayElement();
 						{
-							writer.WriteBeginObject();
+							success &= writer.WriteBeginObject();
 							{
-								writer.WriteBeginObjectProperty("key");
+								success &= writer.WriteBeginObjectProperty("key");
 								{
-									serializer.Serialize(element.first, writer);
+									success &= serializer.Serialize(element.first, writer);
 								}
-								writer.WriteEndObjectProperty();
-								writer.WriteBeginObjectProperty("value");
+								success &= writer.WriteEndObjectProperty();
+								success &= writer.WriteBeginObjectProperty("value");
 								{
-									serializer.Serialize(element.second, writer);
+									success &= serializer.Serialize(element.second, writer);
 								}
-								writer.WriteEndObjectProperty();
+								success &= writer.WriteEndObjectProperty();
 							}
-							writer.WriteEndObject();
+							success &= writer.WriteEndObject();
 						}
-						writer.WriteEndArrayElement();
+						success &= writer.WriteEndArrayElement();
 					}
 				}
-				writer.WriteEndArray();
+				success &= writer.WriteEndArray();
+
+				return success;
 			}
 
-			static void Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
+			static bool Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
 			{
 				using element_t = typename object_t::value_type;
 				using key_t = typename object_t::key_type;
 				using value_t = typename object_t::mapped_type;
 
+				bool success = true;
+
 				object_t& collection = *static_cast<object_t*>(value);
-				reader.ReadBeginArray();
+				success &= reader.ReadBeginArray();
 				{
 					while (reader.HasArrayElementRemaining())
 					{
 						uint32_t index;
-						reader.ReadBeginArrayElement(index);
+						success &= reader.ReadBeginArrayElement(index);
 						{
-							reader.ReadBeginObject();
+							success &= reader.ReadBeginObject();
 							{
 								key_t key;
 								value_t value;
 								while (reader.HasObjectPropertyRemaining())
 								{
 									std::string propertyName;
-									reader.ReadBeginObjectProperty(propertyName);
+									success &= reader.ReadBeginObjectProperty(propertyName);
 									{
 										if (propertyName == "key")
 										{
-											serializer.Deserialize<key_t>(key, reader);
+											success &= serializer.Deserialize<key_t>(key, reader);
 										}
 										else if (propertyName == "value")
 										{
-											serializer.Deserialize<value_t>(value, reader);
+											success &= serializer.Deserialize<value_t>(value, reader);
 										}
 									}
-									reader.ReadEndObjectProperty();
+									success &= reader.ReadEndObjectProperty();
 								}
 								collection.insert({ key, value });
 							}
-							reader.ReadEndObject();
+							success &= reader.ReadEndObject();
 						}
-						reader.ReadEndArrayElement();
+						success &= reader.ReadEndArrayElement();
 					}
 				}
-				reader.ReadEndArray();
+				success &= reader.ReadEndArray();
+				return success;
 			}
 		};
 	}

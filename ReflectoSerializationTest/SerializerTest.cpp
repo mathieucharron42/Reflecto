@@ -3,7 +3,6 @@
 #include "Serialization/Serializer.h"
 #include "Serialization/SerializerFactory.h"
 #include "Serialization/Strategy/SerializationStrategy.h"
-#include "Serialization/TextSerialization.h"
 #include "Serialization/Writer/JsonSerializationWriter.h"
 #include "Type/TypeDescriptorFactory.h"
 #include "Type/TypeFactory.h"
@@ -18,6 +17,39 @@
 #include <vector>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+namespace Reflecto
+{
+	namespace Serialization
+	{
+		namespace Test
+		{
+			struct TestPerson
+			{
+				std::string Name;
+				int32_t Age = 0;
+
+				bool operator==(const TestPerson& other) const
+				{
+					return Name == other.Name && Age == other.Age;
+				}
+			};
+		}
+	}
+}
+
+template<>
+inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<std::vector<std::string>>(const std::vector<std::string>& vector)
+{
+	return Reflecto::Utils::StringExt::ToWstring(Reflecto::Utils::StringExt::Join<std::string>(vector, ","));
+}
+
+template<>
+inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<Reflecto::Serialization::Test::TestPerson>(const Reflecto::Serialization::Test::TestPerson& obj)
+{
+	return Reflecto::Utils::StringExt::Format<std::wstring>(L"{Name=%s,Age=%i}", obj.Name.c_str(), obj.Age);
+}
+
 namespace Reflecto
 {
 	namespace Serialization
@@ -29,6 +61,8 @@ namespace Reflecto
 			public:
 				TEST_METHOD(SerializeInt)
 				{
+					/////////////
+					// Arrange
 					Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
 						.Add<int32_t>("int32")
 					.Build();
@@ -37,28 +71,34 @@ namespace Reflecto
 						.LearnType<int32_t, Int32SerializationStrategy>()
 					.Build();
 
-					int32_t testValue = 42;
+					int32_t expectedValue = 42;
+					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%i})"), "int32", expectedValue);
+
+					/////////////
+					// Act
+					bool success = true;
+					std::string actualSerializedStr;
+					int32_t actualDeserializedValue;
 
 					JsonSerializationWriter writer;
-					serializer.Serialize(testValue, writer);
-
-					std::string actualSerializedStr;
-					writer.Transpose(actualSerializedStr);
-
-					std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%i})"), "int32", testValue);
-					Assert::AreEqual(expectedSerialized, actualSerializedStr, L"Serialized value is unexpected!");
+					success &= serializer.Serialize(expectedValue, writer);
+					success &= writer.Transpose(actualSerializedStr);
 
 					JsonSerializationReader reader;
-					reader.Import(actualSerializedStr);
+					success &= reader.Import(actualSerializedStr);
+					success &= serializer.Deserialize(actualDeserializedValue, reader);
 
-					int32_t actualDeserializedValue;
-					serializer.Deserialize(actualDeserializedValue, reader);
-
-					Assert::AreEqual(testValue, actualDeserializedValue, L"Deserialized value is unexpected");
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Failure is unexpected!");
+					Assert::AreEqual(expectedSerialized, actualSerializedStr, L"Serialized value is unexpected!");
+					Assert::AreEqual(expectedValue, actualDeserializedValue, L"Deserialized value is unexpected");
 				}
 
 				TEST_METHOD(SerializeString)
 				{
+					/////////////
+					// Arrange
 					Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
 						.Add<std::string>("string")
 					.Build();
@@ -67,28 +107,34 @@ namespace Reflecto
 						.LearnType<std::string, StringSerializationStrategy>()
 					.Build();
 
-					std::string testValue = "test";
+					std::string expectedValue = "test";
+					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", expectedValue.c_str());
+
+					/////////////
+					// Act
+					bool success = true;
+					std::string actualSerialized;
+					std::string actualDeserializedValue;
 
 					JsonSerializationWriter writer;
-					serializer.Serialize(testValue, writer);
-
-					std::string actualSerialized;
-					writer.Transpose(actualSerialized);
-
-					std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testValue.c_str());
-					Assert::AreEqual(expectedSerialized, actualSerialized, L"Serialized value is unexpected!");
+					success &= serializer.Serialize(expectedValue, writer);
+					success &= writer.Transpose(actualSerialized);
 
 					JsonSerializationReader reader;
-					reader.Import(actualSerialized);
+					success &= reader.Import(actualSerialized);
+					success &= serializer.Deserialize(actualDeserializedValue, reader);
 
-					std::string actualDeserializedValue;
-					serializer.Deserialize(actualDeserializedValue, reader);
-
-					Assert::AreEqual(testValue, actualDeserializedValue, L"Deserialized value is unexpected");
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Failure is unexpected!");
+					Assert::AreEqual(expectedSerialized, actualSerialized, L"Serialized value is unexpected!");
+					Assert::AreEqual(expectedValue, actualDeserializedValue, L"Deserialized value is unexpected");
 				}
 
 				TEST_METHOD(SerializeFloat)
 				{
+					/////////////
+					// Arrange
 					Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
 						.Add<float>("float")
 					.Build();
@@ -97,28 +143,34 @@ namespace Reflecto
 						.LearnType<float, FloatSerializationStrategy>()
 					.Build();
 
-					float testValue = 0.5f;
+					const float expectedValue = 0.5f;
+					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%.1f})"), "float", expectedValue);
+
+					/////////////
+					// Act
+					bool success = true;
+					std::string actualSerializedStr;
+					float actualDeserializedValue;
 
 					JsonSerializationWriter writer;
-					serializer.Serialize(testValue, writer);
-
-					std::string actualSerializedStr;
-					writer.Transpose(actualSerializedStr);
-
-					std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%.1f})"), "float", testValue);
-					Assert::AreEqual(expectedSerialized, actualSerializedStr, L"Serialized value is unexpected!");
+					success &= serializer.Serialize(expectedValue, writer);
+					success &= writer.Transpose(actualSerializedStr);
 
 					JsonSerializationReader reader;
-					reader.Import(actualSerializedStr);
+					success &= reader.Import(actualSerializedStr);
+					success &= serializer.Deserialize(actualDeserializedValue, reader);
 
-					float actualDeserializedValue;
-					serializer.Deserialize(actualDeserializedValue, reader);
-
-					Assert::AreEqual(testValue, actualDeserializedValue, L"Deserialized value is unexpected");
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Failure is unexpected!");
+					Assert::AreEqual(expectedSerialized, actualSerializedStr, L"Serialized value is unexpected!");
+					Assert::AreEqual(expectedValue, actualDeserializedValue, L"Deserialized value is unexpected");
 				}
 
 				TEST_METHOD(SerializeDouble)
 				{
+					/////////////
+					// Arrange
 					Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
 						.Add<double>("double")
 						.Build();
@@ -127,28 +179,34 @@ namespace Reflecto
 						.LearnType<double, DoubleSerializationStrategy>()
 					.Build();
 
-					double testValue = 0.5;
+					const double expectedValue = 0.5;
+					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%.1f})"), "double", expectedValue);
+
+					/////////////
+					// Act
+					bool success = true;
+					std::string actualSerializedStr;
+					double actualDeserializedValue;
 
 					JsonSerializationWriter writer;
-					serializer.Serialize(testValue, writer);
-
-					std::string actualSerializedStr;
-					writer.Transpose(actualSerializedStr);
-
-					std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%.1f})"), "double", testValue);
-					Assert::AreEqual(expectedSerialized, actualSerializedStr, L"Serialized value is unexpected!");
+					success &= serializer.Serialize(expectedValue, writer);
+					success &= writer.Transpose(actualSerializedStr);
 
 					JsonSerializationReader reader;
-					reader.Import(actualSerializedStr);
+					success &= reader.Import(actualSerializedStr);
+					success &= serializer.Deserialize(actualDeserializedValue, reader);
 
-					double actualDeserializedValue;
-					serializer.Deserialize(actualDeserializedValue, reader);
-
-					Assert::AreEqual(testValue, actualDeserializedValue, L"Deserialized value is unexpected");
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Failure is unexpected!");
+					Assert::AreEqual(expectedSerialized, actualSerializedStr, L"Serialized value is unexpected!");
+					Assert::AreEqual(expectedValue, actualDeserializedValue, L"Deserialized value is unexpected");
 				}
 
 				TEST_METHOD(SerializeBoolean)
 				{
+					/////////////
+					// Arrange
 					Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
 						.Add<bool>("boolean")
 					.Build();
@@ -156,40 +214,76 @@ namespace Reflecto
 					Serializer serializer = SerializerFactory(testTypeLibrary)
 						.LearnType<bool, BooleanSerializationStrategy>()
 					.Build();
+					
+					bool expectedValue = true;
+					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%s})"), "boolean", expectedValue ? "true" : "false");
 
-					bool testValue = true;
+					/////////////
+					// Act
+					bool success = true;
+					std::string actualSerializedStr;
+					bool actualDeserializedValue;
 
 					JsonSerializationWriter writer;
-					serializer.Serialize(testValue, writer);
-
-					std::string actualSerializedStr;
-					writer.Transpose(actualSerializedStr);
-
-					std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%s})"), "boolean", testValue ? "true" : "false");
-					Assert::AreEqual(expectedSerialized, actualSerializedStr, L"Serialized value is unexpected!");
+					success &= serializer.Serialize(expectedValue, writer);
+					success &= writer.Transpose(actualSerializedStr);
 
 					JsonSerializationReader reader;
-					reader.Import(actualSerializedStr);
+					success &= reader.Import(actualSerializedStr);
+					success &= serializer.Deserialize(actualDeserializedValue, reader);
 
-					bool actualDeserializedValue;
-					serializer.Deserialize(actualDeserializedValue, reader);
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Failure is unexpected!");
+					Assert::AreEqual(expectedSerialized, actualSerializedStr, L"Serialized value is unexpected!");
+					Assert::AreEqual(expectedValue, actualDeserializedValue, L"Deserialized value is unexpected");
+				}
 
-					Assert::AreEqual(testValue, actualDeserializedValue, L"Deserialized value is unexpected");
+				TEST_METHOD(SerializeVector)
+				{
+					/////////////
+					// Arrange
+					Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
+						.Add<std::string>("string")
+						.Add<std::vector<std::string>>("vector<string>")
+					.Build();
+
+					Serializer serializer = SerializerFactory(testTypeLibrary)
+						.LearnType<std::string, StringSerializationStrategy>()
+						.LearnType<std::vector<std::string>, VectorSerializationStrategy<std::vector<std::string>>>()
+					.Build();
+
+					const std::vector<std::string> expectedValue = { "uno", "dos", "tres" };
+					const std::string value1ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "uno");
+					const std::string value2ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "dos");
+					const std::string value3ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "tres");
+					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":[%s,%s,%s]})"), "vector<string>", value1ExpectedStr.c_str(), value2ExpectedStr.c_str(), value3ExpectedStr.c_str());
+
+					/////////////
+					// Act
+					bool success = true;
+					std::string actualSerialized;
+					std::vector<std::string> actualDeserializedValue;
+
+					JsonSerializationWriter writer;
+					success &= serializer.Serialize(expectedValue, writer);
+					success &= writer.Transpose(actualSerialized);
+
+					JsonSerializationReader reader;
+					success &= reader.Import(actualSerialized);
+					success &= serializer.Deserialize(actualDeserializedValue, reader);
+
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Failure is unexpected!");
+					Assert::AreEqual(expectedSerialized, actualSerialized, L"Serialized value is unexpected!");
+					Assert::AreEqual(expectedValue, actualDeserializedValue, L"Deserialized value is unexpected");
 				}
 
 				TEST_METHOD(SerializeObject)
 				{
-					struct TestPerson
-					{
-						std::string Name;
-						int32_t Age = 0;
-
-						bool operator==(const TestPerson& other)
-						{
-							return Name == other.Name && Age == other.Age;
-						}
-					};
-
+					/////////////
+					// Arrange
 					const Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
 						.Add<TestPerson>("TestPerson")
 						.Add<std::string>("string")
@@ -206,70 +300,42 @@ namespace Reflecto
 						.LearnType<std::string, StringSerializationStrategy>()
 						.LearnType<TestPerson, ObjectSerializationStrategy<TestPerson>>(testPersonDescriptor)
 					.Build();
-	
-					TestPerson testValue;
-					const std::string testValueName = "George";
-					testValue.Name = testValueName;
-					const int32_t testValueAge = 1;
-					testValue.Age = testValueAge;
-					
-					JsonSerializationWriter writer;
-					serializer.Serialize(testValue, writer);
-					
+
+					const std::string expectedNameValue = "George";
+					const int32_t expectedAgeValue = 1;
+					const std::string expectedNameStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", expectedNameValue.c_str());
+					const std::string expectedAgeStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int32", expectedAgeValue);
+					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Age":%s,"Name":%s}})"), testPersonDescriptor.GetType().GetName().c_str(), expectedAgeStr.c_str(), expectedNameStr.c_str());
+
+					/////////////
+					// Act
+					bool success = true;
 					std::string actualSerialized;
-					writer.Transpose(actualSerialized);
-
-					std::string expectedNameStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testValueName.c_str());
-					std::string expectedAgeStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int32", testValueAge);
-					std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Age":%s,"Name":%s}})"), testPersonDescriptor.GetType().GetName().c_str(), expectedAgeStr.c_str(), expectedNameStr.c_str());
-					Assert::AreEqual(expectedSerialized, actualSerialized, L"Serialized value is unexpected!");
-
-					JsonSerializationReader reader;
-					reader.Import(actualSerialized);
-
 					TestPerson actualDeserializedValue;
-					serializer.Deserialize(actualDeserializedValue, reader);
 
-					Assert::IsTrue(testValue == actualDeserializedValue, L"Deserialized value is unexpected");
-				}
-
-				TEST_METHOD(SerializeVector)
-				{
-					Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
-						.Add<std::string>("string")
-						.Add<std::vector<std::string>>("vector<string>")
-					.Build();
-
-					Serializer serializer = SerializerFactory(testTypeLibrary)
-						.LearnType<std::string, StringSerializationStrategy>()
-						.LearnType<std::vector<std::string>, VectorSerializationStrategy<std::vector<std::string>>>()
-					.Build();
-
-					std::vector<std::string> testValue = { "uno", "dos", "tres" };
-
+					TestPerson expectedValue;
+					expectedValue.Name = expectedNameValue;
+					expectedValue.Age = expectedAgeValue;
+					
 					JsonSerializationWriter writer;
-					serializer.Serialize(testValue, writer);
-
-					std::string actualSerialized;
-					writer.Transpose(actualSerialized);
-
-					std::string value1ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "uno");
-					std::string value2ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "dos");
-					std::string value3ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "tres");
-					std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":[%s,%s,%s]})"), "vector<string>", value1ExpectedStr.c_str(), value2ExpectedStr.c_str(), value3ExpectedStr.c_str());
-					Assert::AreEqual(expectedSerialized, actualSerialized, L"Serialized value is unexpected!");
+					success &= serializer.Serialize(expectedValue, writer);
+					success &= writer.Transpose(actualSerialized);
 
 					JsonSerializationReader reader;
-					reader.Import(actualSerialized);
+					success &= reader.Import(actualSerialized);
+					success &= serializer.Deserialize(actualDeserializedValue, reader);
 
-					std::vector<std::string> actualDeserializedValue;
-					serializer.Deserialize(actualDeserializedValue, reader);
-
-					Assert::IsTrue(testValue == actualDeserializedValue, L"Deserialized value is unexpected");
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Failure is unexpected!");
+					Assert::AreEqual(expectedSerialized, actualSerialized, L"Serialized value is unexpected!");
+					Assert::AreEqual(expectedValue, actualDeserializedValue, L"Deserialized value is unexpected");
 				}
 
 				TEST_METHOD(SerializeMap)
 				{
+					/////////////
+					// Arrange
 					Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
 						.Add<std::string>("string")
 						.Add<int32_t>("int")
@@ -282,39 +348,44 @@ namespace Reflecto
 						.LearnType<std::map<int32_t, std::string>, MapSerializationStrategy<std::map<int32_t, std::string>>>()
 					.Build();
 
-					std::map<int32_t, std::string> testValue = { {1, "uno"}, { 2, "dos"}, { 3, "tres" } };
+					const std::map<int32_t, std::string> expectedValue = { {1, "uno"}, { 2, "dos"}, { 3, "tres" } };
+					
+					const std::string key1ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int", 1);
+					const std::string key2ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int", 2);
+					const std::string key3ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int", 3);
+					const std::string value1ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "uno");
+					const std::string value2ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "dos");
+					const std::string value3ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "tres");
+					const std::string entry1ExpectedStr = Utils::StringExt::Format(std::string(R"({"key":%s,"value":%s})"), key1ExpectedStr.c_str(), value1ExpectedStr.c_str());
+					const std::string entry2ExpectedStr = Utils::StringExt::Format(std::string(R"({"key":%s,"value":%s})"), key2ExpectedStr.c_str(), value2ExpectedStr.c_str());
+					const std::string entry3ExpectedStr = Utils::StringExt::Format(std::string(R"({"key":%s,"value":%s})"), key3ExpectedStr.c_str(), value3ExpectedStr.c_str());
+					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":[%s,%s,%s]})"), "map<int,string>", entry1ExpectedStr.c_str(), entry2ExpectedStr.c_str(), entry3ExpectedStr.c_str());
+
+					/////////////
+					// Act
+					bool success = true;
+					std::string actualSerialized;
+					std::map<int32_t, std::string> actualDeserializedValue;
 
 					JsonSerializationWriter writer;
-					serializer.Serialize(testValue, writer);
+					success &= serializer.Serialize(expectedValue, writer);
+					success &= writer.Transpose(actualSerialized);
 
-					std::string actualSerialized;
-					writer.Transpose(actualSerialized);
-
-					std::string key1ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int", 1);
-					std::string key2ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int", 2);
-					std::string key3ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int", 3);
-					std::string value1ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "uno");
-					std::string value2ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "dos");
-					std::string value3ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "tres");
-
-					std::string entry1ExpectedStr = Utils::StringExt::Format(std::string(R"({"key":%s,"value":%s})"), key1ExpectedStr.c_str(), value1ExpectedStr.c_str());
-					std::string entry2ExpectedStr = Utils::StringExt::Format(std::string(R"({"key":%s,"value":%s})"), key2ExpectedStr.c_str(), value2ExpectedStr.c_str());
-					std::string entry3ExpectedStr = Utils::StringExt::Format(std::string(R"({"key":%s,"value":%s})"), key3ExpectedStr.c_str(), value3ExpectedStr.c_str());
-					
-					std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":[%s,%s,%s]})"), "map<int,string>", entry1ExpectedStr.c_str(), entry2ExpectedStr.c_str(), entry3ExpectedStr.c_str());
-					Assert::AreEqual(expectedSerialized, actualSerialized, L"Serialized value is unexpected!");
-				
 					JsonSerializationReader reader;
-					reader.Import(actualSerialized);
+					success &= reader.Import(actualSerialized);
+					success &= serializer.Deserialize(actualDeserializedValue, reader);
 
-					std::map<int32_t, std::string> actualDeserializedValue;
-					serializer.Deserialize(actualDeserializedValue, reader);
-
-					Assert::IsTrue(testValue == actualDeserializedValue, L"Deserialized value is unexpected");
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Failure is unexpected!");
+					Assert::AreEqual(expectedSerialized, actualSerialized, L"Serialized value is unexpected!");
+					Assert::IsTrue(expectedValue == actualDeserializedValue, L"Deserialized value is unexpected");
 				}
 
 				TEST_METHOD(SerializeObjectObject)
 				{
+					/////////////
+					// Arrange
 					struct TestPotatoHead
 					{
 						struct Eyes
@@ -399,55 +470,62 @@ namespace Reflecto
 						.LearnType<TestPotatoHead::Nose, ObjectSerializationStrategy<TestPotatoHead::Nose>>(testPotatoHeadNoseDescriptor)
 					.Build();
 
-					TestPotatoHead testPotatoHead;
 					const std::string testValueName = "Mr. Potato Head";
-					testPotatoHead.Name = testValueName;
-					
-					TestPotatoHead::Eyes testEyes;
 					const std::string testEyesColor = "Blue";
-					testEyes.Color = testEyesColor;
-					const int32_t testEyesSize = 3;
-					testEyes.Size = testEyesSize;
-					testPotatoHead.CurrentEyes = testEyes;
-
-					TestPotatoHead::Nose testNose;
 					const std::string testNoseType = "Normal";
-					testNose.Type = testNoseType;
-					testPotatoHead.CurrentNose = testNose;
-
-					TestPotatoHead::Mouth testMouth;
+					const int32_t testEyesSize = 3;
 					const bool testMouthIsSmiling = true;
-					testMouth.IsSmiling = testMouthIsSmiling;
-					testPotatoHead.CurrentMouth = testMouth;
-
-					JsonSerializationWriter writer;
-					serializer.Serialize(testPotatoHead, writer);
-
-					std::string actualSerialized;
-					writer.Transpose(actualSerialized);
 
 					const std::string expectedNameStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testValueName.c_str());
-					
+
 					const std::string expectedEyesColorStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testEyesColor.c_str());
 					const std::string expectedEyesSizeStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int32", testEyesSize);
 					const std::string expectedEyesStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Color":%s,"Size":%s}})"), testPotatoHeadEyesDescriptor.GetType().GetName().c_str(), expectedEyesColorStr.c_str(), expectedEyesSizeStr.c_str());
-					
-					const std::string expectedNoseTypeStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testNoseType.c_str()); 
+
+					const std::string expectedNoseTypeStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testNoseType.c_str());
 					const std::string expectedNoseStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Type":%s}})"), testPotatoHeadNoseDescriptor.GetType().GetName().c_str(), expectedNoseTypeStr.c_str());
 
 					const std::string expectedMouthIsSmilingStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%s})"), "boolean", testMouthIsSmiling ? "true" : "false");
 					const std::string expectedMouthStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"IsSmiling":%s}})"), testPotatoHeadMouthDescriptor.GetType().GetName().c_str(), expectedMouthIsSmilingStr.c_str());
 
 					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Eyes":%s,"Mouth":%s,"Name":%s,"Nose":%s}})"), testPotatoHeadDescriptor.GetType().GetName().c_str(), expectedEyesStr.c_str(), expectedMouthStr.c_str(), expectedNameStr.c_str(), expectedNoseStr.c_str());
-					Assert::AreEqual(expectedSerialized, actualSerialized, L"Serialized value is unexpected!");
-
-					JsonSerializationReader reader;
-					reader.Import(actualSerialized);
-
+					
+					/////////////
+					// Act
+					bool success = true;
+					std::string actualSerialized;
 					TestPotatoHead actualDeserializedValue;
-					serializer.Deserialize(actualDeserializedValue, reader);
 
+					TestPotatoHead testPotatoHead;
+					
+					testPotatoHead.Name = testValueName;
+					
+					TestPotatoHead::Eyes testEyes;
+					testEyes.Color = testEyesColor;
+					testEyes.Size = testEyesSize;
+					testPotatoHead.CurrentEyes = testEyes;
+
+					TestPotatoHead::Nose testNose;
+					testNose.Type = testNoseType;
+					testPotatoHead.CurrentNose = testNose;
+
+					TestPotatoHead::Mouth testMouth;
+					testMouth.IsSmiling = testMouthIsSmiling;
+					testPotatoHead.CurrentMouth = testMouth;
+
+					JsonSerializationWriter writer;
+					success &= serializer.Serialize(testPotatoHead, writer);
+					success &= writer.Transpose(actualSerialized);
+					
+					JsonSerializationReader reader;
+					success &= reader.Import(actualSerialized);
+					success &= serializer.Deserialize(actualDeserializedValue, reader);
+
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Failure is unexpected!");
 					Assert::IsTrue(testPotatoHead == actualDeserializedValue, L"Deserialized value is unexpected");
+					Assert::AreEqual(expectedSerialized, actualSerialized, L"Serialized value is unexpected!");
 				}
 			};
 		}
