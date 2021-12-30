@@ -59,7 +59,7 @@ InstructionResult ProcessMethodInstruction(const Serialization::Serializer& seri
 	const Reflection::MethodDescriptor* methodDescriptor = typeDescriptor.GetMethodByName(methodName);
 	if (methodDescriptor)
 	{
-		auto method = resolver.ResolveMethod(*methodDescriptor, instance);
+		auto method = resolver.ResolveMethod<void>(*methodDescriptor, instance);
 		// to do: gérer les paramètres et fonction avec type de retour
 		method();
 		result = InstructionResult::Ok;

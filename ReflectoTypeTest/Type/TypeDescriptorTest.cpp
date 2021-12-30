@@ -133,7 +133,7 @@ namespace Reflecto
 					{
 					public:
 						void MethodNoParameter() { }
-						bool MethodReturn() { }
+						bool MethodReturn() { return bool(); }
 						void Method1Parameter(int32_t) { }
 						void Method2Parameter(int32_t, int32_t) { }
 					};
@@ -145,17 +145,17 @@ namespace Reflecto
 
 					const std::vector<MethodDescriptor> kExpectedMethod = [] () -> std::vector<MethodDescriptor> {
 						MethodDescriptor m1(MethodDescriptor::method_ptr_t<SampleClass>(), "MethodNoParameter");
-						//MethodDescriptor m2(MethodDescriptor::method_ptr_t<TestClass>(), "MethodReturn");
+						MethodDescriptor m2(MethodDescriptor::method_ptr_t<TestClass, bool>(), "MethodReturn");
 						MethodDescriptor m3(MethodDescriptor::method_ptr_t<TestClass, int32_t>(), "Method1Parameter");
 						MethodDescriptor m4(MethodDescriptor::method_ptr_t<SampleClass, int32_t, int32_t>(), "Method2Parameter");
-						return { m1, m3, m4 };
+						return { m1, m2, m3, m4 };
 					}();
 
 					/////////////
 					// Act
 					const TypeDescriptor descriptor = TypeDescriptorFactory<SampleClass>(typeLibrary)
 						.RegisterMethod(&SampleClass::MethodNoParameter, "MethodNoParameter")
-						//.RegisterMethod(&SampleClass::MethodReturn, "MethodReturn")
+						.RegisterMethod(&SampleClass::MethodReturn, "MethodReturn")
 						.RegisterMethod(&SampleClass::Method1Parameter, "Method1Parameter")
 						.RegisterMethod(&SampleClass::Method2Parameter, "Method2Parameter")
 					.Build();

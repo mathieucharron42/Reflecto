@@ -267,6 +267,10 @@ namespace Reflecto
 						bool WasMethod2ParamCalled = false; 
 						std::optional<int32_t> Function2Param1;
 						std::optional<float> Function2Param2;
+
+						int32_t MethodReturn(int32_t p) { WasMethodReturnCalled = true; FunctionReturnParam1 = p; return p; }
+						bool WasMethodReturnCalled = false;
+						std::optional<int32_t> FunctionReturnParam1;
 					};
 
 					const TypeLibrary typeLibrary = TypeLibraryFactory()
@@ -277,6 +281,7 @@ namespace Reflecto
 						.RegisterMethod(&SampleClass::MethodNoParam, "MethodNoParam")
 						.RegisterMethod(&SampleClass::Method1Param, "Method1Param")
 						.RegisterMethod(&SampleClass::Method2Param, "Method2Param")
+						.RegisterMethod(&SampleClass::MethodReturn, "MethodReturn")
 					.Build();
 
 					Resolver<SampleClass> resolver(descriptor);
@@ -285,26 +290,33 @@ namespace Reflecto
 
 					/////////////
 					// Act
-					std::function<void()> methodDoSomething = resolver.ResolveMethod("MethodNoParam", instance);
+					int32_t actualReturn = 0;
+					std::function methodDoSomething = resolver.ResolveMethod("MethodNoParam", instance);
 					if (methodDoSomething)
 					{
 						methodDoSomething();
 					}
 
-					std::function<void(int32_t)> methodDoSomethingWith1Param = resolver.ResolveMethod<int32_t>("Method1Param", instance);
+					std::function<void(int32_t)> methodDoSomethingWith1Param = resolver.ResolveMethod<void, int32_t>("Method1Param", instance);
 					if (methodDoSomethingWith1Param)
 					{
 						methodDoSomethingWith1Param(expectedValueParam1);
 					}
 
-					std::function<void(int32_t, float)> methodDoSomethingWith2Param = resolver.ResolveMethod<int32_t, float>("Method2Param", instance);
+					std::function<void(int32_t, float)> methodDoSomethingWith2Param = resolver.ResolveMethod<void, int32_t, float>("Method2Param", instance);
 					if (methodDoSomethingWith2Param)
 					{
 						methodDoSomethingWith2Param(expectedValueParam1, expectedValueParam2);
 					}
 
-					std::function<void(int32_t)> methodMissing = resolver.ResolveMethod<int32_t>("Method1ParamMissing", instance);
-					std::function<void(int32_t, int32_t)> methodWrongType = resolver.ResolveMethod<int32_t, int32_t>("Method2Param", instance);
+					std::function<int32_t(int32_t)> methodReturn = resolver.ResolveMethod<int32_t, int32_t>("MethodReturn", instance);
+					if (methodReturn)
+					{
+						actualReturn = methodReturn(expectedValueParam1);
+					}
+
+					std::function<void(int32_t)> methodMissing = resolver.ResolveMethod<void, int32_t>("Method1ParamMissing", instance);
+					std::function<void(int32_t, int32_t)> methodWrongType = resolver.ResolveMethod<void, int32_t, int32_t>("Method2Param", instance);
 
 					/////////////
 					// Assert
@@ -322,6 +334,12 @@ namespace Reflecto
 					Assert::AreEqual(expectedValueParam1, instance.Function2Param1.value(), L"Value is not as expected");
 					Assert::IsTrue(instance.Function2Param2.has_value(), L"Value is not as expected");
 					Assert::AreEqual(expectedValueParam2, instance.Function2Param2.value(), L"Value is not as expected");
+
+					Assert::IsTrue(static_cast<bool>(methodReturn), L"Unable to resole method");
+					Assert::IsTrue(instance.WasMethodReturnCalled, L"Method was not called");
+					Assert::IsTrue(instance.FunctionReturnParam1.has_value(), L"Value is not as expected");
+					Assert::AreEqual(expectedValueParam1, instance.FunctionReturnParam1.value(), L"Value is not as expected");
+					Assert::AreEqual(expectedValueParam1, actualReturn, L"Value is not as expected");
 
 					Assert::IsFalse(static_cast<bool>(methodMissing), L"Missing method unexpectedly resolved");
 					Assert::IsFalse(static_cast<bool>(methodWrongType), L"Missing method unexpectedly resolved");

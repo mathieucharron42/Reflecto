@@ -47,10 +47,10 @@ namespace Reflecto
 				return *this;
 			}
 
-			template <typename object_t, typename ... args_t>
-			TypeDescriptorFactory& RegisterMethod(void (object_t::* methodPointer)(args_t ...), const std::string& methodName)
+			template <typename object_t, typename return_t, typename ... args_t>
+			TypeDescriptorFactory& RegisterMethod(return_t(object_t::* methodPointer)(args_t ...), const std::string& methodName)
 			{
-				MethodDescriptor method = MethodDescriptorFactory<object_t, args_t ...>(_typeLibrary, _sampleObj, methodPointer, methodName).Build();
+				MethodDescriptor method = MethodDescriptorFactory<object_t, return_t, args_t ...>(_typeLibrary, _sampleObj, methodPointer, methodName).Build();
 
 				_methods.push_back(method);
 

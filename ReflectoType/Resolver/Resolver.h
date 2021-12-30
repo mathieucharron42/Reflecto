@@ -19,8 +19,8 @@ namespace Reflecto
 		class Resolver : private Utils::NonCopyable
 		{
 		public:
-			template<typename ... args_t>
-			using resolved_method_t = std::function<void(args_t...)>;
+			template<typename return_t, typename ... args_t>
+			using resolved_method_t = std::function<return_t(args_t...)>;
 
 			Resolver(const TypeDescriptor& typeDescriptor)
 				: _typeDescriptor(typeDescriptor)
@@ -87,27 +87,27 @@ namespace Reflecto
 				return memberRawAddr;
 			}
 
-			template<typename ... args_t>
-			resolved_method_t<args_t...> ResolveMethod(const std::string& methodName, object_t& object) const
+			template<typename return_t = void, typename ... args_t>
+			resolved_method_t<return_t, args_t...> ResolveMethod(const std::string& methodName, object_t& object) const
 			{
 				const MethodDescriptor* methodDescriptor = _typeDescriptor.GetMethodByNameRecursive(methodName);
-				return methodDescriptor ? ResolveMethod<args_t...>(*methodDescriptor, object) : resolved_method_t<args_t...>();
+				return methodDescriptor ? ResolveMethod<return_t, args_t...>(*methodDescriptor, object) : resolved_method_t<return_t, args_t...>();
 			}
 
-			template<typename ... args_t>
-			resolved_method_t<args_t...> ResolveMethod(const MethodDescriptor& methodDescriptor, object_t& object) const
+			template<typename return_t = void, typename ... args_t>
+			resolved_method_t<return_t, args_t...> ResolveMethod(const MethodDescriptor& methodDescriptor, object_t& object) const
 			{
-				return ResolveMethod<args_t...>(methodDescriptor, &object);
+				return ResolveMethod<return_t, args_t...>(methodDescriptor, &object);
 			}
 
-			template<typename ... args_t>
-			resolved_method_t<args_t...> ResolveMethod(const MethodDescriptor& methodDescriptor, void* object) const
+			template<typename return_t = void, typename ... args_t>
+			resolved_method_t<return_t, args_t...> ResolveMethod(const MethodDescriptor& methodDescriptor, void* object) const
 			{
-				resolved_method_t<args_t...> resolvedMethod;
-				MethodDescriptor::method_ptr_t<object_t, args_t...> rawMethod = methodDescriptor.GetMethod<object_t, args_t...>();
+				resolved_method_t<return_t, args_t...> resolvedMethod;
+				MethodDescriptor::method_ptr_t<object_t, return_t, args_t...> rawMethod = methodDescriptor.GetMethod<object_t, return_t, args_t...>();
 				if (rawMethod)
 				{
-					resolvedMethod = [=](args_t ... args) {
+					resolvedMethod = [=](args_t ... args) -> return_t {
 						object_t& typedObject = *reinterpret_cast<object_t*>(object);
 						return rawMethod(typedObject, args...);
 					};
