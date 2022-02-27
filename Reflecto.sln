@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectoType", "ReflectoType\ReflectoType.vcxproj", "{D30205BA-BCA6-4D46-B07E-FC2BBBB45EE3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectoReflection", "ReflectoReflection\ReflectoReflection.vcxproj", "{D30205BA-BCA6-4D46-B07E-FC2BBBB45EE3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectoCommon", "ReflectoCommon\ReflectoCommon.vcxproj", "{3403AC28-D2DC-4A4D-9062-9F5D1F883EF7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectoTypeTest", "ReflectoTypeTest\ReflectoTypeTest.vcxproj", "{D635EBCF-D963-4A6E-A301-EE998845970B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectoReflectionTest", "ReflectoReflectionTest\ReflectoReflectionTest.vcxproj", "{D635EBCF-D963-4A6E-A301-EE998845970B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectoCommonTest", "ReflectoCommonTest\ReflectoCommonTest.vcxproj", "{6E088B53-766F-4CF4-A841-21584222AA4D}"
 EndProject
@@ -19,7 +19,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JsonCpp", "JsonCpp\JsonCpp.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JsonCppTest", "JsonCppTest\JsonCppTest.vcxproj", "{11E95469-9026-4ACA-80CB-8881D324520A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectoTypeRepl", "ReflectoTypeRepl\ReflectoTypeRepl.vcxproj", "{E139EA4A-7D63-4539-B19A-55751BAA123D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectoReflectionRepl", "ReflectoReflectionRepl\ReflectoReflectionRepl.vcxproj", "{E139EA4A-7D63-4539-B19A-55751BAA123D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
