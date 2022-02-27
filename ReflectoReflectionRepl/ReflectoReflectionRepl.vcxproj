@@ -60,18 +60,22 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\ReflectoPropertySheet.props" />
+    <Import Project="ReflectoReflectionRepl.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\ReflectoPropertySheet.props" />
+    <Import Project="ReflectoReflectionRepl.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\ReflectoPropertySheet.props" />
+    <Import Project="ReflectoReflectionRepl.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\ReflectoPropertySheet.props" />
+    <Import Project="ReflectoReflectionRepl.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -92,7 +96,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)ReflectoSerialization;$(SolutionDir)ReflectoCommon;$(SolutionDir)JsonCpp;$(SolutionDir)ReflectoType;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -122,7 +125,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)ReflectoSerialization;$(SolutionDir)ReflectoReflection;$(SolutionDir)ReflectoCommon;$(SolutionDir)JsonCpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -155,13 +157,7 @@
     <ProjectReference Include="..\JsonCpp\JsonCpp.vcxproj">
       <Project>{bdfe2d9f-5a3d-44b7-88b2-4ff7035af21c}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\ReflectoCommon\ReflectoCommon.vcxproj">
-      <Project>{3403ac28-d2dc-4a4d-9062-9f5d1f883ef7}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\ReflectoSerialization\ReflectoSerialization.vcxproj">
-      <Project>{3f966c5e-af4a-4375-9954-234f5bcf304e}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\ReflectoType\ReflectoType.vcxproj">
+    <ProjectReference Include="..\ReflectoReflection\ReflectoReflection.vcxproj">
       <Project>{d30205ba-bca6-4d46-b07e-fc2bbbb45ee3}</Project>
     </ProjectReference>
   </ItemGroup>

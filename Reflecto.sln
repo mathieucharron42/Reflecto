@@ -8,12 +8,21 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectoCommon", "ReflectoCommon\ReflectoCommon.vcxproj", "{3403AC28-D2DC-4A4D-9062-9F5D1F883EF7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectoReflectionTest", "ReflectoReflectionTest\ReflectoReflectionTest.vcxproj", "{D635EBCF-D963-4A6E-A301-EE998845970B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D30205BA-BCA6-4D46-B07E-FC2BBBB45EE3} = {D30205BA-BCA6-4D46-B07E-FC2BBBB45EE3}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectoCommonTest", "ReflectoCommonTest\ReflectoCommonTest.vcxproj", "{6E088B53-766F-4CF4-A841-21584222AA4D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectoSerialization", "ReflectoSerialization\ReflectoSerialization.vcxproj", "{3F966C5E-AF4A-4375-9954-234F5BCF304E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D30205BA-BCA6-4D46-B07E-FC2BBBB45EE3} = {D30205BA-BCA6-4D46-B07E-FC2BBBB45EE3}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectoSerializationTest", "ReflectoSerializationTest\ReflectoSerializationTest.vcxproj", "{57AA73DA-E7D9-4207-9D1B-E0CAB3E92334}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D30205BA-BCA6-4D46-B07E-FC2BBBB45EE3} = {D30205BA-BCA6-4D46-B07E-FC2BBBB45EE3}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JsonCpp", "JsonCpp\JsonCpp.vcxproj", "{BDFE2D9F-5A3D-44B7-88B2-4FF7035AF21C}"
 EndProject
