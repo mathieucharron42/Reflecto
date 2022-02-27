@@ -143,7 +143,7 @@ namespace Reflecto
 				return success;
 			}
 
-			bool Transpose(std::string& str)
+			bool Export(std::ostream& outputStream)
 			{
 				std::unique_ptr<Json::StreamWriter> writer = [&] {
 					Json::StreamWriterBuilder builder;
@@ -154,10 +154,9 @@ namespace Reflecto
 				JsonElement* element;
 				if (GetCurrentElement(element))
 				{
-					std::stringstream ss;
-					writer->write(*element, &ss);
-					str = ss.str();
+					writer->write(*element, &outputStream);
 				}
+
 				return true;
 			}
 

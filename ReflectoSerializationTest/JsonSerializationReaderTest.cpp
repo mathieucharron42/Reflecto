@@ -34,7 +34,7 @@ namespace Reflecto
 					// Arrange
 					const std::string expected = R"(test)";
 					JsonSerializationReader reader;
-					reader.Import(R"("test")");
+					reader.Import(std::stringstream(R"("test")"));
 				
 					/////////////
 					// Act
@@ -54,7 +54,7 @@ namespace Reflecto
 					// Arrange
 					const int32_t expected = 1;
 					JsonSerializationReader reader;
-					reader.Import(R"(1)");
+					reader.Import(std::stringstream(R"(1)"));
 					
 					/////////////
 					// Act
@@ -74,7 +74,7 @@ namespace Reflecto
 					// Arrange
 					const std::int64_t expected = 33445566778899;
 					JsonSerializationReader reader;
-					reader.Import(R"(33445566778899)");
+					reader.Import(std::stringstream(R"(33445566778899)"));
 
 					/////////////
 					// Act
@@ -94,7 +94,7 @@ namespace Reflecto
 					// Arrange
 					const float expected = 0.5f;
 					JsonSerializationReader reader;
-					reader.Import(R"(0.5)");
+					reader.Import(std::stringstream(R"(0.5)"));
 
 					/////////////
 					// Act
@@ -114,7 +114,7 @@ namespace Reflecto
 					// Arrange
 					const double expected = 0.5;
 					JsonSerializationReader reader;
-					reader.Import(R"(0.5)");
+					reader.Import(std::stringstream(R"(0.5)"));
 
 					/////////////
 					// Act
@@ -135,7 +135,7 @@ namespace Reflecto
 					// Arrange
 					const bool expected = true;
 					JsonSerializationReader reader;
-					reader.Import(R"(true)");
+					reader.Import(std::stringstream(R"(true)"));
 
 					/////////////
 					// Act
@@ -155,7 +155,7 @@ namespace Reflecto
 					// Arrange
 					void* expected = nullptr;
 					JsonSerializationReader reader;
-					reader.Import(R"(null)");
+					reader.Import(std::stringstream(R"(null)"));
 
 					/////////////
 					// Act
@@ -174,7 +174,7 @@ namespace Reflecto
 					/////////////
 					// Arrange
 					JsonSerializationReader reader;
-					reader.Import(R"([1,2,3])");
+					reader.Import(std::stringstream(R"([1,2,3])"));
 					const uint32_t expectedFirstIndex = 0;
 					const int32_t expectedFirstValue = 1;
 					const uint32_t expectedSecondIndex = 1;
@@ -230,7 +230,7 @@ namespace Reflecto
 					/////////////
 					// Arrange
 					JsonSerializationReader reader;
-					reader.Import(R"({"Age":1,"Friendliness":0.5,"Name":"Mr. Potato Head"})");
+					reader.Import(std::stringstream(R"({"Age":1,"Friendliness":0.5,"Name":"Mr. Potato Head"})"));
 					
 					const std::string expectedFirstProperty = "Age";
 					const int32_t expectedFirstValue = 1;
@@ -287,7 +287,7 @@ namespace Reflecto
 					/////////////
 					// Arrange
 					JsonSerializationReader reader;
-					reader.Import(R"([["hey","you", "wow"],["potato","test"],["hello","tomorrow","yesterday","Aluminum"]])");
+					reader.Import(std::stringstream(R"([["hey","you", "wow"],["potato","test"],["hello","tomorrow","yesterday","Aluminum"]])"));
 					const std::vector<std::vector<uint32_t>> expectedIndexes = { {0,1,2}, {0,1}, {0,1,2,3} };
 					const std::vector<std::vector<std::string>> expectedValues = { {"hey","you", "wow"}, {"potato","test"}, {"hello","tomorrow","yesterday","Aluminum"} };
 					
@@ -393,7 +393,7 @@ namespace Reflecto
 					/////////////
 					// Arrange
 					JsonSerializationReader reader;
-					reader.Import(R"({"Eyes":{"Color":"black","Size":5},"Legs":{"PossibleColors":["blue","orange","white"]},"Mouth":null,"Name":"Mr. Potato Head"})");
+					reader.Import(std::stringstream(R"({"Eyes":{"Color":"black","Size":5},"Legs":{"PossibleColors":["blue","orange","white"]},"Mouth":null,"Name":"Mr. Potato Head"})"));
 
 					/////////////
 					// Act

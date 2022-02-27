@@ -36,6 +36,9 @@
     <ClInclude Include="Serialization\Strategy\SerializationStrategy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Serialization\Reader\JsonSerializationReaderFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Serialization\ReflectoSerialization.cpp">

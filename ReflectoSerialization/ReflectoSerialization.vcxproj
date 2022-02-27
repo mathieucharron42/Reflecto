@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Serialization\Reader\ISerializationReader.h" />
     <ClInclude Include="Serialization\Reader\JsonSerializationReader.h" />
+    <ClInclude Include="Serialization\Reader\JsonSerializationReaderFactory.h" />
     <ClInclude Include="Serialization\SerializerFactory.h" />
     <ClInclude Include="Serialization\Strategy\SerializationStrategy.h" />
     <ClInclude Include="Serialization\Serializer.h" />

@@ -77,15 +77,18 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
-					std::string actualSerializedStr;
+					std::stringstream stream;
 					int32_t actualDeserializedValue;
+					std::string actualSerializedStr;
 
 					JsonSerializationWriter writer;
 					success &= serializer.Serialize(expectedValue, writer);
-					success &= writer.Transpose(actualSerializedStr);
+					success &= writer.Export(stream);
+
+					actualSerializedStr = stream.str();
 
 					JsonSerializationReader reader;
-					success &= reader.Import(actualSerializedStr);
+					success &= reader.Import(stream);
 					success &= serializer.Deserialize(actualDeserializedValue, reader);
 
 					/////////////
@@ -113,15 +116,18 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
+					std::stringstream stream;
 					std::string actualSerialized;
 					std::string actualDeserializedValue;
 
 					JsonSerializationWriter writer;
 					success &= serializer.Serialize(expectedValue, writer);
-					success &= writer.Transpose(actualSerialized);
+					success &= writer.Export(stream);
+
+					actualSerialized = stream.str();
 
 					JsonSerializationReader reader;
-					success &= reader.Import(actualSerialized);
+					success &= reader.Import(stream);
 					success &= serializer.Deserialize(actualDeserializedValue, reader);
 
 					/////////////
@@ -149,15 +155,18 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
+					std::stringstream stream;
 					std::string actualSerializedStr;
 					float actualDeserializedValue;
 
 					JsonSerializationWriter writer;
 					success &= serializer.Serialize(expectedValue, writer);
-					success &= writer.Transpose(actualSerializedStr);
+					success &= writer.Export(stream);
+
+					actualSerializedStr = stream.str();
 
 					JsonSerializationReader reader;
-					success &= reader.Import(actualSerializedStr);
+					success &= reader.Import(stream);
 					success &= serializer.Deserialize(actualDeserializedValue, reader);
 
 					/////////////
@@ -185,15 +194,19 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
+
+					std::stringstream stream;
 					std::string actualSerializedStr;
 					double actualDeserializedValue;
 
 					JsonSerializationWriter writer;
 					success &= serializer.Serialize(expectedValue, writer);
-					success &= writer.Transpose(actualSerializedStr);
+					success &= writer.Export(stream);
+
+					actualSerializedStr = stream.str();
 
 					JsonSerializationReader reader;
-					success &= reader.Import(actualSerializedStr);
+					success &= reader.Import(stream);
 					success &= serializer.Deserialize(actualDeserializedValue, reader);
 
 					/////////////
@@ -221,21 +234,23 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
-					std::string actualSerializedStr;
+					std::stringstream stream;
 					bool actualDeserializedValue;
 
 					JsonSerializationWriter writer;
 					success &= serializer.Serialize(expectedValue, writer);
-					success &= writer.Transpose(actualSerializedStr);
+					success &= writer.Export(stream);
+
+					std::string actualSerialized = stream.str();
 
 					JsonSerializationReader reader;
-					success &= reader.Import(actualSerializedStr);
+					success &= reader.Import(stream);
 					success &= serializer.Deserialize(actualDeserializedValue, reader);
 
 					/////////////
 					// Assert
 					Assert::IsTrue(success, L"Failure is unexpected!");
-					Assert::AreEqual(expectedSerialized, actualSerializedStr, L"Serialized value is unexpected!");
+					Assert::AreEqual(expectedSerialized, actualSerialized, L"Serialized value is unexpected!");
 					Assert::AreEqual(expectedValue, actualDeserializedValue, L"Deserialized value is unexpected");
 				}
 
@@ -262,15 +277,18 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
+					std::stringstream stream;
 					std::string actualSerialized;
 					std::vector<std::string> actualDeserializedValue;
 
 					JsonSerializationWriter writer;
 					success &= serializer.Serialize(expectedValue, writer);
-					success &= writer.Transpose(actualSerialized);
+					success &= writer.Export(stream);
+
+					actualSerialized = stream.str();
 
 					JsonSerializationReader reader;
-					success &= reader.Import(actualSerialized);
+					success &= reader.Import(stream);
 					success &= serializer.Deserialize(actualDeserializedValue, reader);
 
 					/////////////
@@ -310,6 +328,7 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
+					std::stringstream stream;
 					std::string actualSerialized;
 					TestPerson actualDeserializedValue;
 
@@ -319,10 +338,12 @@ namespace Reflecto
 					
 					JsonSerializationWriter writer;
 					success &= serializer.Serialize(expectedValue, writer);
-					success &= writer.Transpose(actualSerialized);
+					success &= writer.Export(stream);
+
+					actualSerialized = stream.str();
 
 					JsonSerializationReader reader;
-					success &= reader.Import(actualSerialized);
+					success &= reader.Import(stream);
 					success &= serializer.Deserialize(actualDeserializedValue, reader);
 
 					/////////////
@@ -364,15 +385,18 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
+					std::stringstream stream;
 					std::string actualSerialized;
 					std::map<int32_t, std::string> actualDeserializedValue;
 
 					JsonSerializationWriter writer;
 					success &= serializer.Serialize(expectedValue, writer);
-					success &= writer.Transpose(actualSerialized);
+					success &= writer.Export(stream);
+
+					actualSerialized = stream.str();
 
 					JsonSerializationReader reader;
-					success &= reader.Import(actualSerialized);
+					success &= reader.Import(stream);
 					success &= serializer.Deserialize(actualDeserializedValue, reader);
 
 					/////////////
@@ -493,6 +517,7 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
+					std::stringstream stream;
 					std::string actualSerialized;
 					TestPotatoHead actualDeserializedValue;
 
@@ -515,10 +540,12 @@ namespace Reflecto
 
 					JsonSerializationWriter writer;
 					success &= serializer.Serialize(testPotatoHead, writer);
-					success &= writer.Transpose(actualSerialized);
+					success &= writer.Export(stream);
+
+					actualSerialized = stream.str();
 					
 					JsonSerializationReader reader;
-					success &= reader.Import(actualSerialized);
+					success &= reader.Import(stream);
 					success &= serializer.Deserialize(actualDeserializedValue, reader);
 
 					/////////////

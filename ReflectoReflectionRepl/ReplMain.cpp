@@ -14,7 +14,9 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <stdint.h>
+#include <iosfwd>
 
 using namespace Reflecto;
 
@@ -38,7 +40,8 @@ InstructionResult ProcessMemberInstruction(const Serialization::Serializer& seri
 		void* member = resolver.ResolveMember(instance, memberName);
 		
 		Serialization::JsonSerializationReader reader;
-		reader.Import(memberValue);
+		std::stringstream stream = std::stringstream(memberValue);
+		reader.Import(stream);
 
 		InstructionResult result = InstructionResult::Ok;
 		serializer.RawDeserialize(memberDescriptor->GetType(), member, reader);
@@ -156,10 +159,7 @@ void WriteValue(const Serialization::Serializer& serializer, const Reflection::T
 	
 	serializer.RawSerialize(type, value, writer);
 
-	std::string str;
-	writer.Transpose(str);
-
-	ouput << str;
+	writer.Export(ouput);
 }
 
 template<typename stream_t>

@@ -23,8 +23,9 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
-					std::string actual;
-					success &= writer.Transpose(actual);
+					std::stringstream stream;
+					success &= writer.Export(stream);
+					std::string actual = stream.str();
 
 					/////////////
 					// Assert
@@ -42,10 +43,11 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
-					std::string actual;
+					std::stringstream stream;
 					success &= writer.WriteString("test");
-					success &= writer.Transpose(actual);
-					
+					success &= writer.Export(stream);
+					std::string actual = stream.str();
+
 					/////////////
 					// Assert
 					Assert::IsTrue(success, L"Unexpected operation failure");
@@ -62,9 +64,10 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
-					std::string actual;
+					std::stringstream stream;
 					success &= writer.WriteInteger32(1);
-					success &= writer.Transpose(actual);
+					success &= writer.Export(stream);
+					std::string actual = stream.str();
 
 					/////////////
 					// Assert
@@ -82,9 +85,10 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
-					std::string actual;
+					std::stringstream stream;
 					success &= writer.WriteInteger64(33445566778899);
-					success &= writer.Transpose(actual);
+					success &= writer.Export(stream);
+					std::string actual = stream.str();
 
 					/////////////
 					// Assert
@@ -102,9 +106,10 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
-					std::string actual;
+					std::stringstream stream;
 					success &= writer.WriteFloat(0.5f);
-					success &= writer.Transpose(actual);
+					success &= writer.Export(stream);
+					std::string actual = stream.str();
 
 					/////////////
 					// Assert
@@ -122,9 +127,10 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
-					std::string actual;
+					std::stringstream stream;
 					success &= writer.WriteDouble(0.5);
-					success &= writer.Transpose(actual);
+					success &= writer.Export(stream);
+					std::string actual = stream.str();
 
 					/////////////
 					// Assert
@@ -142,9 +148,10 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
-					std::string actual;
+					std::stringstream stream;
 					success &= writer.WriteBoolean(false);
-					success &= writer.Transpose(actual);
+					success &= writer.Export(stream);
+					std::string actual = stream.str();
 
 					/////////////
 					// Assert
@@ -162,9 +169,10 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
-					std::string actual;
+					std::stringstream stream;
 					success &= writer.WriteNull();
-					success &= writer.Transpose(actual);
+					success &= writer.Export(stream);
+					std::string actual = stream.str();
 
 					/////////////
 					// Assert
@@ -182,8 +190,8 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
-					std::string actual;
-
+					std::stringstream stream;
+					
 					success &= writer.WriteBeginArray();
 
 					success &= writer.WriteBeginArrayElement();
@@ -199,7 +207,8 @@ namespace Reflecto
 					success &= writer.WriteEndArrayElement();
 
 					success &= writer.WriteEndArray();
-					success &= writer.Transpose(actual);
+					success &= writer.Export(stream);
+					std::string actual = stream.str();
 
 					/////////////
 					// Assert
@@ -217,7 +226,8 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
-					std::string actual;
+					std::stringstream stream;
+					
 					success &= writer.WriteBeginObject();
 
 					success &= writer.WriteBeginObjectProperty("FieldString");
@@ -234,7 +244,8 @@ namespace Reflecto
 
 					success &= writer.WriteEndObject();
 
-					success &= writer.Transpose(actual);
+					success &= writer.Export(stream);
+					std::string actual = stream.str();
 
 					/////////////
 					// Assert
@@ -252,7 +263,7 @@ namespace Reflecto
 					/////////////
 					// Act
 					bool success = true;
-					std::string actual;
+					std::stringstream stream;
 					success &= writer.WriteBeginObject();
 					{
 						success &= writer.WriteBeginObjectProperty("Name");
@@ -311,8 +322,8 @@ namespace Reflecto
 						success &= writer.WriteEndObjectProperty();
 					}
 					success &= writer.WriteEndObject();
-					success &= writer.Transpose(actual);
-
+					success &= writer.Export(stream);
+					std::string actual = stream.str();
 
 					/////////////
 					// Assert

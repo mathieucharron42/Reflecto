@@ -7,6 +7,7 @@
 #include "jsoncpp/json.h"
 
 #include <cstdint>
+#include <istream>
 #include <functional>
 #include <optional>
 #include <stack>
@@ -128,16 +129,15 @@ namespace Reflecto
 				});
 			}
 
-			bool Import(const std::string& str)
+			bool Import(std::istream& inputStream)
 			{
 				bool success = false;
 				JsonElement element;
 
 				const Json::CharReaderBuilder charReaderBuilder;
 				JSONCPP_STRING error;
-				std::stringstream ss(str);
-
-				if (Json::parseFromStream(charReaderBuilder, ss, &element, &error))
+				
+				if (Json::parseFromStream(charReaderBuilder, inputStream, &element, &error))
 				{
 					if (PushElement(element))
 					{
@@ -146,6 +146,11 @@ namespace Reflecto
 				}
 
 				return success;
+			}
+
+			bool ImportFromFile(const std::string& fileName)
+			{
+				
 			}
 
 		private:
