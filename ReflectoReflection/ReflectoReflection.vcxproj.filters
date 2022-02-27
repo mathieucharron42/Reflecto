@@ -62,7 +62,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ReflectoType.cpp">
+    <ClCompile Include="ReflectoReflection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
