@@ -20,6 +20,7 @@ namespace Reflecto
 
 			SerializerFactory(const Reflection::TypeLibrary& library)
 				: _typeLibrary(library)
+				, _format(SerializationFormat::Descriptive)
 			{ }
 
 			SerializerFactory& LearnType(const Reflection::Type& type, const serialization_strategy_t& serializationStrategy, const deserialization_strategy_t& deserializationStrategy)
@@ -47,14 +48,21 @@ namespace Reflecto
 				return *this;
 			}
 
+			SerializerFactory& SetFormat(SerializationFormat format)
+			{
+				_format = format;
+				return *this;
+			}
+
 			Serializer Build()
 			{
-				return Serializer(_typeLibrary, _strategies);
+				return Serializer(_typeLibrary, _strategies, _format);
 			}
 
 		private:
 			Reflection::TypeLibrary _typeLibrary;
 			Serializer::strategy_map_t _strategies;
+			SerializationFormat _format;
 		};
 	}
 }

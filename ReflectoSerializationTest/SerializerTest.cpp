@@ -353,6 +353,60 @@ namespace Reflecto
 					Assert::AreEqual(expectedValue, actualDeserializedValue, L"Deserialized value is unexpected");
 				}
 
+				TEST_METHOD(SerializeObjectShort)
+				{
+					/////////////
+					// Arrange
+					const Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
+						.Add<TestPerson>("TestPerson")
+						.Add<std::string>("string")
+						.Add<int32_t>("int32")
+					.Build();
+
+					const Reflection::TypeDescriptor testPersonDescriptor = Reflection::TypeDescriptorFactory<TestPerson>(testTypeLibrary)
+						.RegisterMember(&TestPerson::Name, "Name")
+						.RegisterMember(&TestPerson::Age, "Age")
+					.Build();
+
+					const Serializer serializer = SerializerFactory(testTypeLibrary)
+						.LearnType<int32_t, Int32SerializationStrategy>()
+						.LearnType<std::string, StringSerializationStrategy>()
+						.LearnType<TestPerson, ObjectSerializationStrategy<TestPerson>>(testPersonDescriptor)
+						.SetFormat(SerializationFormat::Short)
+					.Build();
+
+					const std::string expectedNameValue = "George";
+					const int32_t expectedAgeValue = 41;
+					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"Age":%d,"Name":"%s"})"), expectedAgeValue, expectedNameValue.c_str());
+
+					/////////////
+					// Act
+					bool success = true;
+					std::stringstream stream;
+					std::string actualSerialized;
+					TestPerson actualDeserializedValue;
+
+					TestPerson expectedValue;
+					expectedValue.Name = expectedNameValue;
+					expectedValue.Age = expectedAgeValue;
+
+					JsonSerializationWriter writer;
+					success &= serializer.Serialize(expectedValue, writer);
+					success &= writer.Export(stream);
+
+					actualSerialized = stream.str();
+
+					JsonSerializationReader reader;
+					success &= reader.Import(stream);
+					success &= serializer.Deserialize(actualDeserializedValue, reader);
+
+					/////////////
+					// Assert
+					Assert::IsTrue(success, L"Failure is unexpected!");
+					Assert::AreEqual(expectedSerialized, actualSerialized, L"Serialized value is unexpected!");
+					Assert::AreEqual(expectedValue, actualDeserializedValue, L"Deserialized value is unexpected");
+				}
+
 				TEST_METHOD(SerializeMap)
 				{
 					/////////////

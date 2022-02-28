@@ -17,6 +17,12 @@ namespace Reflecto
 {
 	namespace Serialization
 	{
+		enum class SerializationFormat
+		{
+			Short,
+			Descriptive
+		};
+
 		class Serializer
 		{
 		public:				
@@ -26,9 +32,19 @@ namespace Reflecto
 			using strategy_map_t = std::map<Reflection::Type, strategies_t>;
 
 			Serializer(const Reflection::TypeLibrary& library, const strategy_map_t& strategy)
+				: Serializer(library, strategy, SerializationFormat::Descriptive)
+			{ }
+
+			Serializer(const Reflection::TypeLibrary& library, const strategy_map_t& strategy, SerializationFormat serializationFormat)
 				: _typeLibrary(library)
 				, _strategies(strategy)
+				, _serializationFormat(serializationFormat)
 			{ }
+
+			void SetSerializationFormat(SerializationFormat serializationFormat)
+			{
+				_serializationFormat = serializationFormat;
+			}
 
 			bool Serialize(const Reflection::Type& type, const void* value, ISerializationWriter& writer) const
 			{
@@ -131,19 +147,26 @@ namespace Reflecto
 			bool Serialize(const Reflection::Type& type, const serialization_strategy_t& strategy, const void* value, ISerializationWriter& writer) const
 			{
 				bool success = true;
-				success &= writer.WriteBeginObject();
+				if (_serializationFormat == SerializationFormat::Descriptive)
 				{
-					success &= writer.WriteBeginObjectProperty("type");
+					success &= writer.WriteBeginObject();
 					{
-						success &= writer.WriteString(type.GetName());
-					}
-					success &= writer.WriteEndObjectProperty();
+						success &= writer.WriteBeginObjectProperty("type");
+						{
+							success &= writer.WriteString(type.GetName());
+						}
+						success &= writer.WriteEndObjectProperty();
 
-					success &= writer.WriteBeginObjectProperty("value");
-					{
-						success &= RawSerialize(type, strategy, value, writer);
+						success &= writer.WriteBeginObjectProperty("value");
+						{
+							success &= RawSerialize(type, strategy, value, writer);
+						}
+						success &= writer.WriteEndObjectProperty();
 					}
-					success &= writer.WriteEndObjectProperty();
+				}
+				else if (_serializationFormat == SerializationFormat::Short)
+				{
+					success &= RawSerialize(type, strategy, value, writer);
 				}
 				return success;
 			}
@@ -156,28 +179,36 @@ namespace Reflecto
 			bool Deserialize(const Reflection::Type& type, const deserialization_strategy_t& strategy, void* value, ISerializationReader& reader) const
 			{
 				bool success = true;
-				success &= reader.ReadBeginObject();
+				SerializationFormat currentFormatSerializationFormat = _serializationFormat;
+				if (currentFormatSerializationFormat == SerializationFormat::Descriptive)
 				{
-					while (reader.HasObjectPropertyRemaining())
+					success &= reader.ReadBeginObject();
 					{
-						std::string property;
-						success &= reader.ReadBeginObjectProperty(property);
+						while (reader.HasObjectPropertyRemaining())
 						{
-							if (property == "type")
+							std::string property;
+							success &= reader.ReadBeginObjectProperty(property);
 							{
-								std::string actualType;
-								success &= reader.ReadString(actualType);
-								assert(type.GetName() == actualType);
+								if (property == "type")
+								{
+									std::string actualType;
+									success &= reader.ReadString(actualType);
+									assert(type.GetName() == actualType);
+								}
+								else if (property == "value")
+								{
+									success &= RawDeserialize(type, strategy, value, reader);
+								}
 							}
-							else if (property == "value")
-							{
-								success &= RawDeserialize(type, strategy, value, reader);
-							}
+							success &= reader.ReadEndObjectProperty();
 						}
-						success &= reader.ReadEndObjectProperty();
 					}
+					success &= reader.ReadEndObject();
 				}
-				success &= reader.ReadEndObject();
+				else if (currentFormatSerializationFormat == SerializationFormat::Short)
+				{
+					success &= RawDeserialize(type, strategy, value, reader);
+				}
 				return success;
 			}
 
@@ -195,6 +226,7 @@ namespace Reflecto
 
 			Reflection::TypeLibrary _typeLibrary;
 			strategy_map_t _strategies;
+			SerializationFormat _serializationFormat;
 		};
 	}
 }
