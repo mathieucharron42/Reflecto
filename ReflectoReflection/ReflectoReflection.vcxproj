@@ -174,6 +174,8 @@
     <ClInclude Include="Type\TypeExt.h" />
     <ClInclude Include="Type\TypeLibrary.h" />
     <ClInclude Include="Type\TypeLibraryFactory.h" />
+    <ClInclude Include="Type\ValueDescriptor.h" />
+    <ClInclude Include="Type\ValueDescriptorFactory.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ReflectoCommon\ReflectoCommon.vcxproj">

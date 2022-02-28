@@ -7,6 +7,7 @@
 #include "Common/Ensure.h"
 #include "Resolver/Resolver.h"
 #include "Type/MemberDescriptor.h"
+#include "Type/ValueDescriptor.h"
 
 #include <cstdint>
 #include <string>
@@ -274,6 +275,45 @@ namespace Reflecto
 					}
 				}
 				success &= reader.ReadEndArray();
+				return success;
+			}
+		};
+
+		template<class enum_t>
+		struct EnumSerializationStrategy
+		{
+			static bool Serialize(const Reflection::TypeDescriptor& typeDesriptor, const Serializer& serializer, const void* value, ISerializationWriter& writer)
+			{
+				bool success = false;
+
+				const enum_t& valueEnum = *static_cast<const enum_t*>(value);
+				const Reflection::ValueDescriptor* valueDescriptor = typeDesriptor.GetValueByValue(valueEnum);
+				if (valueDescriptor)
+				{
+					std::string enumValueString = valueDescriptor->GetName();
+					success = writer.WriteString(enumValueString);
+				}
+
+				return success;
+			}
+
+			static bool Deserialize(const Reflection::TypeDescriptor& typeDesriptor, const Serializer& serializer, void* value, ISerializationReader& reader)
+			{
+				bool success = false;
+
+				enum_t& valueEnum = *static_cast<enum_t*>(value);
+
+				std::string enumValueString;
+				if (reader.ReadString(enumValueString))
+				{
+					const Reflection::ValueDescriptor* valueDescriptor = typeDesriptor.GetValueByName(enumValueString);
+					if (valueDescriptor)
+					{
+						valueEnum = valueDescriptor->GetValue<enum_t>();
+						success = true;
+					}
+				}
+				
 				return success;
 			}
 		};

@@ -6,6 +6,8 @@
 #include "MemberDescriptorFactory.h"
 #include "MethodDescriptor.h"
 #include "MethodDescriptorFactory.h"
+#include "ValueDescriptor.h"
+#include "ValueDescriptorFactory.h"
 #include "Resolver/Resolver.h"
 #include "TypeDescriptor.h"
 #include "Type.h"
@@ -57,10 +59,20 @@ namespace Reflecto
 				return *this;
 			}
 
+			template <typename enum_t>
+			TypeDescriptorFactory& RegisterValue(const enum_t& enumValue, const std::string& valueName)
+			{
+				ValueDescriptor value = ValueDescriptorFactory<enum_t>(_typeLibrary, enumValue, valueName).Build();
+
+				_values.push_back(value);
+
+				return *this;
+			}
+
 			TypeDescriptor Build()
 			{
 				const Type& type = _typeLibrary.GetChecked<object_t>();
-				return TypeDescriptor{type, _parent, _constructor, _members, _methods};
+				return TypeDescriptor{type, _parent, _constructor, _members, _methods, _values};
 			}
 
 		private:
@@ -70,6 +82,7 @@ namespace Reflecto
 			ConstructorDescriptor _constructor;
 			std::vector<MemberDescriptor> _members;
 			std::vector<MethodDescriptor> _methods;
+			std::vector<ValueDescriptor> _values;
 		};
 	}
 }

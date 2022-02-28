@@ -3,6 +3,7 @@
 #include "ConstructorDescriptor.h"
 #include "MemberDescriptor.h"
 #include "MethodDescriptor.h"
+#include "ValueDescriptor.h"
 #include "TypeExt.h"
 
 #include <memory>
@@ -17,16 +18,17 @@ namespace Reflecto
 		class TypeDescriptor
 		{
 		public:
-			TypeDescriptor(const Type& type, const ConstructorDescriptor& constructor, const std::vector<MemberDescriptor>& members, const std::vector<MethodDescriptor>& methods)
-				: TypeDescriptor(type, nullptr, constructor, members, methods)
+			TypeDescriptor(const Type& type, const ConstructorDescriptor& constructor, const std::vector<MemberDescriptor>& members, const std::vector<MethodDescriptor>& methods, const std::vector<ValueDescriptor>& values)
+				: TypeDescriptor(type, nullptr, constructor, members, methods, values)
 			{ }
 
-			TypeDescriptor(const Type& type, const TypeDescriptor* parent, const ConstructorDescriptor& constructor, const std::vector<MemberDescriptor>& members, const std::vector<MethodDescriptor>& methods)
+			TypeDescriptor(const Type& type, const TypeDescriptor* parent, const ConstructorDescriptor& constructor, const std::vector<MemberDescriptor>& members, const std::vector<MethodDescriptor>& methods, const std::vector<ValueDescriptor>& values)
 				: _type(type)
 				, _parent(parent)
 				, _constructor(constructor)
 				, _members(members)
 				, _methods(methods)
+				, _values(values)
 			{ }
 
 			const Type& GetType() const
@@ -116,12 +118,37 @@ namespace Reflecto
 				return method;
 			}
 
+			const std::vector<ValueDescriptor>& GetValues() const
+			{
+				return _values;
+			}
+
+			const ValueDescriptor* GetValueByName(const std::string& name) const
+			{
+				auto found = std::find_if(_values.begin(), _values.end(), [&](const ValueDescriptor& value) {
+					return value.GetName() == name;
+				});
+
+				return found != _values.end() ? &(*found) : nullptr;
+			}
+
+			template<typename enum_t>
+			const ValueDescriptor* GetValueByValue(const enum_t& enumValue) const
+			{
+				auto found = std::find_if(_values.begin(), _values.end(), [&](const ValueDescriptor& value) {
+					return value.GetValue<enum_t>() == enumValue;
+				});
+
+				return found != _values.end() ? &(*found) : nullptr;
+			}
+
 		private:
 			Type _type;
 			const TypeDescriptor* _parent;
 			ConstructorDescriptor _constructor;
 			std::vector<MemberDescriptor> _members;
 			std::vector<MethodDescriptor> _methods;
+			std::vector<ValueDescriptor> _values;
 		};
 	}
 }
