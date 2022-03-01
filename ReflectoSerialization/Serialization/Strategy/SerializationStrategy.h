@@ -127,7 +127,7 @@ namespace Reflecto
 						std::string propertyName;
 						success &= reader.ReadBeginObjectProperty(propertyName);
 						{
-							const Reflection::MemberDescriptor* memberDescriptor = typeDesriptor.GetMemberByName(propertyName);
+							const Reflection::MemberDescriptor* memberDescriptor = typeDesriptor.GetMemberByNameRecursive(propertyName);
 							if (ensure(memberDescriptor))
 							{
 								void* member = resolver.ResolveMember(valueObject, *memberDescriptor);
