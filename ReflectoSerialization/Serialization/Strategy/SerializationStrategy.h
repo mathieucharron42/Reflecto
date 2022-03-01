@@ -317,5 +317,39 @@ namespace Reflecto
 				return success;
 			}
 		};
+
+
+		template<class object_t>
+		struct OptionalSerializationStrategy
+		{
+			static bool Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
+			{
+				using element_t = typename object_t::value_type;
+
+				bool success = true;
+				const object_t& valueOptional = *static_cast<const object_t*>(value);
+				if (valueOptional)
+				{
+					success &= serializer.Serialize(valueOptional.value(), writer);
+				}
+				return success;
+			}
+
+			static bool Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
+			{
+				using element_t = typename object_t::value_type;
+
+				bool success = true;
+
+				object_t& valueOptional = *static_cast<object_t*>(value);
+				element_t val;
+				if (success &= serializer.Deserialize(val, reader))
+				{
+					valueOptional = val;
+				}
+
+				return success;
+			}
+		};
 	}
 }
