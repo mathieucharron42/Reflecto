@@ -8,6 +8,8 @@ class ISerializationWriter
 public:
 	virtual bool WriteInteger32(int32_t value) = 0;
 
+	virtual bool WriteUnsignedInteger32(uint32_t value) = 0;
+
 	virtual bool WriteInteger64(int64_t value) = 0;
 
 	virtual bool WriteFloat(float value) = 0;

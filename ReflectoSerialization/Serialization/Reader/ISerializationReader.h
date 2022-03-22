@@ -12,6 +12,8 @@ namespace Reflecto
 		public:
 			virtual bool ReadInteger32(int32_t& value) = 0;
 
+			virtual bool ReadUnsignedInteger32(uint32_t& value) = 0;
+
 			virtual bool ReadInteger64(int64_t& value) = 0;
 
 			virtual bool ReadFloat(float& value) = 0;

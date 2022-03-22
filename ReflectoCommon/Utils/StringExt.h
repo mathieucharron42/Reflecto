@@ -129,6 +129,18 @@ namespace Reflecto
 				const IdentityTransform projection;
 				return StringifyCollection(collection, projection);
 			}
+
+			template<typename string_t>
+			string_t ReplaceAll(string_t string, const string_t& from, const string_t& to)
+			{
+				size_t position = 0;
+				while ((position = string.find(from, position)) != std::string::npos)
+				{
+					string.replace(position, from.length(), to);
+					position += to.length();
+				}
+				return string;
+			}
 		}
 	}
 }

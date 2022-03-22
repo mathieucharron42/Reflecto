@@ -27,6 +27,12 @@ namespace Reflecto
 				return ReadElementValue(Json::intValue, &Json::Value::asInt, value);
 			}
 
+			virtual bool ReadUnsignedInteger32(uint32_t& value) override
+			{
+				return ReadElementValue(Json::uintValue, &Json::Value::asUInt, value)
+				|| ReadElementValue(Json::intValue, &Json::Value::asInt, value);
+			}
+
 			virtual bool ReadInteger64(int64_t& value) override
 			{
 				return ReadElementValue(Json::intValue, &Json::Value::asInt64, value);

@@ -16,8 +16,12 @@ namespace Reflecto
 		class JsonSerializationWriter : public ISerializationWriter
 		{
 		public:
-
 			virtual bool WriteInteger32(int32_t value) override
+			{
+				return PushElement(JsonElement(value));
+			}
+
+			virtual bool WriteUnsignedInteger32(uint32_t value) override
 			{
 				return PushElement(JsonElement(value));
 			}
