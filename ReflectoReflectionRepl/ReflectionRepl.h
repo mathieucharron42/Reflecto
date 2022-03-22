@@ -54,13 +54,25 @@ namespace Reflecto
 				if (memberDescriptor)
 				{
 					void* member = resolver.ResolveMember(instance, memberName);
+					if (member)
+					{
+						Serialization::JsonSerializationReader reader;
+						std::stringstream stream = std::stringstream(memberValue);
+						reader.Import(stream);
 
-					Serialization::JsonSerializationReader reader;
-					std::stringstream stream = std::stringstream(memberValue);
-					reader.Import(stream);
-
-					bool success = serializer.RawDeserialize(memberDescriptor->GetType(), member, reader);
-					result = success ? InstructionResult::Ok : InstructionResult::UnsupportedType;
+						if (serializer.RawDeserialize(memberDescriptor->GetType(), member, reader))
+						{
+							result = InstructionResult::Ok;
+						}
+						else
+						{
+							result = InstructionResult::UnsupportedType;
+						}
+					}
+					else
+					{
+						result = InstructionResult::InternalError;
+					}
 				}
 				else
 				{
