@@ -35,7 +35,7 @@ namespace Reflecto
 					{
 						buffer << separator;
 					}
-					buffer << proj(*it);
+					buffer << std::invoke(proj, *it);
 				}
 
 				return buffer.str();

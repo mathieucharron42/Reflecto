@@ -31,6 +31,21 @@ namespace Reflecto
 			}
 		};
 
+		struct UInt32SerializationStrategy
+		{
+			static bool Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
+			{
+				const uint32_t& valInt = *static_cast<const uint32_t*>(value);
+				return writer.WriteUnsignedInteger32(valInt);
+			}
+
+			static bool Deserialize(const Serializer& serializer, void* value, ISerializationReader& reader)
+			{
+				uint32_t& valInt = *static_cast<uint32_t*>(value);
+				return reader.ReadUnsignedInteger32(valInt);
+			}
+		};
+
 		struct StringSerializationStrategy
 		{
 			static bool Serialize(const Serializer& serializer, const void* value, ISerializationWriter& writer)
