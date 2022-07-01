@@ -82,7 +82,7 @@ namespace Reflecto
 				return result;
 			}
 
-			InstructionResult ProcessMethodInstruction(const Serialization::Serializer& serializer, Reflection::TypeDescriptor typeDescriptor, object_t& instance, const std::string& methodName)
+			InstructionResult ProcessMethodInstruction(const Serialization::Serializer& serializer, Reflection::TypeDescriptor typeDescriptor, object_t& instance, const std::string& methodName, const std::vector<std::string>& parameters)
 			{
 				InstructionResult result;
 
@@ -90,6 +90,8 @@ namespace Reflecto
 				const Reflection::MethodDescriptor* methodDescriptor = typeDescriptor.GetMethodByName(methodName);
 				if (methodDescriptor)
 				{
+					// parameters
+
 					auto method = resolver.ResolveMethod<void>(*methodDescriptor, instance);
 					// to do: gérer les paramètres et fonction avec type de retour
 					method();
@@ -133,7 +135,8 @@ namespace Reflecto
 					else if (instruction.find(kMethodInstructionParamBeginDelimiter) != std::string::npos && instruction.find(kMethodInstructionParamEndDelimiter) != std::string::npos)
 					{
 						const std::string methodName = instruction.substr(0, instruction.find(kMethodInstructionParamBeginDelimiter));
-						result = ProcessMethodInstruction(serializer, typeDescriptor, instance, methodName);
+						const std::vector<std::string> arguments;
+						result = ProcessMethodInstruction(serializer, typeDescriptor, instance, methodName, arguments);
 					}
 					else
 					{

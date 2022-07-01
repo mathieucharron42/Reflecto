@@ -30,6 +30,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JsonCppTest", "JsonCppTest\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectoReflectionRepl", "ReflectoReflectionRepl\ReflectoReflectionRepl.vcxproj", "{E139EA4A-7D63-4539-B19A-55751BAA123D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflectoReflectionReplMain", "ReflectoReflectionReplMain\ReflectoReflectionReplMain.vcxproj", "{05F81044-977C-472F-A23C-7ECE58592E19}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -110,6 +112,14 @@ Global
 		{E139EA4A-7D63-4539-B19A-55751BAA123D}.Release|x64.Build.0 = Release|x64
 		{E139EA4A-7D63-4539-B19A-55751BAA123D}.Release|x86.ActiveCfg = Release|Win32
 		{E139EA4A-7D63-4539-B19A-55751BAA123D}.Release|x86.Build.0 = Release|Win32
+		{05F81044-977C-472F-A23C-7ECE58592E19}.Debug|x64.ActiveCfg = Debug|x64
+		{05F81044-977C-472F-A23C-7ECE58592E19}.Debug|x64.Build.0 = Debug|x64
+		{05F81044-977C-472F-A23C-7ECE58592E19}.Debug|x86.ActiveCfg = Debug|Win32
+		{05F81044-977C-472F-A23C-7ECE58592E19}.Debug|x86.Build.0 = Debug|Win32
+		{05F81044-977C-472F-A23C-7ECE58592E19}.Release|x64.ActiveCfg = Release|x64
+		{05F81044-977C-472F-A23C-7ECE58592E19}.Release|x64.Build.0 = Release|x64
+		{05F81044-977C-472F-A23C-7ECE58592E19}.Release|x86.ActiveCfg = Release|Win32
+		{05F81044-977C-472F-A23C-7ECE58592E19}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
