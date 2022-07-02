@@ -26,11 +26,12 @@ namespace Reflecto
 
 			MethodDescriptor Build()
 			{
-				MethodDescriptor::method_ptr_t<object_t, return_t, args_t...> method_wrapper = [methodPointer = _methodPointer] (object_t& obj, args_t ... args) -> return_t {
+				const Type returnType = *_typeLibrary.Get<return_t>();
+				const MethodDescriptor::method_ptr_t<object_t, return_t, args_t...> method_wrapper = [methodPointer = _methodPointer] (object_t& obj, args_t ... args) -> return_t {
 					return std::invoke(methodPointer, obj, args...);
 				};
 
-				return MethodDescriptor{ method_wrapper, _name };;
+				return MethodDescriptor{ returnType, _name, method_wrapper };
 			}
 
 		private:

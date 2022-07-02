@@ -15,9 +15,10 @@ namespace Reflecto
 			using method_ptr_t = std::function<return_t(object_t&, args_t...)>;
 
 			template<typename object_t, typename return_t = void, typename ... args_t>
-			MethodDescriptor(method_ptr_t<object_t, return_t, args_t...> method, const std::string& name)
-				: _method(method)
+			MethodDescriptor(const Type& returnType, const std::string& name, method_ptr_t<object_t, return_t, args_t...> method)
+				: _returnType(returnType)
 				, _name(name)
+				, _method(method)
 			{ }
 
 			const std::string& GetName() const
@@ -32,6 +33,11 @@ namespace Reflecto
 				return typedMethod ? *typedMethod : method_ptr_t<object_t, return_t, args_t...>();
 			}
 
+			const Type& GetReturnType() const
+			{
+				return _returnType;
+			}
+
 			bool operator<(const MethodDescriptor& other) const
 			{
 				return _name < other._name;
@@ -43,6 +49,7 @@ namespace Reflecto
 			}
 
 		private:
+			Type _returnType;
 			std::string _name;
 			std::any _method;
 		};

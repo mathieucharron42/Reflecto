@@ -275,6 +275,9 @@ namespace Reflecto
 
 					const TypeLibrary typeLibrary = TypeLibraryFactory()
 						.Add<SampleClass>("SampleClass")
+						.Add<float>("float")
+						.Add<int32_t>("int32")
+						.Add<void>("void")
 					.Build();
 
 					const TypeDescriptor descriptor = TypeDescriptorFactory<SampleClass>(typeLibrary)

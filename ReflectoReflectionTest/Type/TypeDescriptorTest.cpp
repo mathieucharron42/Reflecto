@@ -141,13 +141,15 @@ namespace Reflecto
 					const TypeLibrary typeLibrary = TypeLibraryFactory()
 						.Add<SampleClass>("SampleClass")
 						.Add<int32_t>("int32")
+						.Add<bool>("bool")
+						.Add<void>("void")
 					.Build();
 
-					const std::vector<MethodDescriptor> kExpectedMethod = [] () -> std::vector<MethodDescriptor> {
-						MethodDescriptor m1(MethodDescriptor::method_ptr_t<SampleClass>(), "MethodNoParameter");
-						MethodDescriptor m2(MethodDescriptor::method_ptr_t<TestClass, bool>(), "MethodReturn");
-						MethodDescriptor m3(MethodDescriptor::method_ptr_t<TestClass, int32_t>(), "Method1Parameter");
-						MethodDescriptor m4(MethodDescriptor::method_ptr_t<SampleClass, int32_t, int32_t>(), "Method2Parameter");
+					const std::vector<MethodDescriptor> kExpectedMethod = [&] () -> std::vector<MethodDescriptor> {
+						MethodDescriptor m1(*typeLibrary.Get<void>(), "MethodNoParameter", MethodDescriptor::method_ptr_t<SampleClass>());
+						MethodDescriptor m2(*typeLibrary.Get<bool>(), "MethodReturn", MethodDescriptor::method_ptr_t<TestClass, bool>());
+						MethodDescriptor m3(*typeLibrary.Get<void>(), "Method1Parameter", MethodDescriptor::method_ptr_t<TestClass, int32_t>());
+						MethodDescriptor m4(*typeLibrary.Get<void>(), "Method2Parameter", MethodDescriptor::method_ptr_t<SampleClass, int32_t, int32_t>());
 						return { m1, m2, m3, m4 };
 					}();
 
