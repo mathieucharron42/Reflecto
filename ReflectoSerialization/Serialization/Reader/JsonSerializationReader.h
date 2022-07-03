@@ -22,6 +22,8 @@ namespace Reflecto
 		class JsonSerializationReader : public ISerializationReader
 		{
 		public:
+			using JsonElement = Json::Value;
+
 			virtual bool ReadInteger32(int32_t& value) override
 			{
 				return ReadElementValue(Json::intValue, &Json::Value::asInt, value);
@@ -154,13 +156,18 @@ namespace Reflecto
 				return success;
 			}
 
-			bool ImportFromFile(const std::string& fileName)
+			bool Import(const JsonElement& element)
 			{
-				
+				bool success = false;
+				if (PushElement(element))
+				{
+					success = true;
+				}
+				return success;
 			}
 
 		private:
-			using JsonElement = Json::Value;
+			
 			using JsonProperties = Json::Value::Members;
 
 			template<typename member_function_ptr_type, typename type>

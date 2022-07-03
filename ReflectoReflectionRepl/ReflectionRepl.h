@@ -9,6 +9,7 @@
 #include "Type/TypeLibrary.h"
 #include "Resolver/Resolver.h"
 #include "Utils/StringExt.h"
+#include "jsoncpp/json.h"
 
 #include <string>
 
@@ -90,10 +91,15 @@ namespace Reflecto
 				const Reflection::MethodDescriptor* methodDescriptor = typeDescriptor.GetMethodByName(methodName);
 				if (methodDescriptor)
 				{
-					// parameters
+					Serialization::JsonSerializationReader reader;
+					Json::Value element(Json::arrayValue);
+					for (const std::string& parameter : parameters)
+					{
+						element.append(parameter);
+					}
+					reader.Import(element);
 
-					auto method = resolver.ResolveMethod<void>(*methodDescriptor, instance);
-					// to do: gérer les paramètres et fonction avec type de retour
+					Resolver::resolved_method_t<void> method = resolver.ResolveMethod(*methodDescriptor, &instance);
 					method();
 					result = InstructionResult::Ok;
 				}
@@ -116,8 +122,12 @@ namespace Reflecto
 				{
 					const std::string kMemberInstructionDelimiter = "=";
 					const std::string kMethodInstructionParamBeginDelimiter = "(";
-					const std::string kMethodInstructionParamEndDelimiter = "(";
-					if (instruction.find(kMemberInstructionDelimiter) != std::string::npos)
+					const std::string kMethodInstructionParamEndDelimiter = ")";
+
+					const std::size_t memberInstructorDelimiterPos = instruction.find(kMemberInstructionDelimiter);
+					const std::size_t methodInstructionParamBeginDelimiterPos = instruction.find(kMethodInstructionParamBeginDelimiter);
+					const std::size_t methodInstructionParamEndDelimiterPos = instruction.find(kMethodInstructionParamEndDelimiter);
+					if (memberInstructorDelimiterPos != std::string::npos)
 					{
 						std::vector<std::string> tokens = StringExt::Tokenize(instruction, kMemberInstructionDelimiter);
 						if (tokens.size() == 2)
@@ -132,10 +142,10 @@ namespace Reflecto
 							result = InstructionResult::BadInstruction;
 						}
 					}
-					else if (instruction.find(kMethodInstructionParamBeginDelimiter) != std::string::npos && instruction.find(kMethodInstructionParamEndDelimiter) != std::string::npos)
+					else if (methodInstructionParamBeginDelimiterPos != std::string::npos && methodInstructionParamEndDelimiterPos != std::string::npos)
 					{
-						const std::string methodName = instruction.substr(0, instruction.find(kMethodInstructionParamBeginDelimiter));
-						const std::vector<std::string> arguments;
+						const std::string methodName = instruction.substr(0, methodInstructionParamBeginDelimiterPos);
+						const std::vector<std::string> arguments = StringExt::Tokenize<std::string>(instruction.substr(methodInstructionParamBeginDelimiterPos + 1, methodInstructionParamEndDelimiterPos - methodInstructionParamBeginDelimiterPos - 1), ",");
 						result = ProcessMethodInstruction(serializer, typeDescriptor, instance, methodName, arguments);
 					}
 					else
