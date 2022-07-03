@@ -210,8 +210,12 @@ namespace Reflecto
 				for (const Reflection::MethodDescriptor& methodDescriptor : typeDescriptor.GetMethods())
 				{
 					const std::string& methodName = methodDescriptor.GetName();
+					const std::string& returnType = methodDescriptor.GetReturnType().GetName();
+					const std::string& parameters = Utils::StringExt::Join<std::string>(methodDescriptor.GetParameters(), ", ", [](const ParameterDescriptor& descriptor) {
+						return Utils::StringExt::Format<std::string>("%s %s", descriptor.GetType().GetName().c_str(), descriptor.GetName().c_str());
+					});
 					ouput << "  ";
-					ouput << "void " << methodName << "()" << std::endl;
+					ouput << returnType << " " << methodName << "(" << parameters << ")" << std::endl;
 				}
 				ouput << "Members:" << std::endl;
 				for (const Reflection::MemberDescriptor& memberDescriptor : typeDescriptor.GetMembers())

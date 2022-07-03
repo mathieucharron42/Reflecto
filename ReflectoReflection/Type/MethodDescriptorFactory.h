@@ -3,6 +3,9 @@
 #include "MethodDescriptor.h"
 #include "TypeDescriptor.h"
 #include "TypeLibrary.h"
+#include "ParameterDescriptorFactory.h"
+
+#include "Common/Ensure.h"
 
 #include <assert.h>
 #include <memory.h>
@@ -17,28 +20,42 @@ namespace Reflecto
 		public:
 			using method_ptr_t = return_t (object_t::*)(args_t ...);
 
-			MethodDescriptorFactory(const TypeLibrary& typeLibrary, object_t& sampleObj, method_ptr_t methodPointer, const std::string& name)
+			MethodDescriptorFactory(const TypeLibrary& typeLibrary, object_t& sampleObj, method_ptr_t methodPointer, const std::string& name, const std::vector<std::string>& parameterNames)
 				: _typeLibrary(typeLibrary)
 				, _sampleObj(sampleObj)
 				, _methodPointer(methodPointer)
 				, _name(name)
+				, _parametersName(parameterNames)
 			{ }
 
 			MethodDescriptor Build()
 			{
+				ensure(sizeof...(args_t) == _parametersName.size());
 				const Type returnType = *_typeLibrary.Get<return_t>();
+				const std::vector<ParameterDescriptor> parameters = BuildParameters();
 				const MethodDescriptor::method_ptr_t<object_t, return_t, args_t...> method_wrapper = [methodPointer = _methodPointer] (object_t& obj, args_t ... args) -> return_t {
 					return std::invoke(methodPointer, obj, args...);
 				};
-
-				return MethodDescriptor{ returnType, _name, method_wrapper };
+				return MethodDescriptor{ returnType, _name, parameters, method_wrapper };
 			}
 
 		private:
+			std::vector<ParameterDescriptor> BuildParameters()
+			{
+				return BuildParameters(std::make_index_sequence<sizeof...(args_t)>{});
+			}
+
+			template <size_t... i>
+			std::vector<ParameterDescriptor> BuildParameters(std::index_sequence<i...>)
+			{
+				return { ParameterDescriptorFactory<args_t>(_typeLibrary, _parametersName[i]).Build()... };
+			}
+
 			TypeLibrary _typeLibrary;
 			object_t _sampleObj;
 			method_ptr_t _methodPointer;
 			std::string _name;
+			std::vector<std::string> _parametersName;
 		};
 	}
 }

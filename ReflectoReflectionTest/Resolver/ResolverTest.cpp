@@ -282,9 +282,9 @@ namespace Reflecto
 
 					const TypeDescriptor descriptor = TypeDescriptorFactory<SampleClass>(typeLibrary)
 						.RegisterMethod(&SampleClass::MethodNoParam, "MethodNoParam")
-						.RegisterMethod(&SampleClass::Method1Param, "Method1Param")
-						.RegisterMethod(&SampleClass::Method2Param, "Method2Param")
-						.RegisterMethod(&SampleClass::MethodReturn, "MethodReturn")
+						.RegisterMethod(&SampleClass::Method1Param, "Method1Param", {"p1"})
+						.RegisterMethod(&SampleClass::Method2Param, "Method2Param", { "p1", "p2"})
+						.RegisterMethod(&SampleClass::MethodReturn, "MethodReturn", {"p"})
 					.Build();
 
 					Resolver<SampleClass> resolver(descriptor);
