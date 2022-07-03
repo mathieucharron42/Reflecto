@@ -17,6 +17,7 @@ int main()
 		.Add<int32_t>("int32")
 		.Add<bool>("bool")
 		.Add<Potato>("Potato")
+		.Add<void>("void")
 	.Build();
 
 	Reflection::TypeDescriptor potatoTypeDescriptor = Reflection::TypeDescriptorFactory<Potato>(typeLibrary)
