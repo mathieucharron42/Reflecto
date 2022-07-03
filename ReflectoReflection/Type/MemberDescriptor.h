@@ -39,8 +39,7 @@ namespace Reflecto
 
 			bool operator<(const MemberDescriptor& other) const
 			{
-				return _name < other._name
-					&& _type < other._type;
+				return std::tie(_name, _type) < std::tie(other._name, other._type);
 			}
 
 			std::string ToString() const
