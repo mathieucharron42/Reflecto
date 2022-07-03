@@ -119,7 +119,7 @@ namespace Reflecto
 					const std::string kMethodInstructionParamEndDelimiter = "(";
 					if (instruction.find(kMemberInstructionDelimiter) != std::string::npos)
 					{
-						std::vector<std::string> tokens = Utils::StringExt::Tokenize(instruction, kMemberInstructionDelimiter);
+						std::vector<std::string> tokens = StringExt::Tokenize(instruction, kMemberInstructionDelimiter);
 						if (tokens.size() == 2)
 						{
 							const std::string memberName = tokens[0];
@@ -211,8 +211,8 @@ namespace Reflecto
 				{
 					const std::string& methodName = methodDescriptor.GetName();
 					const std::string& returnType = methodDescriptor.GetReturnType().GetName();
-					const std::string& parameters = Utils::StringExt::Join<std::string>(methodDescriptor.GetParameters(), ", ", [](const ParameterDescriptor& descriptor) {
-						return Utils::StringExt::Format<std::string>("%s %s", descriptor.GetType().GetName().c_str(), descriptor.GetName().c_str());
+					const std::string& parameters = StringExt::Join<std::string>(methodDescriptor.GetParameters(), ", ", [](const ParameterDescriptor& descriptor) {
+						return StringExt::Format<std::string>("%s %s", descriptor.GetType().GetName().c_str(), descriptor.GetName().c_str());
 					});
 					ouput << "  ";
 					ouput << returnType << " " << methodName << "(" << parameters << ")" << std::endl;

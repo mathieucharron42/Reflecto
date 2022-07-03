@@ -10,13 +10,13 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 template<>
 inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<std::vector<uint32_t>>(const std::vector<uint32_t>& vector)
 {
-	return Reflecto::Utils::StringExt::Join<std::wstring>(vector, L",");
+	return Reflecto::StringExt::Join<std::wstring>(vector, L",");
 }
 
 template<>
 inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<std::vector<std::string>>(const std::vector<std::string>& vector)
 {
-	return Reflecto::Utils::StringExt::ToWstring(Reflecto::Utils::StringExt::Join<std::string>(vector, ","));
+	return Reflecto::StringExt::ToWstring(Reflecto::StringExt::Join<std::string>(vector, ","));
 }
 
 namespace Reflecto

@@ -41,13 +41,13 @@ namespace Reflecto
 template<>
 inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<std::vector<std::string>>(const std::vector<std::string>& vector)
 {
-	return Reflecto::Utils::StringExt::ToWstring(Reflecto::Utils::StringExt::Join<std::string>(vector, ","));
+	return Reflecto::StringExt::ToWstring(Reflecto::StringExt::Join<std::string>(vector, ","));
 }
 
 template<>
 inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<Reflecto::Serialization::Test::TestPerson>(const Reflecto::Serialization::Test::TestPerson& obj)
 {
-	return Reflecto::Utils::StringExt::Format<std::wstring>(L"{Name=%s,Age=%i}", obj.Name.c_str(), obj.Age);
+	return Reflecto::StringExt::Format<std::wstring>(L"{Name=%s,Age=%i}", obj.Name.c_str(), obj.Age);
 }
 
 namespace Reflecto
@@ -72,7 +72,7 @@ namespace Reflecto
 					.Build();
 
 					int32_t expectedValue = 42;
-					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%i})"), "int32", expectedValue);
+					const std::string expectedSerialized = StringExt::Format(std::string(R"({"type":"%s","value":%i})"), "int32", expectedValue);
 
 					/////////////
 					// Act
@@ -111,7 +111,7 @@ namespace Reflecto
 					.Build();
 
 					std::string expectedValue = "test";
-					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", expectedValue.c_str());
+					const std::string expectedSerialized = StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", expectedValue.c_str());
 
 					/////////////
 					// Act
@@ -150,7 +150,7 @@ namespace Reflecto
 					.Build();
 
 					const float expectedValue = 0.5f;
-					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%.1f})"), "float", expectedValue);
+					const std::string expectedSerialized = StringExt::Format(std::string(R"({"type":"%s","value":%.1f})"), "float", expectedValue);
 
 					/////////////
 					// Act
@@ -189,7 +189,7 @@ namespace Reflecto
 					.Build();
 
 					const double expectedValue = 0.5;
-					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%.1f})"), "double", expectedValue);
+					const std::string expectedSerialized = StringExt::Format(std::string(R"({"type":"%s","value":%.1f})"), "double", expectedValue);
 
 					/////////////
 					// Act
@@ -229,7 +229,7 @@ namespace Reflecto
 					.Build();
 					
 					bool expectedValue = true;
-					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%s})"), "boolean", expectedValue ? "true" : "false");
+					const std::string expectedSerialized = StringExt::Format(std::string(R"({"type":"%s","value":%s})"), "boolean", expectedValue ? "true" : "false");
 
 					/////////////
 					// Act
@@ -269,10 +269,10 @@ namespace Reflecto
 					.Build();
 
 					const std::vector<std::string> expectedValue = { "uno", "dos", "tres" };
-					const std::string value1ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "uno");
-					const std::string value2ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "dos");
-					const std::string value3ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "tres");
-					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":[%s,%s,%s]})"), "vector<string>", value1ExpectedStr.c_str(), value2ExpectedStr.c_str(), value3ExpectedStr.c_str());
+					const std::string value1ExpectedStr = StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "uno");
+					const std::string value2ExpectedStr = StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "dos");
+					const std::string value3ExpectedStr = StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "tres");
+					const std::string expectedSerialized = StringExt::Format(std::string(R"({"type":"%s","value":[%s,%s,%s]})"), "vector<string>", value1ExpectedStr.c_str(), value2ExpectedStr.c_str(), value3ExpectedStr.c_str());
 
 					/////////////
 					// Act
@@ -321,9 +321,9 @@ namespace Reflecto
 
 					const std::string expectedNameValue = "George";
 					const int32_t expectedAgeValue = 1;
-					const std::string expectedNameStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", expectedNameValue.c_str());
-					const std::string expectedAgeStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int32", expectedAgeValue);
-					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Age":%s,"Name":%s}})"), testPersonDescriptor.GetType().GetName().c_str(), expectedAgeStr.c_str(), expectedNameStr.c_str());
+					const std::string expectedNameStr = StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", expectedNameValue.c_str());
+					const std::string expectedAgeStr = StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int32", expectedAgeValue);
+					const std::string expectedSerialized = StringExt::Format(std::string(R"({"type":"%s","value":{"Age":%s,"Name":%s}})"), testPersonDescriptor.GetType().GetName().c_str(), expectedAgeStr.c_str(), expectedNameStr.c_str());
 
 					/////////////
 					// Act
@@ -377,7 +377,7 @@ namespace Reflecto
 
 					const std::string expectedNameValue = "George";
 					const int32_t expectedAgeValue = 41;
-					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"Age":%d,"Name":"%s"})"), expectedAgeValue, expectedNameValue.c_str());
+					const std::string expectedSerialized = StringExt::Format(std::string(R"({"Age":%d,"Name":"%s"})"), expectedAgeValue, expectedNameValue.c_str());
 
 					/////////////
 					// Act
@@ -425,16 +425,16 @@ namespace Reflecto
 
 					const std::map<int32_t, std::string> expectedValue = { {1, "uno"}, { 2, "dos"}, { 3, "tres" } };
 					
-					const std::string key1ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int", 1);
-					const std::string key2ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int", 2);
-					const std::string key3ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int", 3);
-					const std::string value1ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "uno");
-					const std::string value2ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "dos");
-					const std::string value3ExpectedStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "tres");
-					const std::string entry1ExpectedStr = Utils::StringExt::Format(std::string(R"({"key":%s,"value":%s})"), key1ExpectedStr.c_str(), value1ExpectedStr.c_str());
-					const std::string entry2ExpectedStr = Utils::StringExt::Format(std::string(R"({"key":%s,"value":%s})"), key2ExpectedStr.c_str(), value2ExpectedStr.c_str());
-					const std::string entry3ExpectedStr = Utils::StringExt::Format(std::string(R"({"key":%s,"value":%s})"), key3ExpectedStr.c_str(), value3ExpectedStr.c_str());
-					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":[%s,%s,%s]})"), "map<int,string>", entry1ExpectedStr.c_str(), entry2ExpectedStr.c_str(), entry3ExpectedStr.c_str());
+					const std::string key1ExpectedStr = StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int", 1);
+					const std::string key2ExpectedStr = StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int", 2);
+					const std::string key3ExpectedStr = StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int", 3);
+					const std::string value1ExpectedStr = StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "uno");
+					const std::string value2ExpectedStr = StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "dos");
+					const std::string value3ExpectedStr = StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", "tres");
+					const std::string entry1ExpectedStr = StringExt::Format(std::string(R"({"key":%s,"value":%s})"), key1ExpectedStr.c_str(), value1ExpectedStr.c_str());
+					const std::string entry2ExpectedStr = StringExt::Format(std::string(R"({"key":%s,"value":%s})"), key2ExpectedStr.c_str(), value2ExpectedStr.c_str());
+					const std::string entry3ExpectedStr = StringExt::Format(std::string(R"({"key":%s,"value":%s})"), key3ExpectedStr.c_str(), value3ExpectedStr.c_str());
+					const std::string expectedSerialized = StringExt::Format(std::string(R"({"type":"%s","value":[%s,%s,%s]})"), "map<int,string>", entry1ExpectedStr.c_str(), entry2ExpectedStr.c_str(), entry3ExpectedStr.c_str());
 
 					/////////////
 					// Act
@@ -554,19 +554,19 @@ namespace Reflecto
 					const int32_t testEyesSize = 3;
 					const bool testMouthIsSmiling = true;
 
-					const std::string expectedNameStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testValueName.c_str());
+					const std::string expectedNameStr = StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testValueName.c_str());
 
-					const std::string expectedEyesColorStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testEyesColor.c_str());
-					const std::string expectedEyesSizeStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int32", testEyesSize);
-					const std::string expectedEyesStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Color":%s,"Size":%s}})"), testPotatoHeadEyesDescriptor.GetType().GetName().c_str(), expectedEyesColorStr.c_str(), expectedEyesSizeStr.c_str());
+					const std::string expectedEyesColorStr = StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testEyesColor.c_str());
+					const std::string expectedEyesSizeStr = StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int32", testEyesSize);
+					const std::string expectedEyesStr = StringExt::Format(std::string(R"({"type":"%s","value":{"Color":%s,"Size":%s}})"), testPotatoHeadEyesDescriptor.GetType().GetName().c_str(), expectedEyesColorStr.c_str(), expectedEyesSizeStr.c_str());
 
-					const std::string expectedNoseTypeStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testNoseType.c_str());
-					const std::string expectedNoseStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Type":%s}})"), testPotatoHeadNoseDescriptor.GetType().GetName().c_str(), expectedNoseTypeStr.c_str());
+					const std::string expectedNoseTypeStr = StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testNoseType.c_str());
+					const std::string expectedNoseStr = StringExt::Format(std::string(R"({"type":"%s","value":{"Type":%s}})"), testPotatoHeadNoseDescriptor.GetType().GetName().c_str(), expectedNoseTypeStr.c_str());
 
-					const std::string expectedMouthIsSmilingStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":%s})"), "boolean", testMouthIsSmiling ? "true" : "false");
-					const std::string expectedMouthStr = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"IsSmiling":%s}})"), testPotatoHeadMouthDescriptor.GetType().GetName().c_str(), expectedMouthIsSmilingStr.c_str());
+					const std::string expectedMouthIsSmilingStr = StringExt::Format(std::string(R"({"type":"%s","value":%s})"), "boolean", testMouthIsSmiling ? "true" : "false");
+					const std::string expectedMouthStr = StringExt::Format(std::string(R"({"type":"%s","value":{"IsSmiling":%s}})"), testPotatoHeadMouthDescriptor.GetType().GetName().c_str(), expectedMouthIsSmilingStr.c_str());
 
-					const std::string expectedSerialized = Utils::StringExt::Format(std::string(R"({"type":"%s","value":{"Eyes":%s,"Mouth":%s,"Name":%s,"Nose":%s}})"), testPotatoHeadDescriptor.GetType().GetName().c_str(), expectedEyesStr.c_str(), expectedMouthStr.c_str(), expectedNameStr.c_str(), expectedNoseStr.c_str());
+					const std::string expectedSerialized = StringExt::Format(std::string(R"({"type":"%s","value":{"Eyes":%s,"Mouth":%s,"Name":%s,"Nose":%s}})"), testPotatoHeadDescriptor.GetType().GetName().c_str(), expectedEyesStr.c_str(), expectedMouthStr.c_str(), expectedNameStr.c_str(), expectedNoseStr.c_str());
 					
 					/////////////
 					// Act

@@ -16,7 +16,7 @@ namespace Reflecto
 	namespace Reflection
 	{
 		template<class object_t>
-		class Resolver : private Utils::NonCopyable
+		class Resolver : private NonCopyable
 		{
 		public:
 			template<typename return_t, typename ... args_t>

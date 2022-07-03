@@ -35,7 +35,7 @@ namespace Reflecto
 
 			std::string ToString() const
 			{
-				return Utils::StringExt::Format<std::string>("{Type=%s,Name=%s}", _type.ToString().c_str(), _name.c_str());
+				return StringExt::Format<std::string>("{Type=%s,Name=%s}", _type.ToString().c_str(), _name.c_str());
 			}
 
 		private:

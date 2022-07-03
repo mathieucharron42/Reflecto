@@ -4,15 +4,12 @@
 
 namespace Reflecto
 {
-	namespace Utils
+	struct IdentityTransform
 	{
-		struct IdentityTransform
+		template<class type>
+		constexpr type&& operator()(type&& t) const noexcept
 		{
-			template<class type>
-			constexpr type&& operator()(type&& t) const noexcept
-			{
-				return std::forward<type>(t);
-			}
-		};
-	}
+			return std::forward<type>(t);
+		}
+	};
 }

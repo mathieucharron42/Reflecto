@@ -55,7 +55,7 @@ namespace Reflecto
 
 			std::string ToString() const
 			{
-				return Utils::StringExt::Format<std::string>("{ReturnType=%s,Name=%s,Parameters=%s}", _returnType.ToString().c_str(), _name.c_str(), Utils::StringExt::Join<std::string>(_parameters, ",", &ParameterDescriptor::ToString).c_str());
+				return StringExt::Format<std::string>("{ReturnType=%s,Name=%s,Parameters=%s}", _returnType.ToString().c_str(), _name.c_str(), StringExt::Join<std::string>(_parameters, ",", &ParameterDescriptor::ToString).c_str());
 			}
 
 		private:

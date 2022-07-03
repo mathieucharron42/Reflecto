@@ -12,8 +12,8 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 template<>
 inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<std::vector<std::string>>(const std::vector<std::string>& vector)
 {
-	return Reflecto::Utils::StringExt::Join<std::wstring>(vector, L",", [] (const std::string& str) {
-		return Reflecto::Utils::StringExt::ToWstring(str);
+	return Reflecto::StringExt::Join<std::wstring>(vector, L",", [] (const std::string& str) {
+		return Reflecto::StringExt::ToWstring(str);
 	});
 }
 

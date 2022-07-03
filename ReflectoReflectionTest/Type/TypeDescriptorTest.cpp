@@ -27,9 +27,9 @@ namespace Reflecto
 				float _field = 0.f;
 			};
 
-			struct PrivateSampleClassFieldTag : public Reflecto::Utils::TypeMemberTag<PrivateSampleClass, float> { };
+			struct PrivateSampleClassFieldTag : public Reflecto::TypeMemberTag<PrivateSampleClass, float> { };
 			
-			template struct Reflecto::Utils::EncapsulationBreaker<PrivateSampleClassFieldTag, &PrivateSampleClass::_field>;
+			template struct Reflecto::EncapsulationBreaker<PrivateSampleClassFieldTag, &PrivateSampleClass::_field>;
 
 			TEST_CLASS(TypeDescriptorTest)
 			{
@@ -74,7 +74,7 @@ namespace Reflecto
 						return { m4 };
 					}();
 					const std::vector<MemberDescriptor> kExpectedMembersRecursiveChildSampleClass = [&]() -> std::vector<MemberDescriptor> {
-						return Utils::CollectionExt::Concatenate(kExpectedMembersChildSampleClass, kExpectedMembersRecursiveChildSampleClass);
+						return CollectionExt::Concatenate(kExpectedMembersChildSampleClass, kExpectedMembersRecursiveChildSampleClass);
 					}();
 					const std::vector<MemberDescriptor> kExpectedPrivateMembers = [&] () -> std::vector<MemberDescriptor> {
 						MemberDescriptor m1(typeLibrary.GetChecked<float>(), "Field", 0);
