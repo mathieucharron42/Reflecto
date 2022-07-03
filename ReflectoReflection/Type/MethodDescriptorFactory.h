@@ -6,6 +6,7 @@
 #include "ParameterDescriptorFactory.h"
 
 #include "Common/Ensure.h"
+#include "Utils/AnyExt.h"
 
 #include <assert.h>
 #include <memory.h>
@@ -33,9 +34,7 @@ namespace Reflecto
 				ensure(sizeof...(args_t) == _parametersName.size());
 				const Type returnType = *_typeLibrary.Get<return_t>();
 				const std::vector<ParameterDescriptor> parameters = BuildParameters();
-				const MethodDescriptor::method_ptr_t<object_t, return_t, args_t...> method_wrapper = [methodPointer = _methodPointer] (object_t& obj, args_t ... args) -> return_t {
-					return std::invoke(methodPointer, obj, args...);
-				};
+				const MethodDescriptor::weak_method_ptr_t<object_t, args_t...> method_wrapper = BuildMethodWrapper();
 				return MethodDescriptor{ returnType, _name, parameters, method_wrapper };
 			}
 
@@ -49,6 +48,13 @@ namespace Reflecto
 			std::vector<ParameterDescriptor> BuildParameters(std::index_sequence<i...>)
 			{
 				return { ParameterDescriptorFactory<args_t>(_typeLibrary, _parametersName[i]).Build()... };
+			}
+
+			MethodDescriptor::weak_method_ptr_t<object_t, args_t...> BuildMethodWrapper()
+			{
+				return [methodPointer = _methodPointer](object_t& obj, args_t ... args) -> std::any {
+					return AnyExt::Invoke(methodPointer, obj, args...);
+				};
 			}
 
 			TypeLibrary _typeLibrary;

@@ -2,6 +2,7 @@
 
 #include "ParameterDescriptor.h"
 
+#include "Utils/AnyExt.h"
 #include "Utils/CollectionExt.h"
 
 #include <any>
@@ -15,11 +16,14 @@ namespace Reflecto
 		class MethodDescriptor : RelationalOperators<MethodDescriptor>
 		{
 		public:
-			template<typename object_t, typename return_t = void, typename ... args_t>
+			template<typename object_t, typename ... args_t>
+			using weak_method_ptr_t = std::function<std::any(object_t&, args_t...)>;
+
+			template<typename return_t, typename object_t, typename ... args_t>
 			using method_ptr_t = std::function<return_t(object_t&, args_t...)>;
 
 			template<typename object_t, typename return_t = void, typename ... args_t>
-			MethodDescriptor(const Type& returnType, const std::string& name, const std::vector<ParameterDescriptor>& parameters, method_ptr_t<object_t, return_t, args_t...> method)
+			MethodDescriptor(const Type& returnType, const std::string& name, const std::vector<ParameterDescriptor>& parameters, weak_method_ptr_t<object_t, args_t...> method)
 				: _returnType(returnType)
 				, _name(name)
 				, _parameters(parameters)
@@ -31,13 +35,28 @@ namespace Reflecto
 				return _name;
 			}
 
-			template<typename object_t, typename return_t = void, typename ... args_t>
-			method_ptr_t<object_t, return_t, args_t...> GetMethod() const
+			template<typename object_t, typename ... args_t>
+			weak_method_ptr_t<object_t, args_t...> GetWeakMethod() const
 			{
-				const method_ptr_t<object_t, return_t, args_t...>* typedMethod = std::any_cast<method_ptr_t<object_t, return_t, args_t...>>(&_method);
-				return typedMethod ? *typedMethod : method_ptr_t<object_t, return_t, args_t...>();
+				const weak_method_ptr_t<object_t, args_t...>* weakMethod = std::any_cast<weak_method_ptr_t<object_t, args_t...>>(&_method);
+				return weakMethod ? *weakMethod : weak_method_ptr_t<object_t, args_t...>();
 			}
 
+			template<typename return_t, typename object_t, typename ... args_t>
+			method_ptr_t<return_t, object_t, args_t...> GetMethod() const
+			{
+				method_ptr_t<return_t, object_t, args_t...> method;
+				const weak_method_ptr_t<object_t, args_t...> weakMethod = GetWeakMethod<object_t, args_t...>();
+				if (weakMethod)
+				{
+					method = [=](object_t& obj, args_t ... args) -> return_t {
+						const std::any returnValue = std::invoke(weakMethod, obj, args...);
+						return AnyExt::AnyCast<return_t>(returnValue);
+					};
+				}
+				return method;
+			}
+			
 			const Type& GetReturnType() const
 			{
 				return _returnType;

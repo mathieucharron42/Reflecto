@@ -28,7 +28,7 @@ int main()
 		.RegisterMember(&Potato::IsBaked, "IsBaked")
 		.RegisterMethod(&Potato::Bake, "Bake")
 		.RegisterMethod(&Potato::AddButter, "AddButter")
-		.RegisterMethod(&Potato::AddSalt, "AddSalt")
+		.RegisterMethod(&Potato::AddSalt, "AddSalt", {"amount"})
 	.Build();
 
 	Serialization::Serializer serializer = Serialization::SerializerFactory(typeLibrary)

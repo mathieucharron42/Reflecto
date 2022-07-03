@@ -147,10 +147,10 @@ namespace Reflecto
 					.Build();
 
 					const std::vector<MethodDescriptor> kExpectedMethod = [&] () -> std::vector<MethodDescriptor> {
-						MethodDescriptor m1(*typeLibrary.Get<void>(), "MethodNoParameter", {}, MethodDescriptor::method_ptr_t<SampleClass>());
-						MethodDescriptor m2(*typeLibrary.Get<bool>(), "MethodReturn", {}, MethodDescriptor::method_ptr_t<TestClass, bool>());
-						MethodDescriptor m3(*typeLibrary.Get<void>(), "Method1Parameter", {ParameterDescriptor(*typeLibrary.Get<std::string>(), "p")}, MethodDescriptor::method_ptr_t<TestClass, int32_t>());
-						MethodDescriptor m4(*typeLibrary.Get<void>(), "Method2Parameter", { ParameterDescriptor(*typeLibrary.Get<int32_t>(), "param1"), ParameterDescriptor(*typeLibrary.Get<int32_t>(), "param2") }, MethodDescriptor::method_ptr_t<SampleClass, int32_t, int32_t>());
+						MethodDescriptor m1(*typeLibrary.Get<void>(), "MethodNoParameter", {}, MethodDescriptor::weak_method_ptr_t<SampleClass>());
+						MethodDescriptor m2(*typeLibrary.Get<bool>(), "MethodReturn", {}, MethodDescriptor::weak_method_ptr_t<TestClass, bool>());
+						MethodDescriptor m3(*typeLibrary.Get<void>(), "Method1Parameter", {ParameterDescriptor(*typeLibrary.Get<std::string>(), "p")}, MethodDescriptor::weak_method_ptr_t<TestClass, int32_t>());
+						MethodDescriptor m4(*typeLibrary.Get<void>(), "Method2Parameter", { ParameterDescriptor(*typeLibrary.Get<int32_t>(), "param1"), ParameterDescriptor(*typeLibrary.Get<int32_t>(), "param2") }, MethodDescriptor::weak_method_ptr_t<SampleClass, int32_t, int32_t>());
 						return { m1, m2, m3, m4 };
 					}();
 

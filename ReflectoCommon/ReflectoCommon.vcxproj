@@ -158,6 +158,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Common\Definitions.h" />
+    <ClInclude Include="Utils\AnyExt.h" />
     <ClInclude Include="Utils\AreTrait.h" />
     <ClInclude Include="Utils\CollectionExt.h" />
     <ClInclude Include="Utils\EncapsulationBreaker.h" />

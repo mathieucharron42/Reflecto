@@ -43,12 +43,11 @@ public:
 		Calories += AddedCalories;
 	}
 
-	void AddSalt()
+	void AddSalt(int32_t amount)
 	{
 		const float Tsp = 0.3f;
-		const int32_t AddedSodium = static_cast<int32_t>(ceil(Tsp * 2324)); // mg
-		std::cout << "Adding " << Tsp << " tsp of salt for " << AddedSodium << "mg of sodium" << std::endl;
-		Sodium += AddedSodium;
+		std::cout << "Adding " << amount << "mg of sodium" << std::endl;
+		Sodium += amount;
 	}
 
 	std::string Type;
