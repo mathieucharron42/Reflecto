@@ -5,6 +5,9 @@
 #include "Utils/StringExt.h"
 #include "Utils/RelationalOperators.h"
 
+#include <any>
+#include <functional>
+
 namespace Reflecto
 {
 	namespace Reflection
@@ -12,10 +15,16 @@ namespace Reflecto
 		class Type : public RelationalOperators<Type>
 		{
 		public:
-			Type(const std::string& name, typehash_t hash)
-				: _name(name)
+			Type(const std::type_info& typeInfo, const std::string& name, typehash_t hash)
+				: _typeInfo(&typeInfo)
+				, _name(name)
 				, _hash(hash)
 			{ }
+			
+			const std::type_info& GetInfo() const
+			{
+				return *_typeInfo;
+			}
 
 			const std::string GetName() const
 			{
@@ -38,6 +47,7 @@ namespace Reflecto
 			}
 
 		private:
+			const std::type_info* _typeInfo;
 			std::string _name;
 			typehash_t _hash;
 		};

@@ -12,7 +12,8 @@ namespace Reflecto
 		{
 		public:
 			TypeFactory(const std::string& name)
-				: _name(name)
+				: _typeInfo(TypeExt::GetTypeInfo<value_t>())
+				, _name(name)
 				, _hash(TypeExt::GetTypeHash<value_t>())
 			{
 
@@ -20,10 +21,11 @@ namespace Reflecto
 
 			Type Build()
 			{
-				return Type{ _name, _hash };
+				return Type{ _typeInfo, _name, _hash };
 			}
 
 		private:
+			const std::type_info& _typeInfo;
 			std::string _name;
 			typehash_t _hash;
 		};

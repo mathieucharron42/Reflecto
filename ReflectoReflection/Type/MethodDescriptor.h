@@ -62,7 +62,7 @@ namespace Reflecto
 				return _returnType;
 			}
 
-			const std::vector<ParameterDescriptor> GetParameters() const
+			const std::vector<ParameterDescriptor>& GetParameters() const
 			{
 				return _parameters;
 			}

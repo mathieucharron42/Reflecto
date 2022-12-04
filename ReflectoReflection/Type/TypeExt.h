@@ -14,17 +14,33 @@ namespace Reflecto
 		namespace TypeExt
 		{
 			template <typename type>
-			std::string GetClassName()
+			constexpr const std::type_info& GetTypeInfo()
 			{
-				std::string fullName = typeid(type).GetName();
+				return typeid(type);
+			}
+
+			inline std::string GetClassName(const std::type_info& typeinfo)
+			{
+				std::string fullName = typeinfo.name();
 				std::string clean = fullName.substr(fullName.find(" ") + 1);
 				return clean;
 			}
 
 			template <typename type>
+			std::string GetClassName()
+			{
+				return GetClassName(GetTypeInfo<type>());
+			}
+
+			inline typehash_t GetTypeHash(const std::type_info& typeinfo)
+			{
+				return typeinfo.hash_code();
+			}
+
+			template <typename type>
 			typehash_t GetTypeHash()
 			{
-				return typeid(type).hash_code();
+				return GetTypeHash(GetTypeInfo<type>());
 			}
 
 			template<typename object_t, typename member_pointer_owning_t, typename member_t>
