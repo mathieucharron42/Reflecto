@@ -1,5 +1,7 @@
 #include "Utils/StringExt.h"
 
+#include "TestCommon.h"
+
 #include <CppUnitTest.h>
 
 #include <string>
@@ -111,6 +113,40 @@ namespace Reflecto
 					/////////////
 					// Assert
 					Assert::AreEqual(expectedWstr, actualWStr, L"Unexpected wstring");
+				}
+
+				TEST_METHOD(Tokenize)
+				{
+					/////////////
+					// Arrange
+					const std::string string1 = "a,b,c";
+					const std::string separator1 = ",";
+					const std::vector<std::string> expected1 = {"a", "b", "c"};
+
+					const std::string string2 = "";
+					const std::vector<std::string> expected2 = {};
+
+					const std::string string3 = "a||ab||||abc||abcd";
+					const std::string separator3 = "||";
+					const std::vector<std::string> expected3 = {"a", "ab", "abc", "abcd"};
+
+					const std::string string4 = "a,b,c,d";
+					const std::string separator4 = ";";
+					const std::vector<std::string> expected4 = { "a,b,c,d" };
+
+					/////////////
+					// Act
+					const std::vector<std::string> actual1 = StringExt::Tokenize(string1, separator1);
+					const std::vector<std::string> actual2 = StringExt::Tokenize(string2, separator1);
+					const std::vector<std::string> actual3 = StringExt::Tokenize(string3, separator3);
+					const std::vector<std::string> actual4 = StringExt::Tokenize(string4, separator4);
+
+					/////////////
+					// Assert
+					Assert::AreEqual(expected1, actual1, L"Unexpected tokens");
+					Assert::AreEqual(expected2, actual2, L"Unexpected tokens");
+					Assert::AreEqual(expected3, actual3, L"Unexpected tokens");
+					Assert::AreEqual(expected4, actual4, L"Unexpected tokens");
 				}
 			};
 		}

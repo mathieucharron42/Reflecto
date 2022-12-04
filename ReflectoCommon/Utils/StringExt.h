@@ -50,17 +50,22 @@ namespace Reflecto
 		std::vector<string_t> Tokenize(const string_t& string, const string_t& delimiter)
 		{
 			std::vector<string_t> tokens;
-			std::size_t start = 0U;
-			std::size_t end = string.find(delimiter);
-			while (end != std::string::npos)
+			std::size_t start = 0;
+			std::size_t end = 0;
+			while ((end = string.find(delimiter, start)) != std::string::npos)
 			{
 				const std::string token = string.substr(start, end - start);
-				tokens.push_back(token);
+				if (!token.empty())
+				{
+					tokens.push_back(token);
+				}
 				start = end + delimiter.length();
-				end = string.find(delimiter, start);
 			}
 			const std::string token = string.substr(start, end);
-			tokens.push_back(token);
+			if (!token.empty())
+			{
+				tokens.push_back(token);
+			}
 			return tokens;
 		}
 

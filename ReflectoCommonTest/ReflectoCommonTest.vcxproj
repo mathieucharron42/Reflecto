@@ -173,6 +173,9 @@
     <ClCompile Include="Utils\RelationalOperatorTest.cpp" />
     <ClCompile Include="Utils\StringExtTest.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TestCommon.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
