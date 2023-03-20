@@ -32,13 +32,7 @@ namespace Reflecto
 				, _offset(offset)
 			{ }
 
-			const TypeDescriptor& GetType() const
-			{
-				ensure(_type);
-				return *_type;
-			}
-
-			const TypeDescriptorPtr& GetTypePtr() const
+			const TypeDescriptorPtr& GetType() const
 			{
 				return _type;
 			}
@@ -53,10 +47,7 @@ namespace Reflecto
 				return _offset;
 			}
 
-			bool operator<(const MemberDescriptor& other) const
-			{
-				return std::tie(_name, GetType()) < std::tie(other._name, GetType());
-			}
+			bool operator<(const MemberDescriptor& other) const;
 
 			std::string ToString() const;
 

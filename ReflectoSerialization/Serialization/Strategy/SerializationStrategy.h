@@ -123,7 +123,7 @@ namespace Reflecto
 							success &= writer.WriteBeginObjectProperty(member.GetName());
 							{
 								const void* value = resolver.ResolveMember(valueObject, member);
-								success &= serializer.Serialize(member.GetTypePtr(), value, writer);
+								success &= serializer.Serialize(member.GetType(), value, writer);
 							}
 							success &= writer.WriteEndObjectProperty();
 						}
@@ -155,7 +155,7 @@ namespace Reflecto
 								if (ensure(memberDescriptor))
 								{
 									void* member = resolver.ResolveMember(valueObject, *memberDescriptor);
-									success &= serializer.Deserialize(memberDescriptor->GetTypePtr(), member, reader);
+									success &= serializer.Deserialize(memberDescriptor->GetType(), member, reader);
 								}
 							}
 							else

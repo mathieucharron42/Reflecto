@@ -7,7 +7,13 @@
 
 #include <string>
 
+bool Reflecto::Reflection::MemberDescriptor::operator<(const MemberDescriptor& other) const
+{
+	return std::tie(_name, GetType()) < std::tie(other._name, GetType());
+}
+
 std::string Reflecto::Reflection::MemberDescriptor::ToString() const
 {
-	return StringExt::Format<std::string>("{Type=%s,Name=%s,Offset=%u", GetType().ToString().c_str(), _name.c_str(), _offset);
+	std::string typeStr = GetType() ? GetType()->ToString() : "unknown";
+	return StringExt::Format<std::string>("{Type=%s,Name=%s,Offset=%u", typeStr.c_str(), _name.c_str(), _offset);
 }

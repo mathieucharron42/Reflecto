@@ -61,7 +61,7 @@ namespace Reflecto
 						std::stringstream stream = std::stringstream(memberValue);
 						reader.Import(stream);
 
-						if (serializer.RawDeserialize(memberDescriptor->GetTypePtr(), member, reader))
+						if (serializer.RawDeserialize(memberDescriptor->GetType(), member, reader))
 						{
 							result = InstructionResult::Ok;
 						}
@@ -242,12 +242,12 @@ namespace Reflecto
 					for (const Reflection::MemberDescriptor& memberDescriptor : typeDescriptor->GetMembers())
 					{
 						const std::string& memberName = memberDescriptor.GetName();
-						const std::string& memberType = memberDescriptor.GetType().GetName();
+						const std::string& memberType = memberDescriptor.GetType()->GetName();
 						const void* member = resolver.ResolveMember(instance, memberDescriptor);
 						ouput << "  ";
 						ouput << memberType << " " << memberName;
 						ouput << " = ";
-						WriteValue(serializer, memberDescriptor.GetTypePtr(), member, ouput);
+						WriteValue(serializer, memberDescriptor.GetType(), member, ouput);
 						ouput << std::endl;
 					}
 				}

@@ -30,7 +30,7 @@ namespace Reflecto
 			Resolver(const TypeDescriptorPtr& typeDescriptor)
 				: _typeDescriptor(typeDescriptor)
 			{
-				assert(typeDescriptor && TypeExt::GetTypeHash<object_t>() == typeDescriptor->GetHash());
+				ensure(Is());
 			}
 
 			std::unique_ptr<object_t> Instantiate()
@@ -45,6 +45,11 @@ namespace Reflecto
 					}
 				}
 				return instance;
+			}
+
+			bool Is()
+			{
+				return _typeDescriptor && TypeExt::GetTypeHash<object_t>() == _typeDescriptor->GetHash();
 			}
 
 			template<typename member_t>
@@ -80,7 +85,8 @@ namespace Reflecto
 			member_t* ResolveMember(object_t& object, const MemberDescriptor& memberDescriptor) const
 			{
 				member_t* memberPtr = nullptr;
-				if (memberDescriptor.GetType().GetHash() == TypeExt::GetTypeHash<member_t>())
+				const TypeDescriptorPtr& memberType = memberDescriptor.GetType();
+				if (memberType && memberType->GetHash() == TypeExt::GetTypeHash<member_t>())
 				{
 					memberPtr = static_cast<member_t*>(ResolveMember(object, memberDescriptor));
 				}
@@ -89,7 +95,7 @@ namespace Reflecto
 
 			void* ResolveMember(object_t& object, const MemberDescriptor& memberDescriptor) const
 			{
-				return ResolveMember(&object, memberDescriptor);
+				return const_cast<void*>(ResolveMember(const_cast<const object_t&>(object), memberDescriptor));
 			}
 
 			const void* ResolveMember(const object_t& object, const MemberDescriptor& memberDescriptor) const
