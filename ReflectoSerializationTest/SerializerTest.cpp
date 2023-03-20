@@ -5,7 +5,6 @@
 #include "Serialization/Strategy/SerializationStrategy.h"
 #include "Serialization/Writer/JsonSerializationWriter.h"
 #include "Type/TypeDescriptorFactory.h"
-#include "Type/TypeFactory.h"
 #include "Type/TypeLibrary.h"
 #include "Type/TypeLibraryFactory.h"
 #include "Utils/StringExt.h"
@@ -303,27 +302,27 @@ namespace Reflecto
 					/////////////
 					// Arrange
 					const Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
-						.Add<TestPerson>("TestPerson")
 						.Add<std::string>("string")
 						.Add<int32_t>("int32")
-					.Build();
-
-					const Reflection::TypeDescriptor testPersonDescriptor = Reflection::TypeDescriptorFactory<TestPerson>(testTypeLibrary)
-						.RegisterMember(&TestPerson::Name, "Name")
-						.RegisterMember(&TestPerson::Age, "Age")
+						.BeginType<TestPerson>("TestPerson")
+							.RegisterMember(&TestPerson::Name, "Name")
+							.RegisterMember(&TestPerson::Age, "Age")
+						.EndType<TestPerson>()
 					.Build();
 
 					const Serializer serializer = SerializerFactory(testTypeLibrary)
 						.LearnType<int32_t, Int32SerializationStrategy>()
 						.LearnType<std::string, StringSerializationStrategy>()
-						.LearnType<TestPerson, ObjectSerializationStrategy<TestPerson>>(testPersonDescriptor)
+						.LearnType<TestPerson, ObjectSerializationStrategy<TestPerson>>()
 					.Build();
+
+					const Reflection::TypeDescriptorPtr testPersonDescritor = testTypeLibrary.GetDescriptor<TestPerson>();
 
 					const std::string expectedNameValue = "George";
 					const int32_t expectedAgeValue = 1;
 					const std::string expectedNameStr = StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", expectedNameValue.c_str());
 					const std::string expectedAgeStr = StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int32", expectedAgeValue);
-					const std::string expectedSerialized = StringExt::Format(std::string(R"({"type":"%s","value":{"Age":%s,"Name":%s}})"), testPersonDescriptor.GetType().GetName().c_str(), expectedAgeStr.c_str(), expectedNameStr.c_str());
+					const std::string expectedSerialized = StringExt::Format(std::string(R"({"type":"%s","value":{"Age":%s,"Name":%s}})"), testPersonDescritor->GetName().c_str(), expectedAgeStr.c_str(), expectedNameStr.c_str());
 
 					/////////////
 					// Act
@@ -358,20 +357,18 @@ namespace Reflecto
 					/////////////
 					// Arrange
 					const Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
-						.Add<TestPerson>("TestPerson")
 						.Add<std::string>("string")
 						.Add<int32_t>("int32")
-					.Build();
-
-					const Reflection::TypeDescriptor testPersonDescriptor = Reflection::TypeDescriptorFactory<TestPerson>(testTypeLibrary)
-						.RegisterMember(&TestPerson::Name, "Name")
-						.RegisterMember(&TestPerson::Age, "Age")
+						.BeginType<TestPerson>("TestPerson")
+							.RegisterMember(&TestPerson::Name, "Name")
+							.RegisterMember(&TestPerson::Age, "Age")
+						.EndType<TestPerson>()
 					.Build();
 
 					const Serializer serializer = SerializerFactory(testTypeLibrary)
 						.LearnType<int32_t, Int32SerializationStrategy>()
 						.LearnType<std::string, StringSerializationStrategy>()
-						.LearnType<TestPerson, ObjectSerializationStrategy<TestPerson>>(testPersonDescriptor)
+						.LearnType<TestPerson, ObjectSerializationStrategy<TestPerson>>()
 						.SetFormat(SerializationFormat::Short)
 					.Build();
 
@@ -415,7 +412,7 @@ namespace Reflecto
 						.Add<std::string>("string")
 						.Add<int32_t>("int")
 						.Add<std::map<int32_t, std::string>>("map<int,string>")
-						.Build();
+					.Build();
 
 					Serializer serializer = SerializerFactory(testTypeLibrary)
 						.LearnType<std::string, StringSerializationStrategy>()
@@ -509,44 +506,41 @@ namespace Reflecto
 					};
 
 					const Reflection::TypeLibrary testTypeLibrary = Reflection::TypeLibraryFactory()
-						.Add<TestPotatoHead>("TestPotatoHead")
-						.Add<TestPotatoHead::Eyes>("TestPotatoHead::Eyes")
-						.Add<TestPotatoHead::Nose>("TestPotatoHead::Nose")
-						.Add<TestPotatoHead::Mouth>("TestPotatoHead::Mouth")
 						.Add<std::string>("string")
 						.Add<int32_t>("int32")
 						.Add<bool>("boolean")
-					.Build();
-
-					const Reflection::TypeDescriptor testPotatoHeadDescriptor = Reflection::TypeDescriptorFactory<TestPotatoHead>(testTypeLibrary)
-						.RegisterMember(&TestPotatoHead::Name, "Name")
-						.RegisterMember(&TestPotatoHead::CurrentEyes, "Eyes")
-						.RegisterMember(&TestPotatoHead::CurrentNose, "Nose")
-						.RegisterMember(&TestPotatoHead::CurrentMouth, "Mouth")
-					.Build();
-
-					const Reflection::TypeDescriptor testPotatoHeadEyesDescriptor = Reflection::TypeDescriptorFactory<TestPotatoHead::Eyes>(testTypeLibrary)
-						.RegisterMember(&TestPotatoHead::Eyes::Color, "Color")
-						.RegisterMember(&TestPotatoHead::Eyes::Size, "Size")
-					.Build();
-
-					const Reflection::TypeDescriptor testPotatoHeadNoseDescriptor = Reflection::TypeDescriptorFactory<TestPotatoHead::Nose>(testTypeLibrary)
-						.RegisterMember(&TestPotatoHead::Nose::Type, "Type")
-					.Build();
-					
-					const Reflection::TypeDescriptor testPotatoHeadMouthDescriptor = Reflection::TypeDescriptorFactory<TestPotatoHead::Mouth>(testTypeLibrary)
-						.RegisterMember(&TestPotatoHead::Mouth::IsSmiling, "IsSmiling")
+						.BeginType<TestPotatoHead::Eyes>("TestPotatoHead::Eyes")
+							.RegisterMember(&TestPotatoHead::Eyes::Color, "Color")
+							.RegisterMember(&TestPotatoHead::Eyes::Size, "Size")
+						.EndType<TestPotatoHead::Eyes>()
+						.BeginType<TestPotatoHead::Nose>("TestPotatoHead::Nose")
+							.RegisterMember(&TestPotatoHead::Nose::Type, "Type")
+						.EndType<TestPotatoHead::Nose>()
+						.BeginType<TestPotatoHead::Mouth>("TestPotatoHead::Mouth")
+							.RegisterMember(&TestPotatoHead::Mouth::IsSmiling, "IsSmiling")
+						.EndType<TestPotatoHead::Mouth>()
+						.BeginType<TestPotatoHead>("TestPotatoHead")
+							.RegisterMember(&TestPotatoHead::Name, "Name")
+							.RegisterMember(&TestPotatoHead::CurrentEyes, "Eyes")
+							.RegisterMember(&TestPotatoHead::CurrentNose, "Nose")
+							.RegisterMember(&TestPotatoHead::CurrentMouth, "Mouth")
+						.EndType<TestPotatoHead>()
 					.Build();
 
 					const Serializer serializer = SerializerFactory(testTypeLibrary)
 						.LearnType<int32_t, Int32SerializationStrategy>()
 						.LearnType<std::string, StringSerializationStrategy>()
 						.LearnType<bool, BooleanSerializationStrategy>()
-						.LearnType<TestPotatoHead, ObjectSerializationStrategy<TestPotatoHead>>(testPotatoHeadDescriptor)
-						.LearnType<TestPotatoHead::Eyes, ObjectSerializationStrategy<TestPotatoHead::Eyes>>(testPotatoHeadEyesDescriptor)
-						.LearnType<TestPotatoHead::Mouth, ObjectSerializationStrategy<TestPotatoHead::Mouth>>(testPotatoHeadMouthDescriptor)
-						.LearnType<TestPotatoHead::Nose, ObjectSerializationStrategy<TestPotatoHead::Nose>>(testPotatoHeadNoseDescriptor)
+						.LearnType<TestPotatoHead, ObjectSerializationStrategy<TestPotatoHead>>()
+						.LearnType<TestPotatoHead::Eyes, ObjectSerializationStrategy<TestPotatoHead::Eyes>>()
+						.LearnType<TestPotatoHead::Mouth, ObjectSerializationStrategy<TestPotatoHead::Mouth>>()
+						.LearnType<TestPotatoHead::Nose, ObjectSerializationStrategy<TestPotatoHead::Nose>>()
 					.Build();
+
+					Reflection::TypeDescriptorPtr testPotatoHeadEyesDescriptor = testTypeLibrary.GetDescriptor<TestPotatoHead::Eyes>();
+					Reflection::TypeDescriptorPtr testPotatoHeadNoseDescriptor = testTypeLibrary.GetDescriptor<TestPotatoHead::Nose>();
+					Reflection::TypeDescriptorPtr testPotatoHeadMouthDescriptor = testTypeLibrary.GetDescriptor<TestPotatoHead::Mouth>();
+					Reflection::TypeDescriptorPtr testPotatoHeadDescriptor = testTypeLibrary.GetDescriptor<TestPotatoHead>();
 
 					const std::string testValueName = "Mr. Potato Head";
 					const std::string testEyesColor = "Blue";
@@ -558,15 +552,15 @@ namespace Reflecto
 
 					const std::string expectedEyesColorStr = StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testEyesColor.c_str());
 					const std::string expectedEyesSizeStr = StringExt::Format(std::string(R"({"type":"%s","value":%d})"), "int32", testEyesSize);
-					const std::string expectedEyesStr = StringExt::Format(std::string(R"({"type":"%s","value":{"Color":%s,"Size":%s}})"), testPotatoHeadEyesDescriptor.GetType().GetName().c_str(), expectedEyesColorStr.c_str(), expectedEyesSizeStr.c_str());
+					const std::string expectedEyesStr = StringExt::Format(std::string(R"({"type":"%s","value":{"Color":%s,"Size":%s}})"), testPotatoHeadEyesDescriptor->GetName().c_str(), expectedEyesColorStr.c_str(), expectedEyesSizeStr.c_str());
 
 					const std::string expectedNoseTypeStr = StringExt::Format(std::string(R"({"type":"%s","value":"%s"})"), "string", testNoseType.c_str());
-					const std::string expectedNoseStr = StringExt::Format(std::string(R"({"type":"%s","value":{"Type":%s}})"), testPotatoHeadNoseDescriptor.GetType().GetName().c_str(), expectedNoseTypeStr.c_str());
+					const std::string expectedNoseStr = StringExt::Format(std::string(R"({"type":"%s","value":{"Type":%s}})"), testPotatoHeadNoseDescriptor->GetName().c_str(), expectedNoseTypeStr.c_str());
 
 					const std::string expectedMouthIsSmilingStr = StringExt::Format(std::string(R"({"type":"%s","value":%s})"), "boolean", testMouthIsSmiling ? "true" : "false");
-					const std::string expectedMouthStr = StringExt::Format(std::string(R"({"type":"%s","value":{"IsSmiling":%s}})"), testPotatoHeadMouthDescriptor.GetType().GetName().c_str(), expectedMouthIsSmilingStr.c_str());
+					const std::string expectedMouthStr = StringExt::Format(std::string(R"({"type":"%s","value":{"IsSmiling":%s}})"), testPotatoHeadMouthDescriptor->GetName().c_str(), expectedMouthIsSmilingStr.c_str());
 
-					const std::string expectedSerialized = StringExt::Format(std::string(R"({"type":"%s","value":{"Eyes":%s,"Mouth":%s,"Name":%s,"Nose":%s}})"), testPotatoHeadDescriptor.GetType().GetName().c_str(), expectedEyesStr.c_str(), expectedMouthStr.c_str(), expectedNameStr.c_str(), expectedNoseStr.c_str());
+					const std::string expectedSerialized = StringExt::Format(std::string(R"({"type":"%s","value":{"Eyes":%s,"Mouth":%s,"Name":%s,"Nose":%s}})"), testPotatoHeadDescriptor->GetName().c_str(), expectedEyesStr.c_str(), expectedMouthStr.c_str(), expectedNameStr.c_str(), expectedNoseStr.c_str());
 					
 					/////////////
 					// Act

@@ -15,15 +15,29 @@ namespace Reflecto
 {
 	namespace Reflection
 	{
+		class TypeDescriptor;
+		using TypeDescriptorPtr = std::shared_ptr<TypeDescriptor>;
+		using TypeDescriptorUniquePtr = std::unique_ptr<TypeDescriptor>;
+
+		using OptionalConstructorDescriptor = std::optional<ConstructorDescriptor>;
+
 		class TypeDescriptor
 		{
 		public:
-			TypeDescriptor(const Type& type, const ConstructorDescriptor& constructor, const std::vector<MemberDescriptor>& members, const std::vector<MethodDescriptor>& methods, const std::vector<ValueDescriptor>& values)
-				: TypeDescriptor(type, nullptr, constructor, members, methods, values)
+			TypeDescriptor(const std::string& name, const std::type_info& typeInfo, typehash_t hash)
+				: TypeDescriptor(name, typeInfo, hash, {}, {}, {}, {})
+			{
+
+			}
+
+			TypeDescriptor(const std::string& name, const std::type_info& typeInfo, typehash_t hash, const OptionalConstructorDescriptor& constructor, const std::vector<MemberDescriptor>& members, const std::vector<MethodDescriptor>& methods, const std::vector<ValueDescriptor>& values)
+				: TypeDescriptor(name, typeInfo, hash, TypeDescriptorPtr(), constructor, members, methods, values)
 			{ }
 
-			TypeDescriptor(const Type& type, const TypeDescriptor* parent, const ConstructorDescriptor& constructor, const std::vector<MemberDescriptor>& members, const std::vector<MethodDescriptor>& methods, const std::vector<ValueDescriptor>& values)
-				: _type(type)
+			TypeDescriptor(const std::string& name, const std::type_info& typeInfo, typehash_t hash, const TypeDescriptorPtr& parent, const OptionalConstructorDescriptor& constructor, const std::vector<MemberDescriptor>& members, const std::vector<MethodDescriptor>& methods, const std::vector<ValueDescriptor>& values)
+				: _name(name)
+				, _typeInfo(typeInfo)
+				, _hash(hash)
 				, _parent(parent)
 				, _constructor(constructor)
 				, _members(members)
@@ -31,12 +45,22 @@ namespace Reflecto
 				, _values(values)
 			{ }
 
-			const Type& GetType() const
+			const std::type_info& GetInfo() const
 			{
-				return _type;
+				return _typeInfo;
 			}
 
-			const ConstructorDescriptor GetConstructor() const
+			const std::string GetName() const
+			{
+				return _name;
+			}
+
+			typehash_t GetHash() const
+			{
+				return _hash;
+			}
+
+			const OptionalConstructorDescriptor& GetConstructor() const
 			{
 				return _constructor;
 			}
@@ -142,10 +166,23 @@ namespace Reflecto
 				return found != _values.end() ? &(*found) : nullptr;
 			}
 
+			bool operator<(const TypeDescriptor& other) const
+			{
+				return std::tie(_hash, _name) < std::tie(other._hash, other._name);
+			}
+
+			std::string ToString() const
+			{
+				return StringExt::Format<std::string>("Type{Name=%s}", _name.c_str());
+			}
+
 		private:
-			Type _type;
-			const TypeDescriptor* _parent;
-			ConstructorDescriptor _constructor;
+			std::string _name;
+			const std::type_info& _typeInfo;
+			typehash_t _hash;
+
+			TypeDescriptorPtr _parent;
+			OptionalConstructorDescriptor _constructor;
 			std::vector<MemberDescriptor> _members;
 			std::vector<MethodDescriptor> _methods;
 			std::vector<ValueDescriptor> _values;

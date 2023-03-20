@@ -95,7 +95,6 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <BrowseInformation>true</BrowseInformation>
@@ -114,7 +113,6 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
     </ClCompile>
@@ -130,7 +128,6 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
     </ClCompile>
@@ -148,7 +145,6 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
     </ClCompile>
@@ -171,8 +167,6 @@
     <ClInclude Include="Type\ParameterDescriptorFactory.h" />
     <ClInclude Include="Type\TypeDescriptor.h" />
     <ClInclude Include="Type\TypeDescriptorFactory.h" />
-    <ClInclude Include="Type\Type.h" />
-    <ClInclude Include="Type\TypeFactory.h" />
     <ClInclude Include="Type\TypeExt.h" />
     <ClInclude Include="Type\TypeLibrary.h" />
     <ClInclude Include="Type\TypeLibraryFactory.h" />
@@ -186,6 +180,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReflectoReflection.cpp" />
+    <ClCompile Include="Type\MemberDescriptor.cpp" />
+    <ClCompile Include="Type\MethodDescriptor.cpp" />
+    <ClCompile Include="Type\ParameterDescriptor.cpp" />
+    <ClCompile Include="Type\ValueDescriptor.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

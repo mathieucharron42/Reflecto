@@ -20,8 +20,7 @@ namespace Reflecto
 
 			ParameterDescriptor Build()
 			{
-				const Type type = *_typeLibrary.Get<type_t>();
-				
+				const TypeDescriptorPtr type = _typeLibrary.GetDescriptor<type_t>();
 				return ParameterDescriptor{ type, _name};
 			}
 

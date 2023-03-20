@@ -1,8 +1,8 @@
 #pragma once
 
+#include "Type/TypeDescriptor.h"
 #include "Type/MemberDescriptor.h"
 #include "Type/MethodDescriptor.h"
-#include "Type/Type.h"
 
 #include <CppUnitTest.h>
 
@@ -10,7 +10,7 @@
 #include <vector>
 
 template<>
-inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<Reflecto::Reflection::Type>(const Reflecto::Reflection::Type& type)
+inline std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<Reflecto::Reflection::TypeDescriptor>(const Reflecto::Reflection::TypeDescriptor& type)
 {
 	return Reflecto::StringExt::ToWstring(type.ToString());
 }

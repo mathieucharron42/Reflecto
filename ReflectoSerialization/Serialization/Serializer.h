@@ -29,7 +29,7 @@ namespace Reflecto
 			using serialization_strategy_t = typename std::function<bool(const Serializer&, const void*, ISerializationWriter& writer)>;
 			using deserialization_strategy_t = typename std::function<bool(const Serializer&, void*, ISerializationReader& reader)>;
 			using strategies_t = std::tuple<serialization_strategy_t, deserialization_strategy_t>;
-			using strategy_map_t = std::map<Reflection::Type, strategies_t>;
+			using strategy_map_t = std::map<Reflection::TypeDescriptorPtr, strategies_t>;
 
 			Serializer(const Reflection::TypeLibrary& library, const strategy_map_t& strategy)
 				: Serializer(library, strategy, SerializationFormat::Descriptive)
@@ -46,7 +46,7 @@ namespace Reflecto
 				_serializationFormat = serializationFormat;
 			}
 
-			bool Serialize(const Reflection::Type& type, const void* value, ISerializationWriter& writer) const
+			bool Serialize(const Reflection::TypeDescriptorPtr& type, const void* value, ISerializationWriter& writer) const
 			{
 				bool success = false;
 				const serialization_strategy_t* strategy = GetSerializationStrategy(type);
@@ -61,15 +61,15 @@ namespace Reflecto
 			bool Serialize(const value_t& value, ISerializationWriter& writer) const
 			{
 				bool success = false;
-				const Reflection::Type* type = _typeLibrary.Get<value_t>();
+				Reflection::TypeDescriptorPtr type = _typeLibrary.GetDescriptor<value_t>();
 				if (type)
 				{
-					success = Serialize(*type, &value, writer);
+					success = Serialize(type, &value, writer);
 				}
 				return success;
 			}
 
-			bool RawSerialize(const Reflection::Type& type, const void* value, ISerializationWriter& writer) const
+			bool RawSerialize(const Reflection::TypeDescriptorPtr& type, const void* value, ISerializationWriter& writer) const
 			{
 				bool success = false;
 				const serialization_strategy_t* strategy = GetSerializationStrategy(type);
@@ -84,11 +84,8 @@ namespace Reflecto
 			bool RawSerialize(const value_t& value, ISerializationWriter& writer) const
 			{
 				bool success = false;
-				const Reflection::Type* type = _typeLibrary.Get<value_t>();
-				if (type)
-				{
-					success = RawSerialize(*type, &value, writer);
-				}
+				Reflection::TypeDescriptorPtr type = _typeLibrary.GetDescriptor<value_t>();
+				success = RawSerialize(type, &value, writer);
 				return success;
 			}
 
@@ -96,15 +93,12 @@ namespace Reflecto
 			bool Deserialize(value_t& value, ISerializationReader& reader) const
 			{
 				bool success = false;
-				const Reflection::Type* type = _typeLibrary.Get<value_t>();
-				if (type)
-				{
-					success = Deserialize(*type, &value, reader);
-				}
+				Reflection::TypeDescriptorPtr type = _typeLibrary.GetDescriptor<value_t>();
+				success = Deserialize(type, &value, reader);
 				return success;
 			}
 
-			bool Deserialize(const Reflection::Type& type, void* value, ISerializationReader& reader) const
+			bool Deserialize(const Reflection::TypeDescriptorPtr& type, void* value, ISerializationReader& reader) const
 			{
 				bool success = false;
 				const deserialization_strategy_t* strategy = GetDeserializationStrategy(type);
@@ -119,7 +113,7 @@ namespace Reflecto
 			bool RawDeserialize(value_t& value, ISerializationReader& reader) const
 			{
 				bool success = false;
-				const Reflection::Type* type = _typeLibrary.Get<value_t>();
+				Reflection::TypeDescriptorPtr type = _typeLibrary.GetDescriptor<value_t>();
 				if (type)
 				{
 					success = RawDeserialize(*type, &value, reader);
@@ -127,7 +121,7 @@ namespace Reflecto
 				return success;
 			}
 
-			bool RawDeserialize(const Reflection::Type& type, void* value, ISerializationReader& reader) const
+			bool RawDeserialize(const Reflection::TypeDescriptorPtr& type, void* value, ISerializationReader& reader) const
 			{
 				bool success = false;
 				const deserialization_strategy_t* strategy = GetDeserializationStrategy(type);
@@ -139,29 +133,36 @@ namespace Reflecto
 			}
 
 		private:
-			bool RawSerialize(const Reflection::Type& type, const serialization_strategy_t& strategy, const void* value, ISerializationWriter& writer) const
+			bool RawSerialize(const Reflection::TypeDescriptorPtr& type, const serialization_strategy_t& strategy, const void* value, ISerializationWriter& writer) const
 			{
 				return strategy(*this, value, writer);
 			}
 
-			bool Serialize(const Reflection::Type& type, const serialization_strategy_t& strategy, const void* value, ISerializationWriter& writer) const
+			bool Serialize(const Reflection::TypeDescriptorPtr& type, const serialization_strategy_t& strategy, const void* value, ISerializationWriter& writer) const
 			{
 				bool success = true;
 				if (_serializationFormat == SerializationFormat::Descriptive)
 				{
 					success &= writer.WriteBeginObject();
 					{
-						success &= writer.WriteBeginObjectProperty("type");
+						if (type)
 						{
-							success &= writer.WriteString(type.GetName());
-						}
-						success &= writer.WriteEndObjectProperty();
+							success &= writer.WriteBeginObjectProperty("type");
+							{
+								success &= writer.WriteString(type->GetName());
+							}
+							success &= writer.WriteEndObjectProperty();
 
-						success &= writer.WriteBeginObjectProperty("value");
-						{
-							success &= RawSerialize(type, strategy, value, writer);
+							success &= writer.WriteBeginObjectProperty("value");
+							{
+								success &= RawSerialize(type, strategy, value, writer);
+							}
+							success &= writer.WriteEndObjectProperty();
 						}
-						success &= writer.WriteEndObjectProperty();
+						else
+						{
+							success = false;
+						}
 					}
 				}
 				else if (_serializationFormat == SerializationFormat::Short)
@@ -171,12 +172,12 @@ namespace Reflecto
 				return success;
 			}
 
-			bool RawDeserialize(const Reflection::Type& type, const deserialization_strategy_t& strategy, void* value, ISerializationReader& reader) const
+			bool RawDeserialize(const Reflection::TypeDescriptorPtr& type, const deserialization_strategy_t& strategy, void* value, ISerializationReader& reader) const
 			{
 				return strategy(*this, value, reader);
 			}
 
-			bool Deserialize(const Reflection::Type& type, const deserialization_strategy_t& strategy, void* value, ISerializationReader& reader) const
+			bool Deserialize(const Reflection::TypeDescriptorPtr& type, const deserialization_strategy_t& strategy, void* value, ISerializationReader& reader) const
 			{
 				bool success = true;
 				SerializationFormat currentFormatSerializationFormat = _serializationFormat;
@@ -186,21 +187,28 @@ namespace Reflecto
 					{
 						while (reader.HasObjectPropertyRemaining())
 						{
-							std::string property;
-							success &= reader.ReadBeginObjectProperty(property);
+							if (type)
 							{
-								if (property == "type")
+								std::string property;
+								success &= reader.ReadBeginObjectProperty(property);
 								{
-									std::string actualType;
-									success &= reader.ReadString(actualType);
-									assert(type.GetName() == actualType);
+									if (property == "type")
+									{
+										std::string actualType;
+										success &= reader.ReadString(actualType);
+										assert(type->GetName() == actualType);
+									}
+									else if (property == "value")
+									{
+										success &= RawDeserialize(type, strategy, value, reader);
+									}
 								}
-								else if (property == "value")
-								{
-									success &= RawDeserialize(type, strategy, value, reader);
-								}
+								success &= reader.ReadEndObjectProperty();
 							}
-							success &= reader.ReadEndObjectProperty();
+							else
+							{
+								success = false;
+							}
 						}
 					}
 					success &= reader.ReadEndObject();
@@ -212,13 +220,13 @@ namespace Reflecto
 				return success;
 			}
 
-			const serialization_strategy_t* GetSerializationStrategy(const Reflection::Type& type) const
+			const serialization_strategy_t* GetSerializationStrategy(const Reflection::TypeDescriptorPtr& type) const
 			{
 				strategy_map_t::const_iterator found = _strategies.find(type);
 				return found != _strategies.end() ? &std::get<serialization_strategy_t>((*found).second) : nullptr;
 			}
 
-			const deserialization_strategy_t* GetDeserializationStrategy(const Reflection::Type& type) const
+			const deserialization_strategy_t* GetDeserializationStrategy(const Reflection::TypeDescriptorPtr& type) const
 			{
 				strategy_map_t::const_iterator found = _strategies.find(type);
 				return found != _strategies.end() ? &std::get<deserialization_strategy_t>((*found).second) : nullptr;

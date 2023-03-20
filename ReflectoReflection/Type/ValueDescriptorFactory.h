@@ -26,9 +26,8 @@ namespace Reflecto
 
 			ValueDescriptor Build()
 			{
-				const Type* type = _typeLibrary.Get<enum_t>();
-				assert(type && "Unknown type!");
-				return ValueDescriptor(*type, _name, _value);
+				const TypeDescriptorPtr type = _typeLibrary.GetDescriptor<enum_t>();
+				return ValueDescriptor(type, _name, _value);
 			}
 
 		private:

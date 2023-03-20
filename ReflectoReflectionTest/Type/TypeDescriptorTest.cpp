@@ -64,45 +64,45 @@ namespace Reflecto
 
 					const std::vector<MemberDescriptor> kExpectedMemberEmpty;
 					const std::vector<MemberDescriptor> kExpectedMembersSampleClass = [&] () -> std::vector<MemberDescriptor> {
-						MemberDescriptor m1(typeLibrary.GetChecked<float>(), "Field1", 0);
-						MemberDescriptor m2(typeLibrary.GetChecked<std::string>(), "Field2", 0);
-						MemberDescriptor m3(typeLibrary.GetChecked<bool>(), "Field3", 0);
+						MemberDescriptor m1(typeLibrary.GetDescriptor<float>(), "Field1", 0);
+						MemberDescriptor m2(typeLibrary.GetDescriptor<std::string>(), "Field2", 0);
+						MemberDescriptor m3(typeLibrary.GetDescriptor<bool>(), "Field3", 0);
 						return {m1, m2, m3};
 					}();
 					const std::vector<MemberDescriptor> kExpectedMembersChildSampleClass = [&]() -> std::vector<MemberDescriptor> {
-						MemberDescriptor m4(typeLibrary.GetChecked<uint64_t>(), "Field4", 0);
+						MemberDescriptor m4(typeLibrary.GetDescriptor<uint64_t>(), "Field4", 0);
 						return { m4 };
 					}();
 					const std::vector<MemberDescriptor> kExpectedMembersRecursiveChildSampleClass = [&]() -> std::vector<MemberDescriptor> {
 						return CollectionExt::Concatenate(kExpectedMembersChildSampleClass, kExpectedMembersRecursiveChildSampleClass);
 					}();
 					const std::vector<MemberDescriptor> kExpectedPrivateMembers = [&] () -> std::vector<MemberDescriptor> {
-						MemberDescriptor m1(typeLibrary.GetChecked<float>(), "Field", 0);
+						MemberDescriptor m1(typeLibrary.GetDescriptor<float>(), "Field", 0);
 						return { m1 };
 					}();
 
 					/////////////
 					// Act
-					const TypeDescriptor uint64Descriptor = TypeDescriptorFactory<uint64_t>(typeLibrary).Build();
-					const TypeDescriptor sampleClassDescriptor = TypeDescriptorFactory<SampleClass>(typeLibrary)
+					const TypeDescriptorUniquePtr uint64Descriptor = TypeDescriptorFactory<uint64_t>(typeLibrary, "uint64").Build();
+					const TypeDescriptorUniquePtr sampleClassDescriptor = TypeDescriptorFactory<SampleClass>(typeLibrary, "SampleClass")
 						.RegisterMember(&SampleClass::Field1, "Field1")
 						.RegisterMember(&SampleClass::Field2, "Field2")
 						.RegisterMember(&SampleClass::Field3, "Field3")
 					.Build();
-					const TypeDescriptor childSampleClassDescriptor = TypeDescriptorFactory<ChildSampleClass>(typeLibrary)
+					const TypeDescriptorUniquePtr childSampleClassDescriptor = TypeDescriptorFactory<ChildSampleClass>(typeLibrary, "ChildSampleClass")
 						.RegisterMember(&ChildSampleClass::Field4, "Field4")
 					.Build();
-					const TypeDescriptor privateSampleClassDescriptor = TypeDescriptorFactory<PrivateSampleClass>(typeLibrary)
+					const TypeDescriptorUniquePtr privateSampleClassDescriptor = TypeDescriptorFactory<PrivateSampleClass>(typeLibrary, "PrivateSampleClass")
 						.RegisterMember(GetPrivateMemberPointer(PrivateSampleClassFieldTag()), "Field")
 					.Build();
 
 					////////////
 					// Arrange
-					Assert::AreEqual(kExpectedMemberEmpty, uint64Descriptor.GetMembers(), L"Members are unexpected");
-					Assert::AreEqual(kExpectedMembersSampleClass, sampleClassDescriptor.GetMembers(), L"Members are unexpected");
-					Assert::AreEqual(kExpectedMembersChildSampleClass, childSampleClassDescriptor.GetMembers(), L"Members are unexpected");
-					Assert::AreEqual(kExpectedMembersRecursiveChildSampleClass, childSampleClassDescriptor.FetchMemberResursive(), L"Members are unexpected");
-					Assert::AreEqual(kExpectedPrivateMembers, privateSampleClassDescriptor.GetMembers(), L"Members are unexpected");
+					Assert::AreEqual(kExpectedMemberEmpty, uint64Descriptor->GetMembers(), L"Members are unexpected");
+					Assert::AreEqual(kExpectedMembersSampleClass, sampleClassDescriptor->GetMembers(), L"Members are unexpected");
+					Assert::AreEqual(kExpectedMembersChildSampleClass, childSampleClassDescriptor->GetMembers(), L"Members are unexpected");
+					Assert::AreEqual(kExpectedMembersRecursiveChildSampleClass, childSampleClassDescriptor->FetchMemberResursive(), L"Members are unexpected");
+					Assert::AreEqual(kExpectedPrivateMembers, privateSampleClassDescriptor->GetMembers(), L"Members are unexpected");
 				}
 
 				TEST_METHOD(Constructor)
@@ -117,12 +117,13 @@ namespace Reflecto
 
 					/////////////
 					// Act
-					const TypeDescriptor descriptor = TypeDescriptorFactory<SampleClass>(typeLibrary).Build();
+					const TypeDescriptorUniquePtr descriptor = TypeDescriptorFactory<SampleClass>(typeLibrary, "SampleClass").Build();
 
 					/////////////
 					// Assert
-					const ConstructorDescriptor& constructorDescriptor = descriptor.GetConstructor();
-					Assert::IsTrue(static_cast<bool>(constructorDescriptor.GetConstructorMethod<SampleClass>()), L"No constructor function set!");
+					const OptionalConstructorDescriptor& constructorDescriptor = descriptor->GetConstructor();
+					Assert::IsTrue(constructorDescriptor.has_value(), L"No constructor function set!");
+					Assert::IsTrue(static_cast<bool>(constructorDescriptor.value().GetConstructorMethod<SampleClass>()), L"No constructor function set!");
 				}
 
 				TEST_METHOD(Methods)
@@ -147,16 +148,16 @@ namespace Reflecto
 					.Build();
 
 					const std::vector<MethodDescriptor> kExpectedMethod = [&] () -> std::vector<MethodDescriptor> {
-						MethodDescriptor m1(*typeLibrary.Get<void>(), "MethodNoParameter", {}, MethodDescriptor::weak_method_ptr_t<SampleClass>());
-						MethodDescriptor m2(*typeLibrary.Get<bool>(), "MethodReturn", {}, MethodDescriptor::weak_method_ptr_t<TestClass, bool>());
-						MethodDescriptor m3(*typeLibrary.Get<void>(), "Method1Parameter", {ParameterDescriptor(*typeLibrary.Get<std::string>(), "p")}, MethodDescriptor::weak_method_ptr_t<TestClass, int32_t>());
-						MethodDescriptor m4(*typeLibrary.Get<void>(), "Method2Parameter", { ParameterDescriptor(*typeLibrary.Get<int32_t>(), "param1"), ParameterDescriptor(*typeLibrary.Get<int32_t>(), "param2") }, MethodDescriptor::weak_method_ptr_t<SampleClass, int32_t, int32_t>());
+						MethodDescriptor m1(typeLibrary.GetDescriptor<void>(), "MethodNoParameter", {}, MethodDescriptor::weak_method_ptr_t<SampleClass>());
+						MethodDescriptor m2(typeLibrary.GetDescriptor<bool>(), "MethodReturn", {}, MethodDescriptor::weak_method_ptr_t<TestClass, bool>());
+						MethodDescriptor m3(typeLibrary.GetDescriptor<void>(), "Method1Parameter", {ParameterDescriptor(typeLibrary.GetDescriptor<std::string>(), "p")}, MethodDescriptor::weak_method_ptr_t<TestClass, int32_t>());
+						MethodDescriptor m4(typeLibrary.GetDescriptor<void>(), "Method2Parameter", { ParameterDescriptor(typeLibrary.GetDescriptor<int32_t>(), "param1"), ParameterDescriptor(typeLibrary.GetDescriptor<int32_t>(), "param2") }, MethodDescriptor::weak_method_ptr_t<SampleClass, int32_t, int32_t>());
 						return { m1, m2, m3, m4 };
 					}();
 
 					/////////////
 					// Act
-					const TypeDescriptor descriptor = TypeDescriptorFactory<SampleClass>(typeLibrary)
+					const TypeDescriptorUniquePtr descriptor = TypeDescriptorFactory<SampleClass>(typeLibrary, "SampleClass")
 						.RegisterMethod(&SampleClass::MethodNoParameter, "MethodNoParameter")
 						.RegisterMethod(&SampleClass::MethodReturn, "MethodReturn")
 						.RegisterMethod(&SampleClass::Method1Parameter, "Method1Parameter", {"p"})
@@ -166,7 +167,7 @@ namespace Reflecto
 
 					/////////////
 					// Assert
-					Assert::AreEqual(kExpectedMethod, descriptor.GetMethods());
+					Assert::AreEqual(kExpectedMethod, descriptor->GetMethods());
 				}
 			};
 		}

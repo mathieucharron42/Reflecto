@@ -1,10 +1,11 @@
 #pragma once
 
-#include "Type.h"
 #include "TypeExt.h"
 
+#include "Common/Ensure.h"
 #include "Common/Definitions.h"
 #include "Utils/RelationalOperators.h"
+#include "Utils/StringExt.h"
 
 #include <stdint.h>
 #include <string>
@@ -13,16 +14,31 @@ namespace Reflecto
 {
 	namespace Reflection
 	{
+		class MemberDescriptor;
+		using MemberDescriptorPtr = std::shared_ptr<MemberDescriptor>;
+		using MemberDescriptorUniquePtr = std::unique_ptr<MemberDescriptor>;
+		using MemberDescriptorWeakPtr = std::weak_ptr<MemberDescriptor>;
+
+		class TypeDescriptor;
+		using TypeDescriptorPtr = std::shared_ptr<TypeDescriptor>;
+		using TypeDescriptorUniquePtr = std::unique_ptr<TypeDescriptor>;
+
 		class MemberDescriptor : public RelationalOperators<MemberDescriptor>
 		{
 		public:
-			MemberDescriptor(const Type& type, const std::string& name, byte offset)
+			MemberDescriptor(const TypeDescriptorPtr& type, const std::string& name, byte offset)
 				: _type(type)
 				, _name(name)
 				, _offset(offset)
 			{ }
 
-			const Type& GetType() const
+			const TypeDescriptor& GetType() const
+			{
+				ensure(_type);
+				return *_type;
+			}
+
+			const TypeDescriptorPtr& GetTypePtr() const
 			{
 				return _type;
 			}
@@ -39,16 +55,13 @@ namespace Reflecto
 
 			bool operator<(const MemberDescriptor& other) const
 			{
-				return std::tie(_name, _type) < std::tie(other._name, other._type);
+				return std::tie(_name, GetType()) < std::tie(other._name, GetType());
 			}
 
-			std::string ToString() const
-			{
-				return StringExt::Format<std::string>("{Type=%s,Name=%s,Offset=%u", _type.ToString().c_str(), _name.c_str(), _offset);
-			}
+			std::string ToString() const;
 
 		private:
-			Type _type;
+			TypeDescriptorPtr _type;
 			std::string _name;
 			uint32_t _offset;
 		};

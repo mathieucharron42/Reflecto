@@ -10,11 +10,12 @@
 #include "ValueDescriptorFactory.h"
 #include "Resolver/Resolver.h"
 #include "TypeDescriptor.h"
-#include "Type.h"
+#include "TypeExt.h"
 
 #include "Type/TypeLibrary.h"
 
 #include <memory>
+
 
 namespace Reflecto
 {
@@ -24,16 +25,19 @@ namespace Reflecto
 		class TypeDescriptorFactory
 		{
 		public:
-			TypeDescriptorFactory(const TypeLibrary& typeLibrary)
-				: TypeDescriptorFactory(typeLibrary, nullptr)
+			TypeDescriptorFactory(const TypeLibrary& typeLibrary, const std::string& name)
+				: TypeDescriptorFactory(typeLibrary, name, TypeDescriptorPtr())
 			{
 
 			}
 
-			TypeDescriptorFactory(const TypeLibrary& typeLibrary, const TypeDescriptor* parentTypeDescriptor)
+			TypeDescriptorFactory(const TypeLibrary& typeLibrary, const std::string& name, const TypeDescriptorPtr& parent)
 				: _typeLibrary(typeLibrary)
+				, _name(name)
+				, _typeInfo(TypeExt::GetTypeInfo<object_t>())
+				, _hash(TypeExt::GetTypeHash<object_t>())
 				, _sampleObj()
-				, _parent(parentTypeDescriptor)
+				, _parent(parent)
 				, _constructor(ConstructorDescriptorFactory<object_t>().Build())
 			{
 
@@ -76,16 +80,20 @@ namespace Reflecto
 				return *this;
 			}
 
-			TypeDescriptor Build()
+			TypeDescriptorUniquePtr Build()
 			{
-				const Type& type = _typeLibrary.GetChecked<object_t>();
-				return TypeDescriptor{type, _parent, _constructor, _members, _methods, _values};
+				return std::make_unique<TypeDescriptor>(_name, _typeInfo, _hash, _parent, _constructor, _members, _methods, _values);
 			}
 
 		private:
 			TypeLibrary _typeLibrary;
 			object_t _sampleObj;
-			const TypeDescriptor* _parent;
+
+			std::string _name;
+			const std::type_info& _typeInfo;
+			typehash_t _hash;
+			
+			TypeDescriptorPtr _parent;
 			ConstructorDescriptor _constructor;
 			std::vector<MemberDescriptor> _members;
 			std::vector<MethodDescriptor> _methods;

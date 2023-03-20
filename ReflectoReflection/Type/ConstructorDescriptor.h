@@ -10,6 +10,10 @@ namespace Reflecto
 {
 	namespace Reflection
 	{
+		class ConstructorDescriptor;
+		using ConstructorDescriptorUniquePtr = std::unique_ptr<ConstructorDescriptor>();
+		using ConstructorDescriptorWeakPtr = std::weak_ptr<ConstructorDescriptor>();
+		
 		class ConstructorDescriptor
 		{
 		public:

@@ -27,9 +27,8 @@ namespace Reflecto
 			MemberDescriptor Build()
 			{
 				byte offset = TypeExt::ComputeMemberOffset(_sampleObj, _memberPointer);
-				const Type* type = _typeLibrary.Get<member_t>();
-				assert(type && "Unknown type!");
-				return MemberDescriptor{ *type, _name, offset };
+				const TypeDescriptorPtr type = _typeLibrary.GetDescriptor<member_t>();
+				return MemberDescriptor{ type, _name, offset };
 			}
 
 		private:

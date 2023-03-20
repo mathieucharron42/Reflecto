@@ -23,28 +23,28 @@ namespace Reflecto
 				, _format(SerializationFormat::Descriptive)
 			{ }
 
-			SerializerFactory& LearnType(const Reflection::Type& type, const serialization_strategy_t& serializationStrategy, const deserialization_strategy_t& deserializationStrategy)
+			SerializerFactory& LearnType(const Reflection::TypeDescriptorPtr& type, const serialization_strategy_t& serializationStrategy, const deserialization_strategy_t& deserializationStrategy)
 			{
 				_strategies.insert({ type, strategies_t(serializationStrategy, deserializationStrategy) });
 				return *this;
 			}
 
-			template<typename value_t, typename strategy_t, typename ... args_t>
-			SerializerFactory& LearnType(args_t ... args)
+			template<typename value_t, typename strategy_t>
+			SerializerFactory& LearnType()
 			{
-				serialization_strategy_t serializationStrategy = std::bind(&strategy_t::Serialize, args..., _1, _2, _3);
-				deserialization_strategy_t deserializationStrategy = std::bind(&strategy_t::Deserialize, args..., _1, _2, _3);
+				const Reflection::TypeDescriptorPtr& type = _typeLibrary.GetDescriptor<value_t>();
+
+				serialization_strategy_t serializationStrategy = std::bind(&strategy_t::Serialize, type, _1, _2, _3);
+				deserialization_strategy_t deserializationStrategy = std::bind(&strategy_t::Deserialize, type, _1, _2, _3);
+
 				return LearnType<value_t>(serializationStrategy, deserializationStrategy);
 			}
 
 			template<class value_t>
 			SerializerFactory& LearnType(serialization_strategy_t serializationStrategy, deserialization_strategy_t deserializationStrategy)
 			{
-				const Reflection::Type* type = _typeLibrary.Get<value_t>();
-				if (ensure(type))
-				{
-					LearnType(*type, serializationStrategy, deserializationStrategy);
-				}
+				const Reflection::TypeDescriptorPtr type = _typeLibrary.GetDescriptor<value_t>();
+				LearnType(type, serializationStrategy, deserializationStrategy);
 				return *this;
 			}
 

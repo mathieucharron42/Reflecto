@@ -32,7 +32,7 @@ namespace Reflecto
 			MethodDescriptor Build()
 			{
 				ensure(sizeof...(args_t) == _parametersName.size());
-				const Type returnType = *_typeLibrary.Get<return_t>();
+				const TypeDescriptorPtr returnType = _typeLibrary.GetDescriptor<return_t>();
 				const std::vector<ParameterDescriptor> parameters = BuildParameters();
 				const MethodDescriptor::weak_method_ptr_t<object_t, args_t...> method_wrapper = BuildMethodWrapper();
 				return MethodDescriptor{ returnType, _name, parameters, method_wrapper };

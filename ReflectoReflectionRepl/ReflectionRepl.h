@@ -22,14 +22,14 @@ namespace Reflecto
 		{
 		public:
 			template<typename stream_in_t, typename stream_out_t>
-			void Run(object_t& instance, TypeDescriptor& typeDescriptor, const Serialization::Serializer& serializer, stream_in_t& input, stream_out_t& ouput)
+			void Run(object_t& instance, const TypeLibrary& typeLibrary, const Serialization::Serializer& serializer, stream_in_t& input, stream_out_t& ouput)
 			{
 				bool leave;
 				do
 				{
-					WriteState(serializer, typeDescriptor, instance, ouput);
+					WriteState(serializer, typeLibrary, instance, ouput);
 					std::string instruction = PromptInstruction(input, ouput);
-					InstructionResult result = ProcessInstruction(serializer, instance, typeDescriptor, instruction);
+					InstructionResult result = ProcessInstruction(serializer, instance, typeLibrary, instruction);
 					WriteResult(result, ouput);
 					leave = result == InstructionResult::Leave;
 					ouput << std::endl;
@@ -46,12 +46,12 @@ namespace Reflecto
 				Leave
 			};
 
-			InstructionResult ProcessMemberInstruction(const Serialization::Serializer& serializer, Reflection::TypeDescriptor typeDescriptor, object_t& instance, const std::string& memberName, const std::string& memberValue)
+			InstructionResult ProcessMemberInstruction(const Serialization::Serializer& serializer, const Reflection::TypeDescriptorPtr& typeDescriptor, object_t& instance, const std::string& memberName, const std::string& memberValue)
 			{
 				InstructionResult result;
 
 				Reflection::Resolver<object_t> resolver(typeDescriptor);
-				const Reflection::MemberDescriptor* memberDescriptor = typeDescriptor.GetMemberByName(memberName);
+				const Reflection::MemberDescriptor* memberDescriptor = typeDescriptor->GetMemberByName(memberName);
 				if (memberDescriptor)
 				{
 					void* member = resolver.ResolveMember(instance, memberName);
@@ -61,7 +61,7 @@ namespace Reflecto
 						std::stringstream stream = std::stringstream(memberValue);
 						reader.Import(stream);
 
-						if (serializer.RawDeserialize(memberDescriptor->GetType(), member, reader))
+						if (serializer.RawDeserialize(memberDescriptor->GetTypePtr(), member, reader))
 						{
 							result = InstructionResult::Ok;
 						}
@@ -83,12 +83,12 @@ namespace Reflecto
 				return result;
 			}
 
-			InstructionResult ProcessMethodInstruction(const Serialization::Serializer& serializer, Reflection::TypeDescriptor typeDescriptor, object_t& instance, const std::string& methodName, const std::vector<std::string>& parameters)
+			InstructionResult ProcessMethodInstruction(const Serialization::Serializer& serializer, const Reflection::TypeDescriptorPtr& typeDescriptor, object_t& instance, const std::string& methodName, const std::vector<std::string>& parameters)
 			{
 				InstructionResult result;
 
 				Reflection::Resolver<object_t> resolver(typeDescriptor);
-				const Reflection::MethodDescriptor* methodDescriptor = typeDescriptor.GetMethodByName(methodName);
+				const Reflection::MethodDescriptor* methodDescriptor = typeDescriptor->GetMethodByName(methodName);
 				if (methodDescriptor)
 				{
 					Serialization::JsonSerializationReader reader;
@@ -111,46 +111,54 @@ namespace Reflecto
 				return result;
 			}
 
-			InstructionResult ProcessInstruction(const Serialization::Serializer& serializer, object_t& instance, Reflection::TypeDescriptor typeDescriptor, const std::string& instruction)
+			InstructionResult ProcessInstruction(const Serialization::Serializer& serializer, object_t& instance, const Reflection::TypeLibrary& typeLibrary, const std::string& instruction)
 			{
 				InstructionResult result;
-				if (instruction.empty() || instruction == "q")
+				TypeDescriptorPtr typeDescriptor = typeLibrary.GetDescriptor<object_t>();
+				if (!typeDescriptor)
 				{
-					result = InstructionResult::Leave;
+					result = InstructionResult::UnsupportedType;
 				}
 				else
 				{
-					const std::string kMemberInstructionDelimiter = "=";
-					const std::string kMethodInstructionParamBeginDelimiter = "(";
-					const std::string kMethodInstructionParamEndDelimiter = ")";
-
-					const std::size_t memberInstructorDelimiterPos = instruction.find(kMemberInstructionDelimiter);
-					const std::size_t methodInstructionParamBeginDelimiterPos = instruction.find(kMethodInstructionParamBeginDelimiter);
-					const std::size_t methodInstructionParamEndDelimiterPos = instruction.find(kMethodInstructionParamEndDelimiter);
-					if (memberInstructorDelimiterPos != std::string::npos)
+					if (instruction.empty() || instruction == "q")
 					{
-						std::vector<std::string> tokens = StringExt::Tokenize(instruction, kMemberInstructionDelimiter);
-						if (tokens.size() == 2)
-						{
-							const std::string memberName = tokens[0];
-							const std::string memberValue = tokens[1];
+						result = InstructionResult::Leave;
+					}
+					else
+					{
+						const std::string kMemberInstructionDelimiter = "=";
+						const std::string kMethodInstructionParamBeginDelimiter = "(";
+						const std::string kMethodInstructionParamEndDelimiter = ")";
 
-							result = ProcessMemberInstruction(serializer, typeDescriptor, instance, memberName, memberValue);
+						const std::size_t memberInstructorDelimiterPos = instruction.find(kMemberInstructionDelimiter);
+						const std::size_t methodInstructionParamBeginDelimiterPos = instruction.find(kMethodInstructionParamBeginDelimiter);
+						const std::size_t methodInstructionParamEndDelimiterPos = instruction.find(kMethodInstructionParamEndDelimiter);
+						if (memberInstructorDelimiterPos != std::string::npos)
+						{
+							std::vector<std::string> tokens = StringExt::Tokenize(instruction, kMemberInstructionDelimiter);
+							if (tokens.size() == 2)
+							{
+								const std::string memberName = tokens[0];
+								const std::string memberValue = tokens[1];
+
+								result = ProcessMemberInstruction(serializer, typeDescriptor, instance, memberName, memberValue);
+							}
+							else
+							{
+								result = InstructionResult::BadInstruction;
+							}
+						}
+						else if (methodInstructionParamBeginDelimiterPos != std::string::npos && methodInstructionParamEndDelimiterPos != std::string::npos)
+						{
+							const std::string methodName = instruction.substr(0, methodInstructionParamBeginDelimiterPos);
+							const std::vector<std::string> arguments = StringExt::Tokenize<std::string>(instruction.substr(methodInstructionParamBeginDelimiterPos + 1, methodInstructionParamEndDelimiterPos - methodInstructionParamBeginDelimiterPos - 1), ",");
+							result = ProcessMethodInstruction(serializer, typeDescriptor, instance, methodName, arguments);
 						}
 						else
 						{
 							result = InstructionResult::BadInstruction;
 						}
-					}
-					else if (methodInstructionParamBeginDelimiterPos != std::string::npos && methodInstructionParamEndDelimiterPos != std::string::npos)
-					{
-						const std::string methodName = instruction.substr(0, methodInstructionParamBeginDelimiterPos);
-						const std::vector<std::string> arguments = StringExt::Tokenize<std::string>(instruction.substr(methodInstructionParamBeginDelimiterPos + 1, methodInstructionParamEndDelimiterPos - methodInstructionParamBeginDelimiterPos - 1), ",");
-						result = ProcessMethodInstruction(serializer, typeDescriptor, instance, methodName, arguments);
-					}
-					else
-					{
-						result = InstructionResult::BadInstruction;
 					}
 				}
 				return result;
@@ -198,7 +206,7 @@ namespace Reflecto
 			}
 
 			template<typename stream_t>
-			void WriteValue(const Serialization::Serializer& serializer, const Reflection::Type& type, const void* value, stream_t& ouput)
+			void WriteValue(const Serialization::Serializer& serializer, const Reflection::TypeDescriptorPtr& type, const void* value, stream_t& ouput)
 			{
 				Serialization::JsonSerializationWriter writer;
 
@@ -212,32 +220,36 @@ namespace Reflecto
 			}
 
 			template<typename stream_t>
-			void WriteState(const Serialization::Serializer& serializer, Reflection::TypeDescriptor typeDescriptor, const object_t& instance, stream_t& ouput)
+			void WriteState(const Serialization::Serializer& serializer, const Reflection::TypeLibrary& typeLibrary, const object_t& instance, stream_t& ouput)
 			{
-				Reflection::Resolver<object_t> resolver{ typeDescriptor };
-				ouput << "Instance[" << typeDescriptor.GetType().GetName() << "]" << std::endl;
-				ouput << "Methods:" << std::endl;
-				for (const Reflection::MethodDescriptor& methodDescriptor : typeDescriptor.GetMethods())
+				Reflection::TypeDescriptorPtr typeDescriptor = typeLibrary.GetDescriptor<object_t>();
+				if (typeDescriptor)
 				{
-					const std::string& methodName = methodDescriptor.GetName();
-					const std::string& returnType = methodDescriptor.GetReturnType().GetName();
-					const std::string& parameters = StringExt::Join<std::string>(methodDescriptor.GetParameters(), ", ", [](const ParameterDescriptor& descriptor) {
-						return StringExt::Format<std::string>("%s %s", descriptor.GetType().GetName().c_str(), descriptor.GetName().c_str());
-					});
-					ouput << "  ";
-					ouput << returnType << " " << methodName << "(" << parameters << ")" << std::endl;
-				}
-				ouput << "Members:" << std::endl;
-				for (const Reflection::MemberDescriptor& memberDescriptor : typeDescriptor.GetMembers())
-				{
-					const std::string& memberName = memberDescriptor.GetName();
-					const std::string& memberType = memberDescriptor.GetType().GetName();
-					const void* member = resolver.ResolveMember(instance, memberDescriptor);
-					ouput << "  ";
-					ouput << memberType << " " << memberName;
-					ouput << " = ";
-					WriteValue(serializer, memberDescriptor.GetType(), member, ouput);
-					ouput << std::endl;
+					Reflection::Resolver<object_t> resolver{ typeDescriptor };
+					ouput << "Instance[" << typeDescriptor->GetName() << "]" << std::endl;
+					ouput << "Methods:" << std::endl;
+					for (const Reflection::MethodDescriptor& methodDescriptor : typeDescriptor->GetMethods())
+					{
+						const std::string& methodName = methodDescriptor.GetName();
+						const std::string& returnType = methodDescriptor.GetReturnType().GetName();
+						const std::string& parameters = StringExt::Join<std::string>(methodDescriptor.GetParameters(), ", ", [](const ParameterDescriptor& descriptor) {
+							return StringExt::Format<std::string>("%s %s", descriptor.GetType().GetName().c_str(), descriptor.GetName().c_str());
+							});
+						ouput << "  ";
+						ouput << returnType << " " << methodName << "(" << parameters << ")" << std::endl;
+					}
+					ouput << "Members:" << std::endl;
+					for (const Reflection::MemberDescriptor& memberDescriptor : typeDescriptor->GetMembers())
+					{
+						const std::string& memberName = memberDescriptor.GetName();
+						const std::string& memberType = memberDescriptor.GetType().GetName();
+						const void* member = resolver.ResolveMember(instance, memberDescriptor);
+						ouput << "  ";
+						ouput << memberType << " " << memberName;
+						ouput << " = ";
+						WriteValue(serializer, memberDescriptor.GetTypePtr(), member, ouput);
+						ouput << std::endl;
+					}
 				}
 			}
 		};

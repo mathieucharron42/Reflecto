@@ -1,45 +1,33 @@
 #pragma once
 
-#include "Type.h"
-
 #include "Utils/RelationalOperators.h"
 
+#include <memory>
 #include <string>
 
 namespace Reflecto
 {
 	namespace Reflection
 	{
+		class TypeDescriptor;
+		using TypeDescriptorPtr = std::shared_ptr<TypeDescriptor>;
+		using TypeDescriptorUniquePtr = std::unique_ptr<TypeDescriptor>;
+
 		class ParameterDescriptor : RelationalOperators<ParameterDescriptor>
 		{
 		public:
-			ParameterDescriptor(const Type& type, const std::string& name)
-				: _type(type)
-				, _name(name)
-			{ }
+			ParameterDescriptor(const TypeDescriptorPtr& type, const std::string& name);
 
-			const Type& GetType() const
-			{
-				return _type;
-			}
+			const TypeDescriptor& GetType() const;
 
-			const std::string GetName() const
-			{
-				return _name;
-			}
+			const std::string GetName() const;
 
-			bool operator<(const ParameterDescriptor& other) const
-			{
-				return std::tie(_type, _name) < std::tie(other._type, other._name);
-			}
+			bool operator<(const ParameterDescriptor& other) const;
 
-			std::string ToString() const
-			{
-				return StringExt::Format<std::string>("{Type=%s,Name=%s}", _type.ToString().c_str(), _name.c_str());
-			}
+			std::string ToString() const;
 
 		private:
-			Type _type;
+			TypeDescriptorPtr _type;
 			std::string _name;
 		};
 	}

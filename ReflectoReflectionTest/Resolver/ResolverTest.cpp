@@ -38,21 +38,19 @@ namespace Reflecto
 					};
 
 					const TypeLibrary typeLibrary = TypeLibraryFactory()
-						.Add<SampleClass>("SampleClass")
 						.Add<int64_t>("int64")
 						.Add<float>("float")
 						.Add<bool>("bool")
 						.Add<std::string>("string")
+						.BeginType<SampleClass>("SampleClass")
+							.RegisterMember(&SampleClass::FieldString, "FieldString")
+							.RegisterMember(&SampleClass::FieldFloat, "FieldFloat")
+							.RegisterMember(&SampleClass::FieldBool, "FieldBool")
+							.RegisterMember(&SampleClass::FieldInt64, "FieldInt64")
+						.EndType<SampleClass>()
 					.Build();
 
-					const TypeDescriptor descriptor = TypeDescriptorFactory<SampleClass>(typeLibrary)
-						.RegisterMember(&SampleClass::FieldString, "FieldString")
-						.RegisterMember(&SampleClass::FieldFloat, "FieldFloat")
-						.RegisterMember(&SampleClass::FieldBool, "FieldBool")
-						.RegisterMember(&SampleClass::FieldInt64, "FieldInt64")
-					.Build();
-
-					Resolver<SampleClass> resolver(descriptor);
+					Resolver<SampleClass> resolver(typeLibrary.GetDescriptor<SampleClass>());
 
 					SampleClass instance;
 					instance.FieldString = kExpectedString;
@@ -107,21 +105,19 @@ namespace Reflecto
 					};
 
 					const TypeLibrary typeLibrary = TypeLibraryFactory()
-						.Add<SampleClass>("SampleClass")
 						.Add<int64_t>("int64")
 						.Add<float>("float")
 						.Add<bool>("bool")
 						.Add<std::string>("string")
+						.BeginType<SampleClass>("SampleClass")
+							.RegisterMember(&SampleClass::FieldString, "FieldString")
+							.RegisterMember(&SampleClass::FieldFloat, "FieldFloat")
+							.RegisterMember(&SampleClass::FieldBool, "FieldBool")
+							.RegisterMember(&SampleClass::FieldInt64, "FieldInt64")
+						.EndType<SampleClass>()
 					.Build();
 
-					const TypeDescriptor descriptor = TypeDescriptorFactory<SampleClass>(typeLibrary)
-						.RegisterMember(&SampleClass::FieldString, "FieldString")
-						.RegisterMember(&SampleClass::FieldFloat, "FieldFloat")
-						.RegisterMember(&SampleClass::FieldBool, "FieldBool")
-						.RegisterMember(&SampleClass::FieldInt64, "FieldInt64")
-					.Build();
-
-					Resolver<SampleClass> resolver(descriptor);
+					Resolver<SampleClass> resolver(typeLibrary.GetDescriptor<SampleClass>());
 
 					SampleClass instance;
 
@@ -188,26 +184,22 @@ namespace Reflecto
 					};
 
 					const TypeLibrary typeLibrary = TypeLibraryFactory()
-						.Add<SampleBaseClass>("SampleBaseClass")
-						.Add<SampleChildClass>("SampleClass")
 						.Add<float>("float")
 						.Add<std::string>("string")
 						.Add<uint8_t>("uint8")
 						.Add<bool>("bool")
+						.BeginType<SampleBaseClass>("SampleBaseClass")
+							.RegisterMember(&SampleBaseClass::FieldBase1, "FieldBase1")
+							.RegisterMember(&SampleBaseClass::FieldBase2, "FieldBase2")
+						.EndType<SampleBaseClass>()
+						.BeginType<SampleChildClass, SampleBaseClass>("SampleChildClass")
+							.RegisterMember(&SampleChildClass::FieldChild1, "FieldChild1")
+							.RegisterMember(&SampleChildClass::FieldChild2, "FieldChild2")
+						.EndType<SampleChildClass>()
 					.Build();
 
-					const TypeDescriptor baseDescriptor = TypeDescriptorFactory<SampleBaseClass>(typeLibrary)
-						.RegisterMember(&SampleBaseClass::FieldBase1, "FieldBase1")
-						.RegisterMember(&SampleBaseClass::FieldBase2, "FieldBase2")
-					.Build();
-
-					const TypeDescriptor childDescriptor = TypeDescriptorFactory<SampleChildClass>(typeLibrary, &baseDescriptor)
-						.RegisterMember(&SampleChildClass::FieldChild1, "FieldChild1")
-						.RegisterMember(&SampleChildClass::FieldChild2, "FieldChild2")
-					.Build();
-
-					Resolver<SampleChildClass> sampleChildResolver(childDescriptor);
-					Resolver<SampleBaseClass> sampleBaseResolver(baseDescriptor);
+					Resolver<SampleChildClass> sampleChildResolver(typeLibrary.GetDescriptor<SampleChildClass>());
+					Resolver<SampleBaseClass> sampleBaseResolver(typeLibrary.GetDescriptor<SampleBaseClass>());
 
 					SampleChildClass child;
 					child.FieldBase1 = kExpectedFieldBase1Value;
@@ -274,20 +266,18 @@ namespace Reflecto
 					};
 
 					const TypeLibrary typeLibrary = TypeLibraryFactory()
-						.Add<SampleClass>("SampleClass")
 						.Add<float>("float")
 						.Add<int32_t>("int32")
 						.Add<void>("void")
+						.BeginType<SampleClass>("SampleClass")
+							.RegisterMethod(&SampleClass::MethodNoParam, "MethodNoParam")
+							.RegisterMethod(&SampleClass::Method1Param, "Method1Param", { "p1" })
+							.RegisterMethod(&SampleClass::Method2Param, "Method2Param", { "p1", "p2" })
+							.RegisterMethod(&SampleClass::MethodReturn, "MethodReturn", { "p" })
+						.EndType<SampleClass>()
 					.Build();
 
-					const TypeDescriptor descriptor = TypeDescriptorFactory<SampleClass>(typeLibrary)
-						.RegisterMethod(&SampleClass::MethodNoParam, "MethodNoParam")
-						.RegisterMethod(&SampleClass::Method1Param, "Method1Param", {"p1"})
-						.RegisterMethod(&SampleClass::Method2Param, "Method2Param", { "p1", "p2"})
-						.RegisterMethod(&SampleClass::MethodReturn, "MethodReturn", {"p"})
-					.Build();
-
-					Resolver<SampleClass> resolver(descriptor);
+					Resolver<SampleClass> resolver(typeLibrary.GetDescriptor<SampleClass>());
 
 					SampleClass instance;
 
@@ -360,28 +350,26 @@ namespace Reflecto
 					};
 
 					const TypeLibrary typeLibrary = TypeLibraryFactory()
-						.Add<SampleObject>("Potato")
 						.Add<int32_t>("int32")
+						.BeginType<SampleObject>("SampleObject")
+							.RegisterMember(&SampleObject::Field, "Field")
+						.EndType<SampleObject>()
 					.Build();
 
-					const TypeDescriptor descriptor = TypeDescriptorFactory<SampleObject>(typeLibrary)
-						.RegisterMember(&SampleObject::Field, "Field")
-					.Build();
-
-					Resolver<SampleObject> resolver(descriptor);
+					Resolver<SampleObject> resolver(typeLibrary.GetDescriptor<SampleObject>());
 
 					/////////////
 					// Act
-					std::unique_ptr<SampleObject> potato = resolver.Instantiate();
-					if (potato)
+					std::unique_ptr<SampleObject> sampleInstance = resolver.Instantiate();
+					if (sampleInstance)
 					{
-						potato->Field = kExpectedFieldValue;
+						sampleInstance->Field = kExpectedFieldValue;
 					}
 					
 					/////////////
 					// Assert
-					Assert::IsNotNull(potato.get(), L"Unable to build new instance");
-					Assert::AreEqual(kExpectedFieldValue, potato->Field, L"Unexpected value on member of instantiated instance");
+					Assert::IsNotNull(sampleInstance.get(), L"Unable to build new instance");
+					Assert::AreEqual(kExpectedFieldValue, sampleInstance->Field, L"Unexpected value on member of instantiated instance");
 				}
 			};
 		}

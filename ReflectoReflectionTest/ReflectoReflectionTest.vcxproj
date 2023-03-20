@@ -173,6 +173,11 @@
   <ItemGroup>
     <ClInclude Include="TestCommon.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ReflectoReflection\ReflectoReflection.vcxproj">
+      <Project>{d30205ba-bca6-4d46-b07e-fc2bbbb45ee3}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

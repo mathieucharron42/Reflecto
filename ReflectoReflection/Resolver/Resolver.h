@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Type/TypeDescriptor.h"
-#include "Type/TypeFactory.h"
 #include "Type/TypeExt.h"
 
 #include "Common/Definitions.h"
@@ -28,17 +27,23 @@ namespace Reflecto
 			using weak_resolved_method_t = std::function<std::any(args_t...)>;
 
 
-			Resolver(const TypeDescriptor& typeDescriptor)
+			Resolver(const TypeDescriptorPtr& typeDescriptor)
 				: _typeDescriptor(typeDescriptor)
 			{
-				assert(TypeExt::GetTypeHash<object_t>() == typeDescriptor.GetType().GetHash());
+				assert(typeDescriptor && TypeExt::GetTypeHash<object_t>() == typeDescriptor->GetHash());
 			}
 
 			std::unique_ptr<object_t> Instantiate()
 			{
-				const ConstructorDescriptor& constructorDescriptor = _typeDescriptor.GetConstructor();
-				auto& constructor = constructorDescriptor.GetConstructorMethod<object_t>();
-				std::unique_ptr<object_t> instance = constructor();
+				std::unique_ptr<object_t> instance;
+				if (ensure(_typeDescriptor))
+				{
+					const OptionalConstructorDescriptor& constructorDescriptor = _typeDescriptor->GetConstructor();
+					if (constructorDescriptor.has_value())
+					{
+						instance = constructorDescriptor->GetConstructorMethod<object_t>()();
+					}
+				}
 				return instance;
 			}
 
@@ -46,18 +51,29 @@ namespace Reflecto
 			member_t* ResolveMember(object_t& object, const std::string& memberName) const
 			{
 				member_t* memberPtr = nullptr;
-				const MemberDescriptor* memberDescriptor = _typeDescriptor.GetMemberByNameRecursive(memberName);	
-				if (memberDescriptor)
+				if (ensure(_typeDescriptor))
 				{
-					memberPtr = ResolveMember<member_t>(object, *memberDescriptor);
+					const MemberDescriptor* memberDescriptor = _typeDescriptor->GetMemberByNameRecursive(memberName);
+					if (memberDescriptor)
+					{
+						memberPtr = ResolveMember<member_t>(object, *memberDescriptor);
+					}
 				}
 				return memberPtr;
 			}
 
 			void* ResolveMember(object_t& object, const std::string& memberName) const
 			{
-				const MemberDescriptor* memberDescriptor = _typeDescriptor.GetMemberByNameRecursive(memberName);
-				return memberDescriptor ? ResolveMember(object, *memberDescriptor) : nullptr;
+				void* memberPtr = nullptr;
+				if (ensure(_typeDescriptor))
+				{
+					const MemberDescriptor* memberDescriptor = _typeDescriptor->GetMemberByNameRecursive(memberName);
+					if (ensure(memberDescriptor))
+					{
+						memberPtr = ResolveMember(object, *memberDescriptor);
+					}
+				}
+				return memberPtr;
 			}
 
 			template<typename member_t>
@@ -96,8 +112,16 @@ namespace Reflecto
 			template<typename return_t = void, typename ... args_t>
 			resolved_method_t<return_t, args_t...> ResolveMethod(const std::string& methodName, object_t& object) const
 			{
-				const MethodDescriptor* methodDescriptor = _typeDescriptor.GetMethodByNameRecursive(methodName);
-				return methodDescriptor ? ResolveMethod<return_t, args_t...>(*methodDescriptor, object) : resolved_method_t<return_t, args_t...>();
+				resolved_method_t<return_t, args_t...> method;
+				if (ensure(_typeDescriptor))
+				{
+					const MethodDescriptor* methodDescriptor = _typeDescriptor->GetMethodByNameRecursive(methodName);
+					if (methodDescriptor)
+					{
+						method = ResolveMethod<return_t, args_t...>(*methodDescriptor, object);
+					}
+				}
+				return method;
 			}
 
 			template<typename return_t = void, typename ... args_t>
@@ -124,8 +148,13 @@ namespace Reflecto
 			template<typename return_t = void, typename ... args_t>
 			weak_resolved_method_t<return_t, args_t...> WeakResolveMethod(const std::string& methodName, object_t& object) const
 			{
-				const MethodDescriptor* methodDescriptor = _typeDescriptor.GetMethodByNameRecursive(methodName);
-				return methodDescriptor ? WeakResolveMethod<return_t, args_t...>(*methodDescriptor, object) : weak_resolved_method_t<return_t, args_t...>();
+				weak_resolved_method_t<return_t, args_t...> method;
+				if (ensure(_typeDescriptor))
+				{
+					const MethodDescriptor* methodDescriptor = _typeDescriptor->GetMethodByNameRecursive(methodName);
+					method = WeakResolveMethod<return_t, args_t...>(*methodDescriptor, object);
+				}
+				return method;
 			}
 
 			template<typename return_t = void, typename ... args_t>
@@ -150,7 +179,7 @@ namespace Reflecto
 			}
 
 		private:
-			TypeDescriptor _typeDescriptor;
+			TypeDescriptorPtr _typeDescriptor;
 		};
 	}
 }

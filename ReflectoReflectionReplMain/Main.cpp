@@ -16,20 +16,19 @@ int main()
 		.Add<float>("float")
 		.Add<int32_t>("int32")
 		.Add<bool>("bool")
-		.Add<Potato>("Potato")
 		.Add<void>("void")
+		.BeginType<Potato>("Potato")
+			.RegisterMember(&Potato::Type, "Type")
+			.RegisterMember(&Potato::Weight, "Weight")
+			.RegisterMember(&Potato::Calories, "Calories")
+			.RegisterMember(&Potato::Sodium, "Sodium")
+			.RegisterMember(&Potato::IsBaked, "IsBaked")
+			.RegisterMethod(&Potato::Bake, "Bake")
+			.RegisterMethod(&Potato::AddButter, "AddButter")
+			.RegisterMethod(&Potato::AddSalt, "AddSalt", { "amount" })
+		.EndType<Potato>()
 	.Build();
-
-	Reflection::TypeDescriptor potatoTypeDescriptor = Reflection::TypeDescriptorFactory<Potato>(typeLibrary)
-		.RegisterMember(&Potato::Type, "Type")
-		.RegisterMember(&Potato::Weight, "Weight")
-		.RegisterMember(&Potato::Calories, "Calories")
-		.RegisterMember(&Potato::Sodium, "Sodium")
-		.RegisterMember(&Potato::IsBaked, "IsBaked")
-		.RegisterMethod(&Potato::Bake, "Bake")
-		.RegisterMethod(&Potato::AddButter, "AddButter")
-		.RegisterMethod(&Potato::AddSalt, "AddSalt", {"amount"})
-	.Build();
+;
 
 	Serialization::Serializer serializer = Serialization::SerializerFactory(typeLibrary)
 		.LearnType<int32_t, Serialization::Int32SerializationStrategy>()
@@ -44,5 +43,5 @@ int main()
 	auto& ouput = std::cout;
 
 	Reflection::Repl<Potato> repl;
-	repl.Run(instance, potatoTypeDescriptor, serializer, input, ouput);
+	repl.Run(instance, typeLibrary, serializer, input, ouput);
 }

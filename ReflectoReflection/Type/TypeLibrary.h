@@ -1,11 +1,8 @@
 #pragma once
 
-#include "Type/TypeFactory.h"
-#include "Type/Type.h"
+#include "Type/TypeDescriptor.h"
 #include "Type/TypeExt.h"
 
-
-#include <assert.h>
 #include <map>
 #include <vector>
 
@@ -13,42 +10,43 @@ namespace Reflecto
 {
 	namespace Reflection
 	{
+		class TypeDescriptor;
+		using TypeDescriptorPtr = std::shared_ptr<TypeDescriptor>;
+		using TypeDescriptorUniquePtr = std::unique_ptr<TypeDescriptor>;
+
 		class TypeLibrary
 		{
 		public:
-			TypeLibrary(const std::vector<Type>& types)
-				: _types(types)
+			TypeLibrary(const std::vector<TypeDescriptorPtr>& typeDescriptors)
+				: _typeDescriptors(typeDescriptors)
 			{ }
 			
 			template<class value_t>
-			const Type* Get() const
+			TypeDescriptorPtr GetDescriptor() const
 			{
-				return GetByHash(TypeExt::GetTypeHash<value_t>());
+				return GetDescriptorByHash(TypeExt::GetTypeHash<value_t>());
 			}
 
-			template<class value_t>
-			Type GetChecked() const
+			const TypeDescriptorPtr GetDescriptorByHash(const typehash_t& hash) const
 			{
-				const Type* found = Get<value_t>();
-				assert(found);
-				return *found;
+				std::vector<TypeDescriptorPtr>::const_iterator found = std::find_if(begin(_typeDescriptors), end(_typeDescriptors), [&](const auto& type) { return type->GetHash() == hash; });
+
+				TypeDescriptorPtr type = found != _typeDescriptors.end() ? (*found) : nullptr;
+
+				return type;
 			}
 
-			const Type* GetByHash(const typehash_t& hash) const
+			const TypeDescriptorPtr GetDescriptorByName(const std::string& name) const
 			{
-				std::vector<Type>::const_iterator found = std::find_if(begin(_types), end(_types), [&](const auto& type) { return type.GetHash() == hash; });
-				
-				return found != _types.end() ? &(*found) : nullptr;
-			}
+				std::vector<TypeDescriptorPtr>::const_iterator found = std::find_if(begin(_typeDescriptors), end(_typeDescriptors), [&](const auto& type) { return type->GetName() == name; });
 
-			const Type* GetByName(const std::string& name) const
-			{
-				std::vector<Type>::const_iterator found = std::find_if(begin(_types), end(_types), [&](const auto& type) { return type.GetName() == name; });
-				return found != _types.end() ? &(*found) : nullptr;
+				TypeDescriptorPtr type = found != _typeDescriptors.end() ? (*found) : nullptr;
+
+				return type;
 			}
 
 		private:
-			std::vector<Type> _types;
+			std::vector<TypeDescriptorPtr> _typeDescriptors;
 		};
 	}
 }
