@@ -7,7 +7,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)ReflectoSerialization;$(SolutionDir)ReflectoReflection;$(SolutionDir)ReflectoCommon;$(SolutionDir)JsonCpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\ReflectoSerialization;$(ProjectDir)..\ReflectoReflection;$(ProjectDir)..\ReflectoCommon;$(ProjectDir)..\JsonCpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
