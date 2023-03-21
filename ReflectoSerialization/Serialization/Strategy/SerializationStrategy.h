@@ -120,8 +120,8 @@ namespace Reflecto
 						{
 							success &= writer.WriteBeginObjectProperty(member.GetName());
 							{
-								//const void* value = member.ResolveMember(valueObject);
-								//success &= serializer.Serialize(member.GetType(), value, writer);
+								const void* value = member.ResolveMember(valueObject);
+								success &= serializer.Serialize(member.GetType(), value, writer);
 							}
 							success &= writer.WriteEndObjectProperty();
 						}
@@ -151,8 +151,8 @@ namespace Reflecto
 								const Reflection::MemberDescriptor* memberDescriptor = typeDescriptor->GetMemberByNameRecursive(propertyName);
 								if (ensure(memberDescriptor))
 								{
-									//void* member = memberDescriptor->ResolveMember<object_t>(valueObject);
-									//success &= serializer.Deserialize(memberDescriptor->GetType(), member, reader);
+									void* member = memberDescriptor->ResolveMember<object_t>(valueObject);
+									success &= serializer.Deserialize(memberDescriptor->GetType(), member, reader);
 								}
 							}
 							else
