@@ -50,13 +50,8 @@ namespace Reflecto
 			template<typename object_t, typename member_t>
 			const member_t* ResolveMember(const object_t& object) const
 			{
-				const member_t* typedMemberPtr = nullptr;
-				const TypeDescriptorPtr& memberType = GetType();
-				if (memberType /* && memberType->GetHash() == TypeExt::GetTypeHash<member_t>()*/)
-				{
-					void* memberPtr = ResolveMember<object_t>(object);
-					typedMemberPtr = static_cast<const member_t*>(memberPtr);
-				}
+				void* memberPtr = ResolveMember<object_t>(object);
+				const member_t* typedMemberPtr = static_cast<const member_t*>(memberPtr);
 				return typedMemberPtr;
 			}
 
