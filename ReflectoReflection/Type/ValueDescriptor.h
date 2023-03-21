@@ -14,23 +14,37 @@ namespace Reflecto
 	{
 		class TypeDescriptor;
 		using TypeDescriptorPtr = std::shared_ptr<TypeDescriptor>;
-		using TypeDescriptorUniquePtr = std::unique_ptr<TypeDescriptor>;
 
 		class ValueDescriptor : public RelationalOperators<ValueDescriptor>
 		{
 		public:
 			using underlying_vale_type = uint64_t;
 
-			ValueDescriptor(const TypeDescriptorPtr& type, const std::string& name, underlying_vale_type value);
+			ValueDescriptor(const TypeDescriptorPtr& type, const std::string& name, underlying_vale_type value)
+				: _type(type)
+				, _name(name)
+				, _underlyingValue(value)
+			{
 
-			const TypeDescriptor& GetType() const;
+			}
 
-			const std::string& GetName() const;
+			const TypeDescriptorPtr& GetType() const
+			{
+				return _type;
+			}
+
+			const std::string& GetName() const
+			{
+				return _name;
+			}
 
 			template <typename enum_t>
 			const enum_t GetValue() const;
 
-			const underlying_vale_type GetUnderlyingValue() const;
+			const underlying_vale_type GetUnderlyingValue() const
+			{
+				return _underlyingValue;
+			}
 
 			bool operator<(const ValueDescriptor& other) const;
 

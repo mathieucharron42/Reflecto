@@ -42,9 +42,6 @@
     <ClInclude Include="Type\TypeDescriptorFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Resolver\Resolver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Type\TypeLibrary.h">
       <Filter>Header Files</Filter>
     </ClInclude>

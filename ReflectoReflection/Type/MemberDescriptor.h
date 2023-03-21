@@ -14,14 +14,8 @@ namespace Reflecto
 {
 	namespace Reflection
 	{
-		class MemberDescriptor;
-		using MemberDescriptorPtr = std::shared_ptr<MemberDescriptor>;
-		using MemberDescriptorUniquePtr = std::unique_ptr<MemberDescriptor>;
-		using MemberDescriptorWeakPtr = std::weak_ptr<MemberDescriptor>;
-
 		class TypeDescriptor;
 		using TypeDescriptorPtr = std::shared_ptr<TypeDescriptor>;
-		using TypeDescriptorUniquePtr = std::unique_ptr<TypeDescriptor>;
 
 		class MemberDescriptor : public RelationalOperators<MemberDescriptor>
 		{
@@ -45,6 +39,50 @@ namespace Reflecto
 			const uint32_t GetOffset() const
 			{
 				return _offset;
+			}
+
+			template<typename object_t, typename member_t>
+			member_t* ResolveMember(object_t& object) const
+			{
+				return const_cast<member_t*>(ResolveMember<object_t, member_t>(const_cast<const object_t&>(object)));
+			}
+
+			template<typename object_t, typename member_t>
+			const member_t* ResolveMember(const object_t& object) const
+			{
+				const member_t* typedMemberPtr = nullptr;
+				const TypeDescriptorPtr& memberType = GetType();
+				if (memberType /* && memberType->GetHash() == TypeExt::GetTypeHash<member_t>()*/)
+				{
+					void* memberPtr = ResolveMember<object_t>(object);
+					typedMemberPtr = static_cast<const member_t*>(memberPtr);
+				}
+				return typedMemberPtr;
+			}
+
+			template<typename object_t>
+			void* ResolveMember(object_t& object) const
+			{
+				return const_cast<void*>(ResolveMember<object_t>(const_cast<const object_t&>(object)));
+			}
+
+			template<typename object_t>
+			const void* ResolveMember(const object_t& object) const
+			{
+				const void* objectPtr = &object;
+				return ResolveMember(objectPtr);
+			}
+
+			void* ResolveMember(void* object) const
+			{
+				return const_cast<void*>(ResolveMember(const_cast<const void*>(object)));
+			}
+
+			const void* ResolveMember(const void* object) const
+			{
+				const byte* objRawAddr = reinterpret_cast<const byte*>(object);
+				const byte* memberRawAddr = objRawAddr + GetOffset();
+				return memberRawAddr;
 			}
 
 			bool operator<(const MemberDescriptor& other) const;

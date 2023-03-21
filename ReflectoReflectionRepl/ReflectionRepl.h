@@ -6,8 +6,8 @@
 #include "Serialization/Strategy/SerializationStrategy.h"
 #include "Serialization/Writer/JsonSerializationWriter.h"
 #include "Type/TypeDescriptor.h"
+#include "Type/TypeDescriptor.h"
 #include "Type/TypeLibrary.h"
-#include "Resolver/Resolver.h"
 #include "Utils/StringExt.h"
 #include "jsoncpp/json.h"
 
@@ -50,11 +50,10 @@ namespace Reflecto
 			{
 				InstructionResult result;
 
-				Reflection::Resolver<object_t> resolver(typeDescriptor);
 				const Reflection::MemberDescriptor* memberDescriptor = typeDescriptor->GetMemberByName(memberName);
 				if (memberDescriptor)
 				{
-					void* member = resolver.ResolveMember(instance, memberName);
+					void* member = memberDescriptor->ResolveMember(instance);
 					if (member)
 					{
 						Serialization::JsonSerializationReader reader;
@@ -87,7 +86,6 @@ namespace Reflecto
 			{
 				InstructionResult result;
 
-				Reflection::Resolver<object_t> resolver(typeDescriptor);
 				const Reflection::MethodDescriptor* methodDescriptor = typeDescriptor->GetMethodByName(methodName);
 				if (methodDescriptor)
 				{
@@ -99,7 +97,7 @@ namespace Reflecto
 					}
 					reader.Import(element);
 
-					Resolver::resolved_method_t<void> method = resolver.ResolveMethod(*methodDescriptor, &instance);
+					MethodDescriptor::resolved_method_t<void> method = methodDescriptor->ResolveMethod<object_t>(&instance);
 					method();
 					result = InstructionResult::Ok;
 				}
@@ -225,15 +223,14 @@ namespace Reflecto
 				Reflection::TypeDescriptorPtr typeDescriptor = typeLibrary.GetDescriptor<object_t>();
 				if (typeDescriptor)
 				{
-					Reflection::Resolver<object_t> resolver{ typeDescriptor };
 					ouput << "Instance[" << typeDescriptor->GetName() << "]" << std::endl;
 					ouput << "Methods:" << std::endl;
 					for (const Reflection::MethodDescriptor& methodDescriptor : typeDescriptor->GetMethods())
 					{
 						const std::string& methodName = methodDescriptor.GetName();
-						const std::string& returnType = methodDescriptor.GetReturnType().GetName();
+						const std::string& returnType = methodDescriptor.GetReturnType()->GetName();
 						const std::string& parameters = StringExt::Join<std::string>(methodDescriptor.GetParameters(), ", ", [](const ParameterDescriptor& descriptor) {
-							return StringExt::Format<std::string>("%s %s", descriptor.GetType().GetName().c_str(), descriptor.GetName().c_str());
+							return StringExt::Format<std::string>("%s %s", descriptor.GetType()->GetName().c_str(), descriptor.GetName().c_str());
 							});
 						ouput << "  ";
 						ouput << returnType << " " << methodName << "(" << parameters << ")" << std::endl;
@@ -243,7 +240,7 @@ namespace Reflecto
 					{
 						const std::string& memberName = memberDescriptor.GetName();
 						const std::string& memberType = memberDescriptor.GetType()->GetName();
-						const void* member = resolver.ResolveMember(instance, memberDescriptor);
+						const void* member = memberDescriptor.ResolveMember(instance);
 						ouput << "  ";
 						ouput << memberType << " " << memberName;
 						ouput << " = ";

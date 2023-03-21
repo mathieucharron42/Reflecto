@@ -60,6 +60,12 @@ namespace Reflecto
 				return _hash;
 			}
 
+			template<typename object_t>
+			bool Is() const
+			{
+				return GetHash() == TypeExt::GetTypeHash<object_t>();
+			}
+
 			const OptionalConstructorDescriptor& GetConstructor() const
 			{
 				return _constructor;

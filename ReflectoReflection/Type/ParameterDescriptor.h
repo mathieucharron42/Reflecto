@@ -11,16 +11,26 @@ namespace Reflecto
 	{
 		class TypeDescriptor;
 		using TypeDescriptorPtr = std::shared_ptr<TypeDescriptor>;
-		using TypeDescriptorUniquePtr = std::unique_ptr<TypeDescriptor>;
 
 		class ParameterDescriptor : RelationalOperators<ParameterDescriptor>
 		{
 		public:
-			ParameterDescriptor(const TypeDescriptorPtr& type, const std::string& name);
+			ParameterDescriptor(const TypeDescriptorPtr& type, const std::string& name)
+				: _type(type)
+				, _name(name)
+			{
 
-			const TypeDescriptor& GetType() const;
+			}
 
-			const std::string GetName() const;
+			const TypeDescriptorPtr& GetType() const
+			{
+				return _type;
+			}
+
+			const std::string GetName() const
+			{
+				return _name;
+			}
 
 			bool operator<(const ParameterDescriptor& other) const;
 

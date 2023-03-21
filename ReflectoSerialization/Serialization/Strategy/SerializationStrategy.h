@@ -5,7 +5,6 @@
 #include "Serialization/Writer/ISerializationWriter.h"
 
 #include "Common/Ensure.h"
-#include "Resolver/Resolver.h"
 #include "Type/MemberDescriptor.h"
 #include "Type/ValueDescriptor.h"
 
@@ -113,7 +112,6 @@ namespace Reflecto
 			{
 				bool success = true;
 				const object_t& valueObject = *static_cast<const object_t*>(value);
-				Reflection::Resolver<object_t> resolver(typeDescriptor);
 				success &= writer.WriteBeginObject();
 				{
 					if (typeDescriptor)
@@ -122,8 +120,8 @@ namespace Reflecto
 						{
 							success &= writer.WriteBeginObjectProperty(member.GetName());
 							{
-								const void* value = resolver.ResolveMember(valueObject, member);
-								success &= serializer.Serialize(member.GetType(), value, writer);
+								//const void* value = member.ResolveMember(valueObject);
+								//success &= serializer.Serialize(member.GetType(), value, writer);
 							}
 							success &= writer.WriteEndObjectProperty();
 						}
@@ -141,7 +139,6 @@ namespace Reflecto
 			{
 				bool success = true;
 				object_t& valueObject = *static_cast<object_t*>(value);
-				Reflection::Resolver<object_t> resolver(typeDescriptor);
 				success &= reader.ReadBeginObject();
 				{
 					while (reader.HasObjectPropertyRemaining())
@@ -154,8 +151,8 @@ namespace Reflecto
 								const Reflection::MemberDescriptor* memberDescriptor = typeDescriptor->GetMemberByNameRecursive(propertyName);
 								if (ensure(memberDescriptor))
 								{
-									void* member = resolver.ResolveMember(valueObject, *memberDescriptor);
-									success &= serializer.Deserialize(memberDescriptor->GetType(), member, reader);
+									//void* member = memberDescriptor->ResolveMember<object_t>(valueObject);
+									//success &= serializer.Deserialize(memberDescriptor->GetType(), member, reader);
 								}
 							}
 							else

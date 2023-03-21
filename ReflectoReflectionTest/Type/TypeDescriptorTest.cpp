@@ -1,6 +1,5 @@
 #include "TestCommon.h"
 
-#include "Resolver/Resolver.h"
 #include "Type/TypeDescriptor.h"
 #include "Type/TypeDescriptorFactory.h"
 #include "Type/TypeLibrary.h"

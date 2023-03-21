@@ -8,7 +8,6 @@
 #include "MethodDescriptorFactory.h"
 #include "ValueDescriptor.h"
 #include "ValueDescriptorFactory.h"
-#include "Resolver/Resolver.h"
 #include "TypeDescriptor.h"
 #include "TypeExt.h"
 
@@ -21,6 +20,8 @@ namespace Reflecto
 {
 	namespace Reflection
 	{
+		using TypeDescriptorUniquePtr = std::unique_ptr<TypeDescriptor>;
+
 		template <typename object_t>
 		class TypeDescriptorFactory
 		{

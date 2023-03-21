@@ -11,8 +11,6 @@ namespace Reflecto
 	namespace Reflection
 	{
 		class TypeDescriptor;
-		using TypeDescriptorPtr = std::shared_ptr<TypeDescriptor>;
-		using TypeDescriptorUniquePtr = std::unique_ptr<TypeDescriptor>;
 
 		class TypeLibrary
 		{

@@ -161,7 +161,6 @@
     <ClInclude Include="Type\MemberDescriptor.h" />
     <ClInclude Include="Type\MemberDescriptorFactory.h" />
     <ClInclude Include="Type\MethodDescriptor.h" />
-    <ClInclude Include="Resolver\Resolver.h" />
     <ClInclude Include="Type\MethodDescriptorFactory.h" />
     <ClInclude Include="Type\ParameterDescriptor.h" />
     <ClInclude Include="Type\ParameterDescriptorFactory.h" />

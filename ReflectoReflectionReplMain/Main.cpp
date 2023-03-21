@@ -1,11 +1,9 @@
 #include "Potato.h"
 
 #include "ReflectionRepl.h"
-#include "Type/TypeLibrary.h"
 #include "Type/TypeLibraryFactory.h"
 
 #include <iostream>
-#include "Type/TypeDescriptorFactory.h"
 
 using namespace Reflecto;
 
