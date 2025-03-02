@@ -59,7 +59,7 @@ namespace Reflecto
 		>
 		constexpr auto ArrayToTupleProjections(const std::array<element_t, array_size>& array, const std::tuple<projections_t...> projections, std::index_sequence<i...>)
 		{
-			return std::make_tuple(std::get<i>(projections)(array[i])...);
+			return std::make_tuple(std::get<i>(projections)(i, array[i])...);
 		}
 
 		template<

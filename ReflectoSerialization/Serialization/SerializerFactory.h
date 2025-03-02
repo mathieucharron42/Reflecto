@@ -16,6 +16,7 @@ namespace Reflecto
 		public:
 			using serialization_strategy_t = typename Serializer::serialization_strategy_t;
 			using deserialization_strategy_t = typename Serializer::deserialization_strategy_t;
+			using any_cast_raw_strategy_t = typename Serializer::any_cast_raw_strategy_t;
 			using strategies_t = typename Serializer::strategies_t;
 
 			SerializerFactory(const Reflection::TypeLibrary& library)
@@ -23,9 +24,9 @@ namespace Reflecto
 				, _format(SerializationFormat::Descriptive)
 			{ }
 
-			SerializerFactory& LearnType(const Reflection::TypeDescriptorPtr& type, const serialization_strategy_t& serializationStrategy, const deserialization_strategy_t& deserializationStrategy)
+			SerializerFactory& LearnType(const Reflection::TypeDescriptorPtr& type, const serialization_strategy_t& serializationStrategy, const deserialization_strategy_t& deserializationStrategy, const any_cast_raw_strategy_t& anyCastRawStrategy)
 			{
-				_strategies.insert({ type, strategies_t(serializationStrategy, deserializationStrategy) });
+				_strategies.insert({ type, strategies_t(serializationStrategy, deserializationStrategy, anyCastRawStrategy) });
 				return *this;
 			}
 
@@ -36,15 +37,18 @@ namespace Reflecto
 
 				serialization_strategy_t serializationStrategy = std::bind(&strategy_t::Serialize, type, _1, _2, _3);
 				deserialization_strategy_t deserializationStrategy = std::bind(&strategy_t::Deserialize, type, _1, _2, _3);
+				any_cast_raw_strategy_t anyCastRawStrategy = [] (std::any& any) -> void* {
+					return &std::any_cast<value_t&>(any);
+				};
 
-				return LearnType<value_t>(serializationStrategy, deserializationStrategy);
+				return LearnType<value_t>(serializationStrategy, deserializationStrategy, anyCastRawStrategy);
 			}
 
 			template<class value_t>
-			SerializerFactory& LearnType(serialization_strategy_t serializationStrategy, deserialization_strategy_t deserializationStrategy)
+			SerializerFactory& LearnType(serialization_strategy_t serializationStrategy, deserialization_strategy_t deserializationStrategy, const any_cast_raw_strategy_t& anyCastRawStrategy)
 			{
 				const Reflection::TypeDescriptorPtr type = _typeLibrary.GetDescriptor<value_t>();
-				LearnType(type, serializationStrategy, deserializationStrategy);
+				LearnType(type, serializationStrategy, deserializationStrategy, anyCastRawStrategy);
 				return *this;
 			}
 

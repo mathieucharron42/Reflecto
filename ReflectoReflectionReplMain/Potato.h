@@ -22,16 +22,18 @@ public:
 		return russetPotato;
 	}
 
-	void Bake()
+	bool Bake()
 	{
 		if (!IsBaked)
 		{
 			std::cout << "Baking potato" << std::endl;
 			IsBaked = true;
+			return true;
 		}
 		else
 		{
 			std::cout << "Potato is already baked" << std::endl;
+			return false;
 		}
 	}
 
@@ -48,6 +50,12 @@ public:
 		const float Tsp = 0.3f;
 		std::cout << "Adding " << amount << "mg of sodium" << std::endl;
 		Sodium += amount;
+	}
+
+	void ChangeType(std::string type)
+	{
+		std::cout << "Chaing type from " << Type << " to " << type << std::endl;
+		Type = type;
 	}
 
 	std::string Type;

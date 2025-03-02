@@ -28,7 +28,8 @@ namespace Reflecto
 		public:				
 			using serialization_strategy_t = typename std::function<bool(const Serializer&, const void*, ISerializationWriter& writer)>;
 			using deserialization_strategy_t = typename std::function<bool(const Serializer&, void*, ISerializationReader& reader)>;
-			using strategies_t = std::tuple<serialization_strategy_t, deserialization_strategy_t>;
+			using any_cast_raw_strategy_t = typename std::function<void*(std::any&)>;
+			using strategies_t = std::tuple<serialization_strategy_t, deserialization_strategy_t, any_cast_raw_strategy_t>;
 			using strategy_map_t = std::map<Reflection::TypeDescriptorPtr, strategies_t>;
 
 			Serializer(const Reflection::TypeLibrary& library, const strategy_map_t& strategy)
@@ -132,6 +133,18 @@ namespace Reflecto
 				return success;
 			}
 
+			bool RawDeserialize(const Reflection::TypeDescriptorPtr& type, std::any& value, ISerializationReader& reader) const
+			{
+				bool success = false;
+				const deserialization_strategy_t* deserialization_strategy = GetDeserializationStrategy(type);
+				const any_cast_raw_strategy_t* any_cast_raw_strategy = GetAnyCastRawStrategy(type);
+				if (ensure(deserialization_strategy) && ensure(any_cast_raw_strategy))
+				{
+					success = RawDeserialize(type, *deserialization_strategy, *any_cast_raw_strategy, value, reader);
+				}
+				return success;
+			}
+
 		private:
 			bool RawSerialize(const Reflection::TypeDescriptorPtr& type, const serialization_strategy_t& strategy, const void* value, ISerializationWriter& writer) const
 			{
@@ -172,9 +185,22 @@ namespace Reflecto
 				return success;
 			}
 
-			bool RawDeserialize(const Reflection::TypeDescriptorPtr& type, const deserialization_strategy_t& strategy, void* value, ISerializationReader& reader) const
+			bool RawDeserialize(const Reflection::TypeDescriptorPtr& type, const deserialization_strategy_t& deserialization_strategy, void* value, ISerializationReader& reader) const
 			{
-				return strategy(*this, value, reader);
+				// Deserialize at address
+				return deserialization_strategy(*this, value, reader);
+			}
+
+			bool RawDeserialize(const Reflection::TypeDescriptorPtr& type, const deserialization_strategy_t& deserialization_strategy, const any_cast_raw_strategy_t& any_cast_raw_strategy, std::any& value, ISerializationReader& reader) const
+			{
+				// Instanciate to retrieve address
+				value = *(type->GetConstructor()->NewWeakInstance());
+
+				// Retrieve address
+				void* address = any_cast_raw_strategy(value);
+
+				// Deserialize at address
+				return RawDeserialize(type, deserialization_strategy, address, reader);
 			}
 
 			bool Deserialize(const Reflection::TypeDescriptorPtr& type, const deserialization_strategy_t& strategy, void* value, ISerializationReader& reader) const
@@ -230,6 +256,12 @@ namespace Reflecto
 			{
 				strategy_map_t::const_iterator found = _strategies.find(type);
 				return found != _strategies.end() ? &std::get<deserialization_strategy_t>((*found).second) : nullptr;
+			}
+
+			const any_cast_raw_strategy_t* GetAnyCastRawStrategy(const Reflection::TypeDescriptorPtr& type) const
+			{
+				strategy_map_t::const_iterator found = _strategies.find(type);
+				return found != _strategies.end() ? &std::get<any_cast_raw_strategy_t>((*found).second) : nullptr;
 			}
 
 			Reflection::TypeLibrary _typeLibrary;

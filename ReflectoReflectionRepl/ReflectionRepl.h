@@ -22,14 +22,14 @@ namespace Reflecto
 		{
 		public:
 			template<typename stream_in_t, typename stream_out_t>
-			void Run(object_t& instance, const TypeLibrary& typeLibrary, const Serialization::Serializer& serializer, stream_in_t& input, stream_out_t& ouput)
+			void Run(const TypeLibrary& typeLibrary, const Serialization::Serializer& serializer, object_t& instance, stream_in_t& input, stream_out_t& ouput)
 			{
 				bool leave;
 				do
 				{
 					WriteState(serializer, typeLibrary, instance, ouput);
 					std::string instruction = PromptInstruction(input, ouput);
-					InstructionResult result = ProcessInstruction(serializer, instance, typeLibrary, instruction);
+					InstructionResult result = ProcessInstruction(typeLibrary, serializer, instance, instruction);
 					WriteResult(result, ouput);
 					leave = result == InstructionResult::Leave;
 					ouput << std::endl;
@@ -46,7 +46,7 @@ namespace Reflecto
 				Leave
 			};
 
-			InstructionResult ProcessMemberInstruction(const Serialization::Serializer& serializer, const Reflection::TypeDescriptorPtr& typeDescriptor, object_t& instance, const std::string& memberName, const std::string& memberValue)
+			InstructionResult ProcessMemberInstruction(const Reflection::TypeLibrary& typeLibrary, const Serialization::Serializer& serializer, const Reflection::TypeDescriptorPtr& typeDescriptor, object_t& instance, const std::string& memberName, const std::string& memberValue)
 			{
 				InstructionResult result;
 
@@ -82,24 +82,35 @@ namespace Reflecto
 				return result;
 			}
 
-			InstructionResult ProcessMethodInstruction(const Serialization::Serializer& serializer, const Reflection::TypeDescriptorPtr& typeDescriptor, object_t& instance, const std::string& methodName, const std::vector<std::string>& parameters)
+			InstructionResult ProcessMethodInstruction(const Reflection::TypeLibrary& typeLibrary, const Serialization::Serializer& serializer, const Reflection::TypeDescriptorPtr& typeDescriptor, object_t& instance, const std::string& methodName, const std::vector<std::string>& parameters)
 			{
 				InstructionResult result;
 
 				const Reflection::MethodDescriptor* methodDescriptor = typeDescriptor->GetMethodByName(methodName);
 				if (methodDescriptor)
 				{
-					Serialization::JsonSerializationReader reader;
-					Json::Value element(Json::arrayValue);
-					for (const std::string& parameter : parameters)
-					{
-						element.append(parameter);
-					}
-					reader.Import(element);
+					const size_t parameterCount = methodDescriptor->GetParameterCount();
 
-					MethodDescriptor::resolved_method_t<void> method = methodDescriptor->ResolveMethod<object_t>(&instance);
-					method();
-					result = InstructionResult::Ok;
+					if (parameterCount == 0)
+					{
+						result = ProcessMethodInstruction<0>(typeLibrary, serializer, typeDescriptor, instance, *methodDescriptor, parameters);
+					}
+					else if (parameterCount == 1)
+					{
+						result = ProcessMethodInstruction<1>(typeLibrary, serializer, typeDescriptor, instance, *methodDescriptor, parameters);
+					}
+					else if (parameterCount == 2)
+					{
+						result = ProcessMethodInstruction<2>(typeLibrary, serializer, typeDescriptor, instance, *methodDescriptor, parameters);
+					}
+					else if (parameterCount == 3)
+					{
+						result = ProcessMethodInstruction<3>(typeLibrary, serializer, typeDescriptor, instance, *methodDescriptor, parameters);
+					}
+					else
+					{
+						result = InstructionResult::UnsupportedType;
+					}
 				}
 				else
 				{
@@ -109,7 +120,40 @@ namespace Reflecto
 				return result;
 			}
 
-			InstructionResult ProcessInstruction(const Serialization::Serializer& serializer, object_t& instance, const Reflection::TypeLibrary& typeLibrary, const std::string& instruction)
+			template<size_t param_count>
+			InstructionResult ProcessMethodInstruction(const Reflection::TypeLibrary& typeLibrary, const Serialization::Serializer& serializer, const Reflection::TypeDescriptorPtr& typeDescriptor, object_t& instance, const Reflection::MethodDescriptor& methodDescriptor, const std::vector<std::string>& parameters)
+			{
+				const std::vector<ParameterDescriptor>& parametersDescriptor = methodDescriptor.GetParameters();
+
+				ensure(parametersDescriptor.size() == param_count);
+
+				MethodDescriptor::weak_resolved_method_t<param_count> method = methodDescriptor.WeakResolveMethod<object_t, param_count>(&instance);
+
+				MethodDescriptor::weak_method_params_t<param_count> weak_parameters;
+
+				if (param_count > 0)
+				{
+					for (size_t i = 0; i < param_count; ++i)
+					{
+						const ParameterDescriptor& parameterDescriptor = parametersDescriptor[i];
+						const std::string strParameter = parameters[i];
+
+						Serialization::JsonSerializationReader reader;
+						std::istringstream stream = std::istringstream(strParameter);
+						reader.Import(stream);
+
+						std::any anyParameter;
+						serializer.RawDeserialize(parameterDescriptor.GetType(), anyParameter, reader);
+
+						weak_parameters[i] = anyParameter;
+					}
+				}
+				
+				std::any returnValue = AnyExt::Invoke(method, weak_parameters);
+				return InstructionResult::Ok;
+			}
+
+			InstructionResult ProcessInstruction(const Reflection::TypeLibrary& typeLibrary, const Serialization::Serializer& serializer, object_t& instance, const std::string& instruction)
 			{
 				InstructionResult result;
 				TypeDescriptorPtr typeDescriptor = typeLibrary.GetDescriptor<object_t>();
@@ -140,7 +184,7 @@ namespace Reflecto
 								const std::string memberName = tokens[0];
 								const std::string memberValue = tokens[1];
 
-								result = ProcessMemberInstruction(serializer, typeDescriptor, instance, memberName, memberValue);
+								result = ProcessMemberInstruction(typeLibrary, serializer, typeDescriptor, instance, memberName, memberValue);
 							}
 							else
 							{
@@ -151,7 +195,7 @@ namespace Reflecto
 						{
 							const std::string methodName = instruction.substr(0, methodInstructionParamBeginDelimiterPos);
 							const std::vector<std::string> arguments = StringExt::Tokenize<std::string>(instruction.substr(methodInstructionParamBeginDelimiterPos + 1, methodInstructionParamEndDelimiterPos - methodInstructionParamBeginDelimiterPos - 1), ",");
-							result = ProcessMethodInstruction(serializer, typeDescriptor, instance, methodName, arguments);
+							result = ProcessMethodInstruction(typeLibrary, serializer, typeDescriptor, instance, methodName, arguments);
 						}
 						else
 						{

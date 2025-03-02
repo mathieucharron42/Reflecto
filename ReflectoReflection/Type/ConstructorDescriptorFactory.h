@@ -14,9 +14,9 @@ namespace Reflecto
 		public:
 			ConstructorDescriptorFactory()
 			{
-				_constructor = []() -> std::unique_ptr<object_t>
+				_constructor = []() -> std::unique_ptr<std::any>
 				{
-					return std::make_unique<object_t>();
+					return std::make_unique<std::any>(object_t());
 				};
 			}
 
@@ -26,7 +26,7 @@ namespace Reflecto
 			}
 
 		private:
-			ConstructorDescriptor::construction_func_t<object_t> _constructor;
+			ConstructorDescriptor::weak_construction_func_t _constructor;
 		};
 	}
 }

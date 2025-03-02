@@ -6,6 +6,7 @@
 #include "Utils/CollectionExt.h"
 
 #include <any>
+#include <array>
 #include <functional>
 #include <string>
 
@@ -19,20 +20,23 @@ namespace Reflecto
 		class MethodDescriptor : RelationalOperators<MethodDescriptor>
 		{
 		public:
-			template<typename object_t, typename ... args_t>
-			using weak_method_ptr_t = std::function<std::any(object_t&, args_t...)>;
+			template <std::size_t nb_param_t>
+			using weak_method_params_t = std::array<std::any, nb_param_t>;
+
+			template<typename object_t, std::size_t nb_param_t>
+			using weak_method_ptr_t = std::function<std::any(object_t*, const weak_method_params_t<nb_param_t>&)>;
 
 			template<typename return_t, typename object_t, typename ... args_t>
-			using method_ptr_t = std::function<return_t(object_t&, args_t...)>;
+			using method_ptr_t = std::function<return_t(object_t*, args_t...)>;
 
 			template<typename return_t, typename ... args_t>
 			using resolved_method_t = std::function<return_t(args_t...)>;
 
-			template<typename ... args_t>
-			using weak_resolved_method_t = std::function<std::any(args_t...)>;
+			template<std::size_t nb_param_t>
+			using weak_resolved_method_t = std::function<std::any(const weak_method_params_t<nb_param_t>&)>;
 
-			template<typename object_t, typename return_t = void, typename ... args_t>
-			MethodDescriptor(const TypeDescriptorPtr& returnType, const std::string& name, const std::vector<ParameterDescriptor>& parameters, weak_method_ptr_t<object_t, args_t...> method)
+			template<typename object_t, typename return_t = void, size_t nb_param_t>
+			MethodDescriptor(const TypeDescriptorPtr& returnType, const std::string& name, const std::vector<ParameterDescriptor>& parameters, weak_method_ptr_t<object_t, nb_param_t> method)
 				: _returnType(returnType)
 				, _name(name)
 				, _parameters(parameters)
@@ -46,22 +50,24 @@ namespace Reflecto
 				return _name;
 			}
 
-			template<typename object_t, typename ... args_t>
-			weak_method_ptr_t<object_t, args_t...> GetWeakMethod() const
+			template<typename object_t, std::size_t nb_param_t>
+			weak_method_ptr_t<object_t, nb_param_t> GetWeakMethod() const
 			{
-				const weak_method_ptr_t<object_t, args_t...>* weakMethod = std::any_cast<weak_method_ptr_t<object_t, args_t...>>(&_method);
-				return weakMethod ? *weakMethod : weak_method_ptr_t<object_t, args_t...>();
+				const weak_method_ptr_t<object_t, nb_param_t>* weakMethod = std::any_cast<weak_method_ptr_t<object_t, nb_param_t>>(&_method);
+				return weakMethod ? *weakMethod : weak_method_ptr_t<object_t, nb_param_t>();
 			}
 
 			template<typename return_t, typename object_t, typename ... args_t>
 			method_ptr_t<return_t, object_t, args_t...> GetMethod() const
 			{
+				constexpr int32_t param_count = sizeof...(args_t);
 				method_ptr_t<return_t, object_t, args_t...> method;
-				const weak_method_ptr_t<object_t, args_t...> weakMethod = GetWeakMethod<object_t, args_t...>();
+				const weak_method_ptr_t<object_t, param_count> weakMethod = GetWeakMethod<object_t, param_count>();
 				if (weakMethod)
 				{
 					method = [=](object_t& obj, args_t ... args) -> return_t {
-						const std::any returnValue = std::invoke(weakMethod, obj, args...);
+						weak_method_params_t<param_count> params = weak_method_params_t<param_count>(args...);
+						const std::any returnValue = AnyExt::Invoke(weakMethod, obj, params);
 						return AnyExt::AnyCast<return_t>(returnValue);
 					};
 				}
@@ -76,6 +82,11 @@ namespace Reflecto
 			const std::vector<ParameterDescriptor>& GetParameters() const
 			{
 				return _parameters;
+			}
+
+			const size_t GetParameterCount() const
+			{
+				return _parameters.size();
 			}
 
 			template<typename object_t, typename return_t = void, typename ... args_t>
@@ -99,22 +110,23 @@ namespace Reflecto
 				return resolvedMethod;
 			}
 
-			template<typename object_t, typename return_t = void, typename ... args_t>
-			weak_resolved_method_t<return_t, args_t...> WeakResolveMethod(object_t& object) const
+			template<typename object_t, typename return_t = void, size_t nb_param_t = 0>
+			weak_resolved_method_t<nb_param_t> WeakResolveMethod(object_t& object) const
 			{
-				return WeakResolveMethod<object_t, return_t, args_t...>(&object);
+				return WeakResolveMethod<object_t, return_t, nb_param_t>(object);
 			}
 
-			template<typename object_t, typename ... args_t>
-			weak_resolved_method_t<args_t...> WeakResolveMethod(void* object) const
+			template<typename object_t, size_t nb_param_t = 0>
+			weak_resolved_method_t<nb_param_t> WeakResolveMethod(void* object) const
 			{
-				weak_resolved_method_t<args_t...> weakResolvedMethod;
-				MethodDescriptor::weak_method_ptr_t<object_t, args_t...> weakMethod = GetWeakMethod<object_t, args_t...>();
+				weak_resolved_method_t<nb_param_t> weakResolvedMethod;
+				MethodDescriptor::weak_method_ptr_t<object_t, nb_param_t> weakMethod = GetWeakMethod<object_t, nb_param_t>();
 				if (weakMethod)
 				{
-					weakResolvedMethod = [=](args_t ... args) -> std::any {
-						object_t& typedObject = *reinterpret_cast<object_t*>(object);
-						return std::invoke(weakMethod, typedObject, args...);
+					weakResolvedMethod = [=](const weak_method_params_t<nb_param_t>& args) -> std::any {
+						object_t* typedObject = reinterpret_cast<object_t*>(object);
+						std::tuple<object_t*, weak_method_params_t<nb_param_t>> invocationArgs = std::make_tuple(typedObject, args);
+						return AnyExt::Apply(weakMethod, invocationArgs);
 					};
 				}
 				return weakResolvedMethod;

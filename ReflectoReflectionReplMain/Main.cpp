@@ -24,6 +24,7 @@ int main()
 			.RegisterMethod(&Potato::Bake, "Bake")
 			.RegisterMethod(&Potato::AddButter, "AddButter")
 			.RegisterMethod(&Potato::AddSalt, "AddSalt", { "amount" })
+			.RegisterMethod(&Potato::ChangeType, "ChangeType", { "type" })
 		.EndType<Potato>()
 	.Build();
 ;
@@ -33,6 +34,7 @@ int main()
 		.LearnType<std::string, Serialization::StringSerializationStrategy>()
 		.LearnType<float, Serialization::FloatSerializationStrategy>()
 		.LearnType<bool, Serialization::BooleanSerializationStrategy>()
+		.SetFormat(Serialization::SerializationFormat::Short)
 	.Build();
 
 	Potato instance = Potato::BuildRusset();
@@ -41,5 +43,5 @@ int main()
 	auto& ouput = std::cout;
 
 	Reflection::Repl<Potato> repl;
-	repl.Run(instance, typeLibrary, serializer, input, ouput);
+	repl.Run(typeLibrary, serializer, instance, input, ouput);
 }

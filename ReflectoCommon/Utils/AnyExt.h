@@ -1,6 +1,7 @@
 #pragma once
 
 #include <any>
+#include <tuple>
 
 namespace Reflecto
 {
@@ -37,6 +38,24 @@ namespace Reflecto
 			std::any>
 		{
 			return std::invoke(func, args...);
+		}
+
+
+		template<typename func_t, typename ... args_t>
+		auto Apply(func_t func, const std::tuple<args_t...>& args) -> std::enable_if_t <
+			std::is_void_v<decltype(std::apply(func, args))>,
+			std::any>
+		{
+			std::apply(func, args);
+			return std::any{};
+		}
+
+		template<typename func_t, typename ... args_t>
+		auto Apply(func_t func, const std::tuple<args_t...>& args) -> std::enable_if_t <
+			!std::is_void_v<decltype(std::apply(func, args))>,
+			std::any>
+		{
+			return std::apply(func, args);
 		}
 	}
 }
