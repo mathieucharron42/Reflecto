@@ -21,7 +21,19 @@ namespace Reflecto
 			{
 				TypeDescriptorFactory<value_t> typeFactory = TypeDescriptorFactory<value_t>(Build(), typeName);
 				Add(typeFactory.Build());
-				
+				return *this;
+			}
+
+			template<class value_t, class parent_value_t>
+			TypeLibraryFactory& Add(const std::string& typeName)
+			{
+				const TypeLibrary typeLibrary = Build();
+				TypeDescriptorPtr parentTypeDescriptor = typeLibrary.GetDescriptor<parent_value_t>();
+				if (ensure(parentTypeDescriptor))
+				{
+					TypeDescriptorFactory<value_t> typeFactory = TypeDescriptorFactory<value_t>(typeLibrary, typeName, parentTypeDescriptor);
+					Add(typeFactory.Build());
+				}
 				return *this;
 			}
 
@@ -75,7 +87,6 @@ namespace Reflecto
 				return *this;
 			}
 
-
 			template <typename object_t, typename return_t, typename ... args_t>
 			TypeLibraryFactory& RegisterMethod(return_t(object_t::* methodPointer)(args_t ...), const std::string& methodName, const std::vector<std::string>& parameterNames)
 			{
@@ -83,6 +94,17 @@ namespace Reflecto
 				if (ensure(typeFactory))
 				{
 					typeFactory->RegisterMethod<object_t, return_t, args_t...>(methodPointer, methodName, parameterNames);
+				}
+				return *this;
+			}
+
+			template <typename enum_t>
+			TypeLibraryFactory& RegisterValue(const enum_t& enumValue, const std::string& valueName)
+			{
+				TypeDescriptorFactory<enum_t>* typeFactory = Get<enum_t>();
+				if (ensure(typeFactory))
+				{
+					typeFactory->RegisterValue<enum_t>(enumValue, valueName);
 				}
 				return *this;
 			}

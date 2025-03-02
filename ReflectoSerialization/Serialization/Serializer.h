@@ -103,7 +103,7 @@ namespace Reflecto
 			{
 				bool success = false;
 				const deserialization_strategy_t* strategy = GetDeserializationStrategy(type);
-				if (strategy)
+				if (ensure(strategy))
 				{
 					success = Deserialize(type, *strategy, value, reader);
 				}
